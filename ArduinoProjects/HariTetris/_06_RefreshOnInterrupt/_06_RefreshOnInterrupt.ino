@@ -55,9 +55,9 @@ ISR(TIMER0_COMPA_vect)
 
 void UpdateBitmap() {
   int sensorValue = analogRead(A5);
-  int minValue = 200;
-  int maxValue = 250;
-  int offset = map(sensorValue, minValue, maxValue, 0,7);
+  int minValue = 220; // Vertical limit
+  int maxValue = 320; // Horizontal limit
+  int offset = map(sensorValue, minValue, maxValue, 0,15);
   Triangle(offset);
 }
 

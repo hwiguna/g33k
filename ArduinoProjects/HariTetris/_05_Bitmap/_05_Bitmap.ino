@@ -1,5 +1,6 @@
 
 // Towards Arduino Tetris
+// by Hari Wiguna, 2014
 
 // In this sketch, I want to create a 16x16 bitmap, be able to draw onto it, and have it reflect on the LED matrix.
 // Eventually, I want to do the refresh in an interrupt routine so refresh rate won't be affected by any game logic.
@@ -13,7 +14,7 @@ const byte Row_RCLK = 11;   // Register Clock: Positive edge triggers shift regi
 const byte Row_SRCLK = 12;  // Shift Register Clock: Positive edge triggers SER input into shift register (Yellow wire)
 const byte Row_SER = 13;    // Serial input, read in on positive edge of SRCLK (Blue wire)
 
-const byte Col_RCLK =5;   // Register Clock: Positive edge triggers shift register to output (White wire)
+const byte Col_RCLK =5;    // Register Clock: Positive edge triggers shift register to output (White wire)
 const byte Col_SRCLK = 6;  // Shift Register Clock: Positive edge triggers SER input into shift register (Yellow wire)
 const byte Col_SER = 7;    // Serial input, read in on positive edge of SRCLK (Blue wire)
 
@@ -30,6 +31,32 @@ void setup() {
   pinMode(Col_SER,OUTPUT);
 
   //DiagonalLine();
+}
+
+void loop() {
+  Triangle(true);
+  for (int d=0; d<50; d++)
+    Refresh();
+
+  Triangle(false);
+  for (int d=0; d<50; d++)
+    Refresh();
+}
+
+
+//=== Bitmap Routines ===
+
+void ClearBitmap() {
+  for (byte r=0; r<16; r++) {
+    bitmap[r] = 0;
+  }
+}
+
+void PlotDot(byte x, byte y, byte isOn) {
+  if (isOn)
+    bitSet(bitmap[y], x);
+  else
+    bitClear(bitmap[y], x);
 }
 
 // I drew a line from 0,0 to 15,15 to confirm that 0,0 is at bottom left corner.
@@ -55,15 +82,8 @@ void Triangle(bool isUpsideDown) {
   }
 }
 
-void loop() {
-  Triangle(true);
-  for (int d=0; d<50; d++)
-    Refresh();
 
-  Triangle(false);
-  for (int d=0; d<50; d++)
-    Refresh();
-}
+//=== Shift Register routines ===
 
 void Refresh() {
   for (byte r=0; r<16; r++) {
@@ -100,15 +120,3 @@ void WriteX(byte hiByte, byte loByte) {
   digitalWrite(Col_RCLK, HIGH);
 };
 
-void ClearBitmap() {
-  for (byte r=0; r<16; r++) {
-    bitmap[r] = 0;
-  }
-}
-
-void PlotDot(byte x, byte y, byte isOn) {
-  if (isOn)
-    bitSet(bitmap[y], x);
-  else
-    bitClear(bitmap[y], x);
-}
