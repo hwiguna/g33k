@@ -1,6 +1,7 @@
 
 // Towards Arduino Tetris
 
+// v0.8 - 
 // v0.7 - Finally, draw Tetris shapes!
 
 // The 16x16 bitmap.  Each array element is a row (16 pixels on the X axis). 0,0 is bottom left of LED matrix.
@@ -18,6 +19,8 @@ const byte Col_SER = 7;    // Serial input, read in on positive edge of SRCLK (B
 int twoBytes;
 int cycles = 0;
 byte currentRotation = 0; // 0..3 clockwise rotation
+byte currentX = 6;
+byte currentY = 16; // 16 instead of 15 because we'll decremented before using this variable.
 
 //=== Tetris Shapes ===
 // Each row of this array represents one 4x4 shape in all its four rotations.
@@ -38,46 +41,44 @@ void DrawShape(byte whichShape, byte whichRotation, byte xOffset, byte yOffset) 
   for (byte r=0; r<4; r++) {
     unsigned int shape = 0xF000 & (shapes[whichShape][r] << (4*whichRotation) );
     shape = shape >> (xOffset);
-    bitmap[3-r+yOffset] = bitmap[3-r+yOffset] | shape;
+    byte bitmapY = 3-r+yOffset;
+    //if (bitmapY>=0 && bitmapY<=15)
+      bitmap[bitmapY] = bitmap[bitmapY] | shape;
   }
 }
 
 // Shows all the bit patterns for a shape
-void DumpShape(byte whichShape, byte vertOffset) {
-  for (byte r=0; r<4; r++) {
-    bitmap[3-r+vertOffset] = shapes[whichShape][r];    
-  }
-}
+//void DumpShape(byte whichShape, byte vertOffset) {
+//  for (byte r=0; r<4; r++) {
+//    bitmap[3-r+vertOffset] = shapes[whichShape][r];    
+//  }
+//}
 
 void UpdateBitmap() {
   int sensorValue = analogRead(A5);
-  int minValue = 220; // Vertical limit
-  int maxValue = 320; // Horizontal limit
-  int vertOffset = map(sensorValue, minValue, maxValue, 0,15);
+// Y min-max
+//  int minValue = 220; // Vertical limit
+//  int maxValue = 320; // Horizontal limit
+//-- X min max --
+  int minValue = 335;
+  int maxValue = 395;
+  int xOffset = map(sensorValue, minValue, maxValue, 0,15-4);
 
   ClearBitmap();
 
-  DumpShape(7,0);
-  DumpShape(6,4);
-  DumpShape(5,8);
-  DumpShape(4,12);
+//  DumpShape(7,0);
+//  DumpShape(6,4);
+//  DumpShape(5,8);
+//  DumpShape(4,12);
 //  DumpShape(3,0);
 //  DumpShape(2,4);
 //  DumpShape(1,8);
 //  DumpShape(0,12);
 
-//  DrawShape(0,currentRotation, 0, 0);
-//  DrawShape(1,currentRotation, 0, 1*4);
-//  DrawShape(2,currentRotation, 0, 2*4);
-//  DrawShape(3,currentRotation, 0, 3*4);
-//
-//  int xOffset = 12;
-//  DrawShape(4,currentRotation, xOffset, 0);
-//  DrawShape(5,currentRotation, xOffset, 1*4);
-//  DrawShape(6,currentRotation, xOffset, 2*4);
-//  DrawShape(7,currentRotation, xOffset, 3*4);
+  DrawShape(0,currentRotation, xOffset, --currentY);
+  if (currentY==0) currentY=16;
 
-  if (++currentRotation>3) currentRotation=0;
+  //if (++currentRotation>3) currentRotation=0;
 }
 
 void setup() {
@@ -108,7 +109,7 @@ ISR(TIMER0_COMPA_vect)
   cycles++;
   RefreshScreen();
   
-  if ((cycles % 50) == 0)
+  if ((cycles % 15) == 0)
     UpdateBitmap();
 }
 
