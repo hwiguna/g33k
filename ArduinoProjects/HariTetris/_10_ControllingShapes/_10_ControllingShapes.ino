@@ -23,7 +23,7 @@ const int ySensor = A5;
 
 int twoBytes;
 int cycles = 0;
-byte currentRotation = 0; // 0..3 clockwise rotation
+signed char currentRotation = 0; // 0..3 clockwise rotation
 signed char currentX = 6; // No such thing as a signed byte?!  I had to use signed char.
 signed char currentY = 6;
 
@@ -68,11 +68,11 @@ void UpdateBitmap() {
  int xValue = analogRead(xSensor);
   int yValue = analogRead(ySensor);
     
-  const int yMax = 250; // Top-down = Rotate
-  const int yMin = 185; // Top-up = Drop piece
+  const int yMax = 340; //250; // Top-down = Rotate
+  const int yMin = 200; //175; // Top-up = Drop piece
   
-  const int xMax = 390; // Right-down = Shift right
-  const int xMin = 330; // Left-down = shift left
+  const int xMax = 415; //390; // Right-down = Shift right
+  const int xMin = 315; //330; // Left-down = shift left
   
   int xOffset = 0;
   int yOffset = 0;
@@ -87,7 +87,7 @@ void UpdateBitmap() {
   if (yOffset==1) {
     yOffset=0;
     currentRotation++;
-    if (currentRotation>3) currentRotation = 0;
+    if (currentRotation > 3) currentRotation = 0;
   }
 
   currentX += xOffset;
@@ -140,7 +140,7 @@ ISR(TIMER0_COMPA_vect)
   cycles++;
   RefreshScreen();
   
-  if ((cycles % 5) == 0)
+  if ((cycles % 8) == 0)
     UpdateBitmap();
 }
 
