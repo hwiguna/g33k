@@ -9,4 +9,7 @@ class MyClass
   int** GetIntMatrix();
   int** GetFromShared();
   
+//  private:
+//    int** shared;
+  
 }; // If you miss this semicolon it will complain about built-in arduino functions!

@@ -1,14 +1,14 @@
 #include "Arduino.h"  // Allows us to use Arduino types and functions within this class
 #include "MyClass.h"
 
-int shared[3][4] = {
-  {1,2,3,4},  
-  {11,12,13,14},  
-  {21,22,23,24},  
-};
-
 MyClass::MyClass() // Constructor
 {
+  int a[][4]={ {1,2,3,4}, {11,12,13,14}, {21,22,23,24} };
+//  shape[][4] = {
+//    {1,2,3,4},  
+//    {11,12,13,14},  
+//    {21,22,23,24},  
+//  };
 }
 
 MyClass::~MyClass() // Destructor

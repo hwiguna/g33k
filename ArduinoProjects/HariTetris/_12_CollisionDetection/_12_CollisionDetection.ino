@@ -1,7 +1,7 @@
 
 // Towards Arduino Tetris
 
-// v0.12 - _12_CollisionDetection
+// v0.12 - _12_CollisionDetection.  There are now three bitmaps: one contains the borders, another is the shape being manipulated, and last represents the LED matrix.
 // v0.11 - Use _11_AccelerometerToButtons to tweak max-min values to make the control feels right
 // v0.10 - Let's control shapes with accelerometer input (using only X and Y)
 // v0.9 - Discovered that analogRead(A3) always returns 0 when timer is enabled?!
@@ -9,7 +9,9 @@
 // v0.7 - Finally, draw Tetris shapes!
 
 // The 16x16 bitmap.  Each array element is a row (16 pixels on the X axis). 0,0 is bottom left of LED matrix.
-int bitmap[16]; 
+int screen[16]; // Represents final bitmap shown on the LED Matrix
+int boardLayer[16]; // This is the whole board minus the current shape controlled by user.
+int shapeLayer[16]; // This is the size of the whole board, but only contains the shape at its "next" location.
 
 //-- Shift register pins --
 const byte Row_RCLK = 11;   // Register Clock: Positive edge triggers shift register to output (White wire)
@@ -27,8 +29,8 @@ int twoBytes;
 int cycles = 0;
 byte currentRotation = 0; // 0..3 clockwise rotation
 int currentX = 6; // No such thing as a signed byte :-(
-int currentY = 6;
-
+int currentY = 12;
+int rotateDelay = 1;
 
 //=== Tetris Shapes ===
 // Each row of this array represents one 4x4 shape in all its four rotations.
@@ -45,11 +47,14 @@ int shapes[][4] = {
   { 0x0000, 0x0000, 0x000, 0x8CEF}
 };
 
+//=== Tetris shape & board routines ===
+
 unsigned int GetShapeRow(byte whichShape, byte whichRotation, byte row) {
   unsigned int shape = 0xF000 & (shapes[whichShape][row] << (4*whichRotation) );
   return shape;  
 }
-void DrawShape(byte whichShape, byte whichRotation, byte xOffset, byte yOffset) {
+
+void DrawShape(int* bitmap, byte whichShape, byte whichRotation, byte xOffset, byte yOffset) {
   for (byte r=0; r<4; r++) {
     unsigned int shape = GetShapeRow(whichShape, whichRotation, r);
     shape = shape >> (xOffset);
@@ -58,20 +63,11 @@ void DrawShape(byte whichShape, byte whichRotation, byte xOffset, byte yOffset) 
   }
 }
 
-// Shows all the bit patterns for a shape
-//void DumpShape(byte whichShape, byte vertOffset) {
-//  for (byte r=0; r<4; r++) {
-//    bitmap[3-r+vertOffset] = shapes[whichShape][r];    
-//  }
-//}
-
-void loop() {
-  //UpdateBitmap();
-  //delay(50);
-}
-
-void UpdateBitmap() {
- int xValue = analogRead(xSensor);
+void UpdateBoard() {
+  int xSaved = currentX;
+  int ySaved = currentY;
+  
+  int xValue = analogRead(xSensor);
   int yValue = analogRead(ySensor);
     
   const int yMax = 250; // Top-down = Rotate
@@ -82,112 +78,90 @@ void UpdateBitmap() {
   
   int xOffset = 0;
   int yOffset = 0;
-  if (yValue > yMax) yOffset++;
-  if (yValue < yMin) yOffset--;
+  if (yValue > yMax) yOffset=1;
+  if (yValue < yMin) yOffset=-1;
   if (yOffset==0) {
-    if (xValue > xMax) xOffset++;
-    if (xValue < xMin) xOffset--;
+    if (xValue > xMax) xOffset=1;
+    if (xValue < xMin) xOffset=-1;
   }
 
   // Moving up is actually "rotate"
   if (yOffset==1) {
     yOffset=0;
-    currentRotation++;
-    if (currentRotation>3) currentRotation = 0;
+    if ( (rotateDelay--) == 0) {
+      rotateDelay = 2;
+      currentRotation++;
+      if (currentRotation>3) currentRotation = 0;
+    }
   }
   
-  xOffset = DetectHorizontalCollisions(currentX, xOffset);
+//  xOffset = DetectHorizontalCollisions(currentX, xOffset);
   currentX += xOffset;
   currentY += yOffset;
 
-  ClearBitmap();
-
-//  DumpShape(7,0);
-//  DumpShape(6,4);
-//  DumpShape(5,8);
-//  DumpShape(4,12);
-//  DumpShape(3,0);
-//  DumpShape(2,4);
-//  DumpShape(1,8);
-//  DumpShape(0,12);
-
-  DrawShape(3,currentRotation, currentX, currentY);
-  //if (currentY==0) currentY=16;
-
-  //if (++currentRotation>3) currentRotation=0;
-}
-
-int DetectVerticalCollision(int currentX, int currentY, int xOffset) {
-  for (byte col=0; col<3; col++) {
-    byte bitmapIsOn = bitRead(bitmap[currentY-1], currentX+col);
-    byte shapeIsOn = bitRead(shapes[currentShape][currentY], currentX+col);
-    if (bitmapIsOn && shapeIsOn) {
-      xOffset = 0;
-      break;
+  ClearBitmap(boardLayer);
+  DrawBoard(boardLayer);
+  
+  ClearBitmap(shapeLayer);
+  DrawShape(shapeLayer, 3,currentRotation, currentX, currentY);
+  if ( HasCollision(shapeLayer, boardLayer) ) {
+    currentX = xSaved;
+    currentY = ySaved;
+  } else {
+    OverlayBitmap(shapeLayer, boardLayer);
+    CopyBitmap(boardLayer, screen);
   }
 }
 
-int DetectHorizontalCollisions(int currentX, int currentY, int xOffset) {
-//  for (byte row=0; row<4; row++) {
-//    byte bitmapIsOn = bitRead(bitmap[currentY+3], currentX-1);
-//    byte shapeIsOn = bitRead(shapes[currentShape][currentY+3], currentX-1);
-//    if (bitmapIsOn && shapeIsOn) {
-//      xOffset = 0;
-//      break;
-//    }
-//  }
-
-  if ((currentX+xOffset) < 0) xOffset=0;
-  if ((currentX+xOffset) > 12) xOffset=0;  
-  return xOffset;
+void DrawBoard(int* bitmap) {
+  for (byte r=0; r<16; r++) {
+      PlotDot(bitmap, 0, r, 1);
+      PlotDot(bitmap, 15, r, 1);
+      PlotDot(bitmap, r,0, 1);
+  }
 }
 
+//=== Bitmap Utilities ===
 
-void setup() {
-  SetupShiftRegisterPins();
-  SetupInterruptRoutine();
+void ClearBitmap(int* bitmap) {
+  for (byte r=0; r<16; r++) {
+    bitmap[r] = 0;
+  }
 }
 
-void SetupInterruptRoutine() {
-  cli(); // Stop interrupts
-
-  TCCR0A = 0; // 
-  TCCR0B = 0;
-  TCNT0 = 0; // Counter
-  
-  // compare match register = [ 16,000,000Hz/ (prescaler * desired interrupt frequency) ] - 1
-  OCR0A = 255; //(16*10^6) / (2000*64) - 1; // OCR0A/OCR02A can be up to 255, OCR1A up to 65535
-  
-  TCCR0A |= (1 << WGM01); // Turn on CTC mode
-  TCCR0B |= (1 << CS01) | (1 << CS00); // turn on bits for 64 prescaler
-  
-  TIMSK0 |= (1 << OCIE0A); // enable timer compare interrupt
-  
-  sei(); // allow interrupts
+void PlotDot(int* bitmap, byte x, byte y, byte isOn) {
+  if (isOn)
+    bitSet(bitmap[y], x);
+  else
+    bitClear(bitmap[y], x);
 }
 
-ISR(TIMER0_COMPA_vect)
-{
-  cycles++;
-  RefreshScreen();
-  
-  if ((cycles % 5) == 0)
-    UpdateBitmap();
+void CopyBitmap(int* sourceLayer, int* targetLayer) {
+  memcpy(targetLayer, sourceLayer, sizeof(screen));
 }
 
-
-void SetupShiftRegisterPins() {
-  pinMode(Row_RCLK,OUTPUT);
-  pinMode(Row_SRCLK,OUTPUT);
-  pinMode(Row_SER,OUTPUT);
-
-  pinMode(Col_RCLK,OUTPUT);
-  pinMode(Col_SRCLK,OUTPUT);
-  pinMode(Col_SER,OUTPUT);
+void OverlayBitmap(int* topLayer, int* targetLayer) {
+  for (byte r=0; r<16; r++) {
+    targetLayer[r] |= topLayer[r];
+  }
 }
 
+bool HasCollision(int* bitmap1, int* bitmap2) {
+  // Take two bitmaps: boardLayer (walls and accumulated shapes), and shapeLayer (shape being tested)
+  // If any of the rows has common bits between the two bitmaps, we have a collision!
+  bool hasCollision = false;
+  for (byte r=0; r<16; r++) {
+    if ((bitmap1[r] & bitmap2[r]) != 0) {
+      hasCollision=true;
+      break;
+    }
+  }
+  return hasCollision;
+}
 
-void RefreshScreen() {
+//=== LED Matrix routines ===
+
+void RefreshScreen(int* bitmap) {
   for (byte r=0; r<16; r++) {
     // Turn off all X bits before turning on the row, so we won't get shadowing of the previous X pattern    
     twoBytes = 0;
@@ -222,15 +196,51 @@ void WriteX(byte hiByte, byte loByte) {
   digitalWrite(Col_RCLK, HIGH);
 };
 
-void ClearBitmap() {
-  for (byte r=0; r<16; r++) {
-    bitmap[r] = 0;
-  }
+//=== SETUP ===
+
+void setup() {
+  SetupShiftRegisterPins();
+  SetupInterruptRoutine();
 }
 
-void PlotDot(byte x, byte y, byte isOn) {
-  if (isOn)
-    bitSet(bitmap[y], x);
-  else
-    bitClear(bitmap[y], x);
+void SetupInterruptRoutine() {
+  cli(); // Stop interrupts
+
+  TCCR0A = 0; // 
+  TCCR0B = 0;
+  TCNT0 = 0; // Counter
+  
+  // compare match register = [ 16,000,000Hz/ (prescaler * desired interrupt frequency) ] - 1
+  OCR0A = 255; //(16*10^6) / (2000*64) - 1; // OCR0A/OCR02A can be up to 255, OCR1A up to 65535
+  
+  TCCR0A |= (1 << WGM01); // Turn on CTC mode
+  TCCR0B |= (1 << CS01) | (1 << CS00); // turn on bits for 64 prescaler
+  
+  TIMSK0 |= (1 << OCIE0A); // enable timer compare interrupt
+  
+  sei(); // allow interrupts
 }
+
+ISR(TIMER0_COMPA_vect)
+{
+  cycles++;
+  RefreshScreen( screen );
+  
+  if ((cycles % 5) == 0)
+    UpdateBoard();
+}
+
+
+void SetupShiftRegisterPins() {
+  pinMode(Row_RCLK,OUTPUT);
+  pinMode(Row_SRCLK,OUTPUT);
+  pinMode(Row_SER,OUTPUT);
+
+  pinMode(Col_RCLK,OUTPUT);
+  pinMode(Col_SRCLK,OUTPUT);
+  pinMode(Col_SER,OUTPUT);
+}
+
+void loop() {
+}
+
