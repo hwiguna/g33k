@@ -1,5 +1,9 @@
 
-// Towards Arduino Tetris
+// Arduino Tetris
+// by Hari Wiguna, 2014
+
+// If this project inspires you, please post me a comment on github, youtube (hwiguna), or on g33k.blogspot.com
+// I'd love to see your version.
 
 // v0.14 - Need to distinguish collisions.  ie: collision with side walls should STILL make it fall down.
   // If we move the piece to where it's supposed to be, would it collide with anything?
@@ -49,7 +53,7 @@ int currentY = 12;
 int currentShape = 0;
 int xSaved = currentX;
 int ySaved = currentY;
-int rotateDelay = 1;
+int rotateDelay = 4;
 int dropDelay = 1;
 
 //=== Tetris Shapes ===
@@ -90,11 +94,13 @@ void UpdateBoard() {
   byte proposedRot;
   ReadSensors(&xOffset, &yOffset);
     
+  proposedRot = currentRotation;
+
   // Moving up is actually "rotate"
   if (yOffset==1) {
     yOffset = 0;
     if ( (rotateDelay--) == 0) {
-      rotateDelay = 2;
+      rotateDelay = 4;
       proposedRot = currentRotation + 1;
       if (proposedRot>3) proposedRot = 0;
     }
@@ -102,7 +108,7 @@ void UpdateBoard() {
 
   // Is it time for shape to fall down?
   if (dropDelay-- == 0) {
-    dropDelay=3;
+    dropDelay=8;
     yOffset = -1;
   }
   
@@ -180,12 +186,13 @@ void RemoveFullRow(int fullRowToRemove) {
 void ReadSensors(int* xOffset, int* yOffset) {
   int xValue = analogRead(xSensor);
   int yValue = analogRead(ySensor);
-    
-  const int yMax = 250; // Top-down = Rotate
-  const int yMin = 185; // Top-up = Drop piece
+
+ // These maxMin refers to game coord not actual accelerometer axis
+  const int yMax = 300; //250; // Top-down = Rotate
+  const int yMin = 200; //185; // Top-up = Drop piece
   
-  const int xMax = 390; // Right-down = Shift right
-  const int xMin = 330; // Left-down = shift left
+  const int xMax = 410; //390; // Right-down = Shift right
+  const int xMin = 340; //330; // Left-down = shift left
   
   *xOffset = 0;
   *yOffset = 0;
@@ -297,6 +304,7 @@ void WriteX(byte hiByte, byte loByte) {
 //=== SETUP ===
 
 void setup() {
+  randomSeed(analogRead(0));
   SetupShiftRegisterPins();
   SetupInterruptRoutine();
 }
