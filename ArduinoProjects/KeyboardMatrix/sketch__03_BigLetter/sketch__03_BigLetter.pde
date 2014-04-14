@@ -1,3 +1,4 @@
+
 import processing.serial.*;
 
 Serial myPort;        // The serial port
@@ -8,24 +9,35 @@ void setup() {
   background(0);
 
   // Create the font
-  printArray(PFont.list());
+  // printArray(PFont.list()); // Uncomment this line to see a list of fonts
   f = createFont("ComicSansMS", 320);
   textFont(f);
   textAlign(CENTER, CENTER);
   translate(180,180);
   fill(255, 204, 0);
 
-  // List all the available serial ports
-  println(Serial.list());
-  
-  // I know that the first port in the serial list on my mac
-  // is always my  Arduino, so I open Serial.list()[0].
-  // Open whatever port is the one you're using.
-  myPort = new Serial(this, Serial.list()[7], 9600);
+  String portNames[] = Serial.list();
+  String portName = "";
+  for (int i=0; i < portNames.length; i++)
+  {
+    print(portNames[i]);
+    if (portNames[i].indexOf("/dev/tty.usbmodem") == 0) {
+      println(" ***");
+      portName = portNames[i];
+    }
+    else {
+      println();
+    }
+  }
+  myPort = new Serial(this, portName, 9600);
   
   // don't generate a serialEvent() unless you get a newline character:
   myPort.bufferUntil('\n');
 } 
+
+void stop() {
+  myPort.stop();
+}
 
 void draw() {
 }
@@ -33,18 +45,11 @@ void draw() {
 void serialEvent (Serial myPort) {
   // get the ASCII string:
   String inString = myPort.readStringUntil('\n');
-
+  
   if (inString != null) {
-    // trim off any whitespace:
     inString = trim(inString);
-
     background(0);
-    //rectMode(CENTER);
     text(inString, 180, 120);
   }
 }
-
-
-
-
 
