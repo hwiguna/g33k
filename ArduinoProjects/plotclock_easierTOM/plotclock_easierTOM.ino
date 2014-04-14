@@ -21,21 +21,21 @@
 // Zero-position of left and right servo
 // When in calibration mode, adjust the NULL-values so that the servo arms are at all times parallel
 // either to the X or Y axis
-#define SERVOLEFTNULL 2150 //Hari:2200. Orig:2250 pointing left pos. larger# = COUNTER clockwise
-#define SERVORIGHTNULL 850 //Hari:600.  Orig:920 Smaller# = clockwise
+#define SERVOLEFTNULL 2080 //Hari:2200. Orig:2250 pointing left pos. larger# = COUNTER clockwise
+#define SERVORIGHTNULL 900 //Hari:600.  Orig:920 Smaller# = clockwise
 
 // When in calibration mode, adjust the following factor until the servos move exactly 90 degrees
-#define SERVOFAKTORLEFT 620 // 650. vertical-ness of left servo.  Larger # = more clockwise
-#define SERVOFAKTORRIGHT 520 // 650. vertical-ness of right servo. Larger # = more COUNTER clockwise
+#define SERVOFAKTORLEFT 570 // 650. vertical-ness of left servo.  Larger # = more clockwise
+#define SERVOFAKTORRIGHT 500 // 650. vertical-ness of right servo. Larger # = more COUNTER clockwise
 
 #define SERVOPINLIFT  2
 #define SERVOPINLEFT  3
 #define SERVOPINRIGHT 4
 
 // lift positions of lifting servo
-#define LIFT0 1320 // Hari:1220. Orig:1080 on drawing surface -- Larger# = closer to surface
-#define LIFT1 1220  // Hari:1055. Orig:925  between numbers (park pen inside sweeper)
-#define LIFT2 900  // Hari:800.  Orig:725  lift above the sweeper
+#define LIFT0 1100 // Hari:1220. Orig:1080 on drawing surface -- Larger# = closer to surface
+#define LIFT1 1050  // Hari:1055. Orig:925  between numbers (park pen inside sweeper)
+#define LIFT2 600  // Hari:800.  Orig:725  lift above the sweeper
 
 // speed of lifting arm, higher is slower
 #define LIFTSPEED 1500
@@ -54,8 +54,19 @@
 #include <Time.h> // see http://playground.arduino.cc/Code/time 
 #include <Servo.h>
 
-double parkX = 77; //74.2; 
-double parkY = 40; //47.5; Smaller# = closer to servo
+int Left0 = 2080; //SERVOLEFTNULL;
+int Right0 = 900; //SERVORIGHTNULL;
+int Left90 = 570; //SERVOFAKTORLEFT;
+int Right90 = 550; //SERVOFAKTORRIGHT;
+
+int lift0 = LIFT0;
+int lift1 = LIFT1;
+int lift2 = LIFT2;
+
+int Mode = 2;
+
+double parkX = 74; //74.2; 
+double parkY = 45; //47.5; Smaller# = closer to servo
 
 double midX = parkX / 2;
 double midY = parkY;
@@ -76,16 +87,97 @@ Servo servo3;  //
 
 int servoLift = LIFT2; // Initially set  orig:1500;
 
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+
 
 volatile double lastX = 75;
 volatile double lastY = 47.5;
 
 int last_min = 0;
 
+void DisplayConfig() 
+{
+  Serial.println();
+  Serial.print("l)eft 0   = ");  Serial.println(Left0);
+  Serial.print("r)ight 0  = ");  Serial.println(Right0);
+  Serial.print("L)eft 90  = ");  Serial.println(Left90);
+  Serial.print("R)ight 90 = ");  Serial.println(Right90);
+  Serial.print("Lift (0)(1)(2) = ");  Serial.print(lift0); Serial.print(","); Serial.print(lift1); Serial.print(","); Serial.println(lift2);
+  Serial.print("park(x), park(y) = ");  Serial.print(parkX); Serial.print(","); Serial.println(parkY);
+  Serial.print("m)ode = ");      Serial.println(Mode);
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read(); 
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+    } 
+  }
+}
+
+void HandleSerialCommands()
+{
+  if (stringComplete) {
+    Serial.println("received: '" + inputString +"'");
+    byte equalPos = inputString.indexOf("=");
+    if (equalPos != -1) {
+      String cmd = inputString.substring(0,equalPos);
+      String val = inputString.substring(equalPos+1, inputString.length()-1);
+      ProcessCommand(cmd, val);
+    }
+    inputString = "";
+    stringComplete = false;
+  }  
+}
+
+void WriteConfig()
+{
+  
+}
+
+void ProcessCommand(String cmd, String val) {
+  Serial.print("cmd="); Serial.println(cmd);
+  Serial.print("val="); Serial.println(val);
+  
+  boolean isBadCmd = false;
+  int value = val.toInt();
+  switch (cmd[0]) {
+    case 'l': Serial.println("left 0");   Left0   = value; break;
+    case 'L': Serial.println("LEFT 90");  Left90  = value; break;
+    case 'r': Serial.println("right 0");  Right0  = value; break;
+    case 'R': Serial.println("RIGHT 90"); Right90 = value; break;
+
+    case 'x': Serial.println("ParkX"); parkX = value; break;
+    case 'y': Serial.println("ParkY"); parkY = value; break;
+
+    case '0': Serial.println("Lift 0"); lift0 = value; break;
+    case '1': Serial.println("Lift 1"); lift1 = value; break;
+    case '2': Serial.println("Lift 2"); lift2 = value; break;
+
+    case 'm': Serial.println("Mode");     Mode = value; break;
+    case 'w': Serial.println("Write"); WriteConfig(); break;
+    default:
+      isBadCmd = true;
+      break;
+  }
+  
+  if (!isBadCmd) {
+    DisplayConfig();
+  }
+}
+
 void setup() 
 { 
-#ifdef REALTIMECLOCK
   Serial.begin(9600);
+
+#ifdef REALTIMECLOCK
   //while (!Serial) { ; } // wait for serial port to connect. Needed for Leonardo only
 
   // Set current time only the first to values, hh,mm are needed  
@@ -113,6 +205,8 @@ void setup()
   setTime(10,45,0,0,0,0);
 #endif
 
+  DisplayConfig();
+
   //-- Set initial positions BEFORE attaching servos --
   lift(2);
   drawTo(parkX, parkY);
@@ -120,8 +214,10 @@ void setup()
   servo2.attach(SERVOPINLEFT);  //  left servo
   servo3.attach(SERVOPINRIGHT);  //  right servo
   delay(1000); // Wait a second to verify that we're above the eraser well
+} 
 
-  if (false) {
+void Reset()
+{
   //-- verify that the pen is parked inside the eraser well --
   lift(1);
   delay(2000);
@@ -137,14 +233,21 @@ void setup()
   drawTo(parkX, parkY);
   lift(1);
   delay(2000);
-  }
-} 
+}
 
 void loop() 
 { 
+  HandleSerialCommands();
+  
+  switch (Mode) {
+    case 0: CalibrationMode(); break;
+    case 1: Reset();break;
+    case 2: ClockMode(); break;
+  }
+}
 
-#ifdef CALIBRATION
-
+void CalibrationMode()
+{
 //  drawTo(parkX, parkY);
 //  lift(0);  delay(3000); // 0 = pen is on writing surface
 //  lift(1);  delay(1000); // 1 = lift pen (height when pen is parked in eraser well)
@@ -155,13 +258,12 @@ void loop()
   delay(500);
   drawTo(74.1, 28);
   delay(500);
+}
 
-#else 
-
-
+void ClockMode()
+{
   //if (last_min != minute()) 
   {
-
     //-- We release servos every cycle to keep them from buzzing, so re-attach them before drawing --
     if (!servo1.attached()) servo1.attach(SERVOPINLIFT);
     if (!servo2.attached()) servo2.attach(SERVOPINLEFT);
@@ -202,12 +304,9 @@ void loop()
     servo2.detach();
     servo3.detach();
     
-    delay(10000); // demo mode :-)
+    delay(10000); // demo mode :-) refresh every 10 seconds.
   }
-
-#endif
-
-} 
+}
 
 // Writing numeral with bx by being the bottom left originpoint. Scale 1 equals a 20 mm high font.
 // The structure follows this principle: move to first startpoint of the numeral, lift down, draw numeral, lift up
@@ -221,14 +320,15 @@ void number(float bx, float by, int num, float scale) {
     bogenGZS(bx + 7 * scale, by + 10 * scale, 10 * scale, -0.8, 6.7, 0.5);
     lift(1);
     break;
-  case 1:
 
+  case 1:
     drawTo(bx + 3 * scale, by + 15 * scale);
     lift(0);
     drawTo(bx + 10 * scale, by + 20 * scale);
     drawTo(bx + 10 * scale, by + 0 * scale);
     lift(1);
     break;
+
   case 2:
     drawTo(bx + 2 * scale, by + 12 * scale);
     lift(0);
@@ -237,6 +337,7 @@ void number(float bx, float by, int num, float scale) {
     drawTo(bx + 12 * scale, by + 0 * scale);
     lift(1);
     break;
+
   case 3:
     drawTo(bx + 2 * scale, by + 17 * scale);
     lift(0);
@@ -244,6 +345,7 @@ void number(float bx, float by, int num, float scale) {
     bogenUZS(bx + 5 * scale, by + 5 * scale, 5 * scale, 1.57, -3, 1);
     lift(1);
     break;
+
   case 4:
     drawTo(bx + 10 * scale, by + 0 * scale);
     lift(0);
@@ -252,6 +354,7 @@ void number(float bx, float by, int num, float scale) {
     drawTo(bx + 12 * scale, by + 6 * scale);
     lift(1);
     break;
+
   case 5:
     drawTo(bx + 2 * scale, by + 5 * scale);
     lift(0);
@@ -260,6 +363,7 @@ void number(float bx, float by, int num, float scale) {
     drawTo(bx + 12 * scale, by + 20 * scale);
     lift(1);
     break;
+
   case 6:
     drawTo(bx + 2 * scale, by + 10 * scale);
     lift(0);
@@ -267,6 +371,7 @@ void number(float bx, float by, int num, float scale) {
     drawTo(bx + 11 * scale, by + 20 * scale);
     lift(1);
     break;
+
   case 7:
     drawTo(bx + 2 * scale, by + 20 * scale);
     lift(0);
@@ -274,6 +379,7 @@ void number(float bx, float by, int num, float scale) {
     drawTo(bx + 2 * scale, by + 0);
     lift(1);
     break;
+
   case 8:
     drawTo(bx + 5 * scale, by + 10 * scale);
     lift(0);
@@ -291,7 +397,6 @@ void number(float bx, float by, int num, float scale) {
     break;
 
   case 111: // Erase
-
     lift(1);
     drawTo(70, 46);
     drawTo(65, 43);
@@ -339,9 +444,9 @@ void number(float bx, float by, int num, float scale) {
 void lift(char lift) {
   int desiredServoPos;
   switch (lift) {
-    case 0: desiredServoPos = LIFT0; break;
-    case 1: desiredServoPos = LIFT1; break;
-    case 2: desiredServoPos = LIFT2; break;
+    case 0: desiredServoPos = lift0; break;
+    case 1: desiredServoPos = lift1; break;
+    case 2: desiredServoPos = lift2; break;
   }
 
   if (servoLift >= desiredServoPos) {
@@ -371,7 +476,6 @@ void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee)
     count += inkr;
   } 
   while ((start + count) > ende);
-
 }
 
 void bogenGZS(float bx, float by, float radius, int start, int ende, float sqee) {
@@ -429,7 +533,7 @@ void set_XY(double Tx, double Ty)
   a1 = atan2(dy, dx); //
   a2 = return_angle(L1, L2, c);
 
-  servo2.writeMicroseconds(floor(((a2 + a1 - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
+  servo2.writeMicroseconds(floor(((a2 + a1 - M_PI) * Left90) + Left0));
 
   // calculate joinr arm point for triangle of the right servo arm
   a2 = return_angle(L2, L1, c);
@@ -444,8 +548,7 @@ void set_XY(double Tx, double Ty)
   a1 = atan2(dy, dx);
   a2 = return_angle(L1, (L2 - L3), c);
 
-  servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
-
+  servo3.writeMicroseconds(floor(((a1 - a2) * Right90) + Right0));
 }
 
 
