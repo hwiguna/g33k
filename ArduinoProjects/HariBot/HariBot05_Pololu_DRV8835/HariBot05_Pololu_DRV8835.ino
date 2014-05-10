@@ -9,10 +9,12 @@
       // Start waffling back and forth, increasing scan range if hand not found, decreasing range if hand found
       // When waffle angle is sufficiently small  
 // v0.3 - Use PWM to compensate for weak 
+// v0.5 - Using the extremely efficient Pololu DRV8835. Different pinouts!!!
+
 // Motor H-Bridge pins
 byte motorPins[][2] = {
-  {2,3}, // Left wheel
-  {4,5},  // Right wheel
+  {2,3}, // Left wheel: 2=enable, 3=direction
+  {4,5}, // Right wheel: 4=enable, 5=direction
 };
 
 byte triggerPin = 6;
@@ -46,48 +48,38 @@ void InitializeRobot() {
 
 //=== MOTOR CONTROL ===
 
-void Motor(byte whichMotor, int cmd)
+void Motor(byte whichMotor, int dir)
 {
-  byte bridgeValues[2] = {0,0}; // Default both bridge pins to LOW
-  switch (cmd) {
-    case 1: bridgeValues[0]=1; break;  // cmd 1 means one direction
-    case -1: bridgeValues[1]=1; break; // cmd -1 means the other direction, 0 means motor pins get two grounds.
-  }
-  digitalWrite(motorPins[whichMotor][0], bridgeValues[0]);
-  digitalWrite(motorPins[whichMotor][1], bridgeValues[1]);
+  digitalWrite( motorPins[whichMotor][0], 1 );
+  digitalWrite( motorPins[whichMotor][1], dir );
 }
 
-void Motors(int leftCmd, int rightCmd, int duration)
+void Motors(int leftDir, int rightDir, int duration)
 {
-  Motor(0, leftCmd);
-  Motor(1, rightCmd);
+  Motor(0, leftDir);
+  Motor(1, rightDir);
   delay(duration);
 }
 
 void Right() {
-  Motors(+1,-1, rotateDuration);
+  Motors(1,0, rotateDuration);
 }
 
 void Left() {
-  Motors(-1,+1, rotateDuration);
+  Motors(0,1, rotateDuration);
 }
 
 void Forward() {
-  // Right motor is stronger than left when moving forward, so slow right motor down using PWM
-  theSpeed = 222; //analogRead(speedKnob) /4;
-  analogWrite(speedPin, theSpeed);
-  Motors(+1,+1, moveDuration);
-  analogWrite(speedPin, 255); // Restore full speed for next movements
-  Serial.print("theSpeed=");
-  Serial.println(theSpeed);
+  Motors(1,1, moveDuration);
 }
 
 void Backward() {
-  Motors(-1,-1, moveDuration);
+  Motors(0,0, moveDuration);
 }
 
 void Stop() {
-  Motors(0,0, moveDuration);
+  digitalWrite( motorPins[0][0], 0 );
+  digitalWrite( motorPins[1][0], 0 );
 }
 
 
