@@ -36,7 +36,7 @@ void setup() {
   shiftOut(dataPin, clockPin, MSBFIRST, B00001111);   
   shiftOut(dataPin, clockPin, MSBFIRST, B00000111);
   shiftOut(dataPin, clockPin, MSBFIRST, B0);
-  shiftOut(dataPin, clockPin, MSBFIRST, B11110000); // Push Least significant byte last
+  shiftOut(dataPin, clockPin, MSBFIRST, B00001111); // Push Least significant byte last
   //return the latch pin high to signal chip that it 
   //no longer needs to listen for information
   digitalWriteFast(latchPin, HIGH);
@@ -70,7 +70,7 @@ void loopFast()
     int prev = i==0 ? 7 : i-1;
     digitalWriteFast(2+prev,LOW); // Turn off prev layer
     digitalWriteFast(2+i,HIGH); // Turn on this layer
-    //delay(100);
+    delay(500);
   }
 }
 
