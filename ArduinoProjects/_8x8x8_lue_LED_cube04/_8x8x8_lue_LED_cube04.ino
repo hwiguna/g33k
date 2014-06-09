@@ -1,8 +1,10 @@
+#include <TimerOne.h>
+
 // 8x8x8x Blue LED Cube
 // by Hari Wiguna 2014
 //
 // v03 - blinks all 512
-// v04 - marquee pattern
+// v04 - more test patterns.  Uses TimerOne library.
 
 //-- Shift Register pins --
 int latchPin = 13;
@@ -18,36 +20,53 @@ void SetupPins()
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
-  
+
   for (int i=0; i<8; i++) {
     pinMode(2+i, OUTPUT);
   }
 }
 
-void setup() {
+void setup(void) {
   SetupPins();
-  CubeAllOn();
-  SetupInterruptRoutine();
-   
-//  long start = micros();
-//  LoopNormal();
-//  long finish = micros();
-//  Serial.begin(9600);
-//  Serial.println(finish-start);
-//  Serial.end();
+  CubeAllOff();
+  //SetupInterruptRoutine();
+  SetupTimer();
+
+  //  long start = micros();
+  //    LoopNormal();
+  //  long finish = micros();
+  //  Serial.begin(9600);
+  //  Serial.println(finish-start);
+  //  Serial.end();
+  // 8052 micro seconds
 }
 
-void loop() {
-//  CubeAllOn();
-//  delay(500);
-//  CubeAllOff();
+void SetupTimer()
+{
+  Timer1.initialize(10000); // 10000 = 0.1 seconds = 100ms
+  Timer1.attachInterrupt(LoopNormal);
 }
 
-void LoopNormal()
+void loop(void) {
+  //noInterrupts();  
+  //CubeAllOn();  
+  //interrupts();
+  //delay(100);
+
+  CubeAllOff();  delay(100);
+  //CubeUp();
+  //CubeLeftRight();
+  TestPattern1();
+  //CubeAllOn(); delay(1000);
+}
+
+void LoopNormal(void)
 {
   for (int8_t z=0; z<8; z++) {
     int8_t prev = z==0 ? 7 : z-1;
 
+    //option 2: turn off prev layer here and add delay at end of loop
+    
     // Prepare for data. Shift data to shift registers but do not reflect it on the outputs yet.
     digitalWrite(latchPin, LOW);
 
@@ -56,13 +75,15 @@ void LoopNormal()
 
     //-- Turn off previous layer --
     digitalWrite(2+prev,LOW); // Turn off prev layer
+    delayMicroseconds(40); // IMPORTANT: Wait for previous layer to turn off before slapping new layer data
 
     // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
     digitalWrite(latchPin, HIGH);
-    
+
     //-- Turn on this layer --
     digitalWrite(2+z,HIGH); // Turn on this layer
 
+    //delayMicroseconds(200);
     //delay(500);
   }
 }
@@ -93,9 +114,51 @@ void CubeUp()
 {
   for (int8_t z=0; z<8; z++) {
     SetLayer(z, 0xFF);
-    delay(500);
+    delay(50);
     SetLayer(z, 0x00);
   }  
+}
+
+void CubeLeftRight()
+{
+  for (int8_t x=0; x<8; x++) {
+    SetXPlane(x);
+    delay(20);
+    CubeAllOff();
+  }  
+}
+
+void SetXPlane(int8_t x)
+{
+  x = Wrap(x);
+  int8_t xPattern = 1 << x;
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t y=0; y<8; y++) {
+      cube[y][z] = xPattern;
+    }
+  }
+}
+
+void TestPattern1()
+{
+  int8_t y = 7;
+  for (int8_t x=0; x<8; x++) {
+    SetDot(x,y,0);
+    SetDot(7-x,y,1);
+    delay(100);
+    ClearDot(x,y,0);
+    ClearDot(7-x,y,1);
+  }
+}
+
+void SetDot(int8_t x,int8_t y,int8_t z)
+{
+  bitSet(cube[y][z], x);
+}
+
+void ClearDot(int8_t x,int8_t y,int8_t z)
+{
+  bitClear(cube[y][z], x);
 }
 
 void SetLayer(int8_t z, byte xByte)
@@ -122,15 +185,15 @@ void SetupInterruptRoutine() {
   TCCR1A = 0; // 
   TCCR1B = 0;
   TCNT1 = 0; // Counter
-  
+
   // compare match register = [ 16,000,000Hz/ (prescaler * desired interrupt frequency) ] - 1
   OCR1A = 15624; //(16*10^6) / (2000*64) - 1; // OCR0A/OCR02A can be up to 255, OCR1A up to 65535
-  
+
   TCCR1A |= (1 << WGM12); // Turn on CTC mode
   TCCR1B |= (1 << CS12) | (1 << CS10); // turn on bits for 64 prescaler
-  
+
   TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
-  
+
   sei(); // allow interrupts
 }
 
@@ -142,5 +205,6 @@ ISR(TIMER0_COMPA_vect)
     LoopNormal();  
   }
 }
+
 
 
