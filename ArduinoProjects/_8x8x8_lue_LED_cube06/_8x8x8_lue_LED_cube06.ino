@@ -1,10 +1,11 @@
-#include <TimerOne.h>
+#include <MsTimer2.h>
 
 // 8x8x8x Blue LED Cube
 // by Hari Wiguna 2014
 //
 // v03 - blinks all 512
 // v04 - more test patterns.  Uses TimerOne library.
+// v06 - Using MsTimer2
 
 //-- Shift Register pins --
 int latchPin = 13;
@@ -12,8 +13,8 @@ int clockPin = 12;
 int dataPin  = 11;
 
 //-- Globals --
-int cycles = 0;
-byte cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
+volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
+volatile int8_t gZ = 0;
 
 void SetupPins()
 {
@@ -35,8 +36,8 @@ void setup(void) {
 
 void SetupTimer()
 {
-  Timer1.initialize(10000); // 10000 microSeconds = 10ms = 0.01 seconds
-  Timer1.attachInterrupt(Refresh);
+  MsTimer2::set(8,Refresh); // was 2
+  MsTimer2::start();
 }
 
 void RunTests()
@@ -45,7 +46,7 @@ void RunTests()
 
   Serial.print("TestCubeAllOff = ");
   Serial.println(TestCubeAllOff());
-  
+
   Serial.print("TestRefresh = ");
   Serial.println(TestRefresh());    // 8052 micro seconds
 
@@ -71,7 +72,7 @@ long TestRefresh()
 void TestPattern3()
 {
   CubeAllOff();
-  delay(250);
+  delay(500);
   CubeAllOn();
   delay(500);
 }
@@ -86,37 +87,59 @@ void loop(void) {
   //CubeUp();
   //CubeLeftRight();
   //TestPattern1();
-  //TestPattern2();
-  TestPattern3();
+  //TestPattern2_Scan_one_layer();
+  //TestPattern4_Scan_one_wall();
+  TestPattern5_swipe_wall_up();
   //CubeAllOn(); delay(1000);
 }
 
 void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 8052 microseconds
 {
-  for (int8_t z=0; z<8; z++) {
-    int8_t prev = z==0 ? 7 : z-1;
+  noInterrupts();
 
-    //option 2: turn off prev layer here and add delay at end of loop
-    
-    // Prepare for data. Shift data to shift registers but do not reflect it on the outputs yet.
-    digitalWrite(latchPin, LOW);
+  //-- Turn off previous layer --
+  digitalWrite(2+gZ,LOW); // Turn off prev layer
 
-    //-- Spit out the bits --
-    DrawLayer(z);
+  //-- Compute new layer --
+  gZ++; 
+  if (gZ>=8) gZ=0;
 
-    //-- Turn off previous layer --
-    digitalWrite(2+prev,LOW); // Turn off prev layer
-    delayMicroseconds(40); // IMPORTANT: Wait for previous layer to turn off before slapping new layer data
+  // Prepare for data. Shift data to shift registers but do not reflect it on the outputs yet.
+  digitalWrite(latchPin, LOW);
 
-    // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
-    digitalWrite(latchPin, HIGH);
+  //-- Spit out the bits --
+  DrawLayer(gZ);
 
-    //-- Turn on this layer --
-    digitalWrite(2+z,HIGH); // Turn on this layer
+  // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
+  digitalWrite(latchPin, HIGH);
 
-    //delayMicroseconds(200);
-    //delay(500);
-  }
+  //-- Turn on this layer --
+  digitalWrite(2+gZ,HIGH); // Turn on this layer
+
+  interrupts();
+}
+
+void TurnOnLayer(int8_t z)
+{
+  int8_t prev = z==0 ? 7 : z-1;
+
+  // Prepare for data. Shift data to shift registers but do not reflect it on the outputs yet.
+  digitalWrite(latchPin, LOW);
+
+  //-- Spit out the bits --
+  DrawLayer(z);
+
+  //-- Turn off previous layer --
+  digitalWrite(2+prev,LOW); // Turn off prev layer
+}
+
+void TurnOffLayer(int8_t z)
+{
+  // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
+  digitalWrite(latchPin, HIGH);
+
+  //-- Turn on this layer --
+  digitalWrite(2+z,HIGH); // Turn on this layer
 }
 
 void DrawLayer(int8_t z)
@@ -175,27 +198,54 @@ void TestPattern1()
   //int8_t y = 7;
   for (int8_t x=0; x<8; x++) {
     for (int8_t y=0; y<8; y++) {
-      SetDot(x,y,0); SetDot(7-x,y,1);
+      SetDot(x,y,0); 
+      SetDot(7-x,y,1);
     }
-    
+
     delay(20);
-    
+
     for (int8_t y=0; y<8; y++) {
-      ClearDot(x,y,0); ClearDot(7-x,y,1);
+      ClearDot(x,y,0); 
+      ClearDot(7-x,y,1);
     }
   }
 }
 
-void TestPattern2()
+void TestPattern2_Scan_one_layer()
 {
   for (int8_t y=0; y<8; y++) {
     for (int8_t x=7; x>=0; x--) {
       SetDot(x,y,0);
-      delayMicroseconds(700);
+      delay(64);
       ClearDot(x,y,0);
     }
   }
 }
+
+void TestPattern4_Scan_one_wall()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=7; x>=0; x--) {
+      SetDot(x,7,z);
+      delay(64);
+      ClearDot(x,7,z);
+    }
+  }
+}
+
+void TestPattern5_swipe_wall_up()
+{
+  for (int8_t z=0; z<8; z++) {
+    SetLayer(z,0xFF);
+    //for (int8_t x=0; x<8; x++) SetDot(x,7,z);
+    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) SetDot(x,y,z);
+    delay(64);
+    SetLayer(z,0x00);
+    //for (int8_t x=0; x<8; x++) ClearDot(x,7,z);
+    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) ClearDot(x,y,z);
+  }
+}
+
 
 void SetDot(int8_t x,int8_t y,int8_t z)
 {
@@ -207,11 +257,14 @@ void ClearDot(int8_t x,int8_t y,int8_t z)
   bitClear(cube[y][z], x);
 }
 
-void SetLayer(int8_t z, byte xByte)
+void SetLayer(int8_t z, int8_t xByte)
 {
-  z = Wrap(z);
-  for (int8_t y=0; y<8; y++) {
+  //z = Wrap(z);
+  for (int8_t y=7; y<8; y++) {
     cube[y][z] = xByte;
+    //for (int8_t x=0; x<8; x++) {
+    //  if (xByte==0) ClearDot(x,y,z); else SetDot(x,y,z);
+    //}
   }
 }
 
@@ -224,4 +277,5 @@ int8_t Wrap(int8_t val)
   else
     return val;
 }
+
 

@@ -14,6 +14,8 @@ int dataPin  = 11;
 //-- Globals --
 int cycles = 0;
 byte cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
+long gKount = 0;
+int8_t gZ = 0;
 
 void SetupPins()
 {
@@ -35,7 +37,7 @@ void setup(void) {
 
 void SetupTimer()
 {
-  Timer1.initialize(10000); // 10000 microSeconds = 10ms = 0.01 seconds
+  Timer1.initialize(10); // 10000 microSeconds = 10ms = 0.01 seconds
   Timer1.attachInterrupt(Refresh);
 }
 
@@ -71,7 +73,7 @@ long TestRefresh()
 void TestPattern3()
 {
   CubeAllOff();
-  delay(250);
+  delay(500);
   CubeAllOn();
   delay(500);
 }
@@ -93,11 +95,26 @@ void loop(void) {
 
 void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 8052 microseconds
 {
-  for (int8_t z=0; z<8; z++) {
+  gKount++;
+  switch (gKount) {
+    case 1:
+      TurnOnLayer(gZ);   
+      break;
+    // do nothing for 100 counts
+    case 100: 
+      TurnOffLayer(gZ);
+      gZ++;
+      if (gZ>=8) gZ=0;
+      gKount=0;
+      break;
+  }
+}
+
+
+void TurnOnLayer(int8_t z)
+{
     int8_t prev = z==0 ? 7 : z-1;
 
-    //option 2: turn off prev layer here and add delay at end of loop
-    
     // Prepare for data. Shift data to shift registers but do not reflect it on the outputs yet.
     digitalWrite(latchPin, LOW);
 
@@ -106,19 +123,16 @@ void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 80
 
     //-- Turn off previous layer --
     digitalWrite(2+prev,LOW); // Turn off prev layer
-    delayMicroseconds(40); // IMPORTANT: Wait for previous layer to turn off before slapping new layer data
-
-    // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
-    digitalWrite(latchPin, HIGH);
-
-    //-- Turn on this layer --
-    digitalWrite(2+z,HIGH); // Turn on this layer
-
-    //delayMicroseconds(200);
-    //delay(500);
-  }
 }
 
+void TurnOffLayer(int8_t z)
+{
+    // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
+  digitalWrite(latchPin, HIGH);
+
+  //-- Turn on this layer --
+  digitalWrite(2+z,HIGH); // Turn on this layer
+}
 void DrawLayer(int8_t z)
 {
   // Spit out all 64 bits for the layer.
