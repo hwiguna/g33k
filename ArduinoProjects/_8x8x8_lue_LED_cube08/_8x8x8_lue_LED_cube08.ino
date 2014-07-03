@@ -48,6 +48,9 @@ void RunTests()
   Serial.print("TestCubeAllOff = ");
   Serial.println(TestCubeAllOff());
 
+  Serial.print("TestDrawLayer = ");
+  Serial.println(TestDrawLayer());    // 8052 micro seconds
+
   Serial.print("TestRefresh = ");
   Serial.println(TestRefresh());    // 8052 micro seconds
 
@@ -70,6 +73,15 @@ long TestRefresh()
   return finish-start;
 }
 
+long TestDrawLayer()
+{
+  long start = micros();
+  DrawLayer(gZ);
+  long finish = micros();
+  return finish-start;
+}
+
+
 void TestPattern3()
 {
   CubeAllOff();
@@ -79,14 +91,59 @@ void TestPattern3()
 }
 
 void loop(void) {
-  CubeAllOn();  delay(1000);
-  CubeAllOff();  delay(1000);
-  CubeUp();  delay(1000);
-  CubeLeftRight();  delay(1000);
-  TestPattern2_Scan_one_layer();  delay(1000);
-  TestPattern4_Scan_one_wall();  delay(1000);
-  TestPattern5_swipe_wall_up();  delay(1000);
+//  CubeAllOn();  delay(1000);
+//  CubeAllOff();  delay(1000);
+//  CubeUp();  delay(1000);
+//  CubeLeftRight();  delay(1000);
+//  TestPattern2_Scan_one_layer();  delay(1000);
+//  TestPattern4_Scan_one_wall();  delay(1000);
+//  TestPattern5_swipe_wall_up();  delay(1000);
   //CubeAllOn(); delay(1000);
+CubeAllOff(); BottomCorner(); delay(1000);
+CubeAllOff(); RightCorner(); delay(1000);
+CubeAllOff(); BottomRow(); delay(1000);
+  //BottomUp();
+  //delay(1000);
+  //LeftRight();
+  //OneWall();  delay(1000);
+}
+
+void BottomUp()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+    delay(64);
+    CubeAllOff();
+  }
+}
+
+
+void OneWall()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void LeftRight()
+{
+  for (int8_t x=0; x<8; x++) {
+    for (int8_t z=0; z<8; z++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+    delay(64);
+    CubeAllOff();
+  }
 }
 
 void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 8052 microseconds
@@ -112,7 +169,7 @@ void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 80
 
   //-- Turn on this layer --
   digitalWrite(2+gZ,HIGH); // Turn on this layer
-
+  
 //  interrupts();
 }
 
@@ -147,19 +204,6 @@ void DrawLayer(int8_t z)
   }  
 }
 
-void CubeAllOn()
-{
-  for (int8_t z=0; z<8; z++) {
-    SetLayer(z, 0xFF);
-  }  
-}
-
-void CubeAllOff()
-{
-  for (int8_t z=0; z<8; z++) {
-    SetLayer(z, 0x00);
-  }  
-}
 
 void CubeUp()
 {
@@ -247,7 +291,9 @@ void TestPattern5_swipe_wall_up()
 
 void SetDot(int8_t x,int8_t y,int8_t z)
 {
+  //noInterrupts();
   bitSet(cube[y][z], x);
+  //interrupts();
 }
 
 void ClearDot(int8_t x,int8_t y,int8_t z)
@@ -276,4 +322,54 @@ int8_t Wrap(int8_t val)
     return val;
 }
 
+void RightCorner()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=4; x<8; x++) {
+      for (int8_t y=0; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void BottomCorner()
+{
+  for (int8_t z=0; z<4; z++) {
+    for (int8_t x=4; x<8; x++) {
+      for (int8_t y=0; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void BottomRow()
+{
+  for (int8_t z=0; z<4; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=0; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void CubeAllOn()
+{
+      for (int8_t x=0; x<8; x++) {
+    for (int8_t y=0; y<8; y++) {
+  for (int8_t z=0; z<8; z++) {
+        SetDot(x,y,z);
+      }  
+    }  
+  }  
+}
+
+void CubeAllOff()
+{
+  for (int8_t z=0; z<8; z++) {
+    SetLayer(z, 0x00);
+  }  
+}
 

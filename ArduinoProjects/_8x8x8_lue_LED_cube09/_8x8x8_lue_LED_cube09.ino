@@ -1,5 +1,3 @@
-#include <MsTimer2.h>
-
 // 8x8x8x Blue LED Cube
 // by Hari Wiguna 2014
 //
@@ -7,6 +5,7 @@
 // v04 - more test patterns.  Uses TimerOne library.
 // v06 - Using MsTimer2
 // v07 - Don't turn off previous layer until the very last moment for brighter display
+// v09 - Pedal to the metal, no timer libraries!
 
 //-- Shift Register pins --
 int latchPin = 13;
@@ -37,8 +36,22 @@ void setup(void) {
 
 void SetupTimer()
 {
-  MsTimer2::set(2,Refresh); // was 2
-  MsTimer2::start();
+  // Reset any PWM that arduino may have setup automatically
+  TCCR2A = 0;
+  TCCR2B = 0;
+  
+  TCCR2A |= (1 << WGM21); // CTC mode. Reset counter when OCR2 is reached
+
+  TCCR2B |= (1 << CS21) | (1 << CS22); // Prescaler = 256
+  OCR2A = 10; // Fire interrupt when timer2 has looped 10 times
+
+  TCNT2 = 0; // initial counter value = 0;
+  TIMSK2 |= (1<<OCIE2A); // Enable CTC interrupt
+}
+
+ISR (TIMER2_COMPA_vect)
+{
+  Refresh();
 }
 
 void RunTests()
@@ -79,14 +92,59 @@ void TestPattern3()
 }
 
 void loop(void) {
-  CubeAllOn();  delay(1000);
-  CubeAllOff();  delay(1000);
-  CubeUp();  delay(1000);
-  CubeLeftRight();  delay(1000);
-  TestPattern2_Scan_one_layer();  delay(1000);
-  TestPattern4_Scan_one_wall();  delay(1000);
-  TestPattern5_swipe_wall_up();  delay(1000);
+//  CubeAllOn();  delay(1000);
+//  CubeAllOff();  delay(1000);
+//  CubeUp();  delay(1000);
+//  CubeLeftRight();  delay(1000);
+//  TestPattern2_Scan_one_layer();  delay(1000);
+//  TestPattern4_Scan_one_wall();  delay(1000);
+//  TestPattern5_swipe_wall_up();  delay(1000);
   //CubeAllOn(); delay(1000);
+  //BottomCorner();
+  //BottomUp();
+  //delay(1000);
+  //LeftRight();
+  //OneWall();  delay(1000);
+  CubeAllOn(); delay(1000);
+  CubeAllOff(); delay(1000);
+}
+
+void BottomUp()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+    delay(64);
+    CubeAllOff();
+  }
+}
+
+
+void OneWall()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void LeftRight()
+{
+  for (int8_t x=0; x<8; x++) {
+    for (int8_t z=0; z<8; z++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+    delay(64);
+    CubeAllOff();
+  }
 }
 
 void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 8052 microseconds
@@ -149,9 +207,15 @@ void DrawLayer(int8_t z)
 
 void CubeAllOn()
 {
+  //noInterrupts();
   for (int8_t z=0; z<8; z++) {
-    SetLayer(z, 0xFF);
+    for (int8_t y=0; y<8; y++) {
+      for (int8_t x=0; x<8; x++) {
+        SetDot(x,y,z);
+      }  
+    }  
   }  
+  //interrupts();
 }
 
 void CubeAllOff()
@@ -247,7 +311,9 @@ void TestPattern5_swipe_wall_up()
 
 void SetDot(int8_t x,int8_t y,int8_t z)
 {
+  //noInterrupts();
   bitSet(cube[y][z], x);
+  //interrupts();
 }
 
 void ClearDot(int8_t x,int8_t y,int8_t z)
@@ -276,4 +342,12 @@ int8_t Wrap(int8_t val)
     return val;
 }
 
+void BottomCorner()
+{
+  for (int8_t x=0; x<1; x++) {
+    for (int8_t y=7; y<8; y++) {
+      SetDot(x,y,1); 
+    }
+  }
+}
 
