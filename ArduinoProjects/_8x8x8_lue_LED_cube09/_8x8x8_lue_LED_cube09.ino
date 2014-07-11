@@ -30,12 +30,13 @@ void SetupPins()
 void setup(void) {
   SetupPins();
   CubeAllOff();
-  RunTests();
+  //RunTests();
   SetupTimer();
 }
 
 void SetupTimer()
 {
+  cli();
   // Reset any PWM that arduino may have setup automatically
   TCCR2A = 0;
   TCCR2B = 0;
@@ -43,10 +44,12 @@ void SetupTimer()
   TCCR2A |= (1 << WGM21); // CTC mode. Reset counter when OCR2 is reached
 
   TCCR2B |= (1 << CS21) | (1 << CS22); // Prescaler = 256
-  OCR2A = 10; // Fire interrupt when timer2 has looped 10 times
+  //TCCR2B |= (1 << CS20) | (1 << CS22); // Prescaler = 128
+  OCR2A = 70; // Fire interrupt when timer2 has looped 80 times
 
   TCNT2 = 0; // initial counter value = 0;
   TIMSK2 |= (1<<OCIE2A); // Enable CTC interrupt
+  sei();
 }
 
 ISR (TIMER2_COMPA_vect)
@@ -96,7 +99,7 @@ void loop(void) {
 //  CubeAllOff();  delay(1000);
 //  CubeUp();  delay(1000);
 //  CubeLeftRight();  delay(1000);
-//  TestPattern2_Scan_one_layer();  delay(1000);
+  TestPattern2_Scan_one_layer();  //delay(1000);
 //  TestPattern4_Scan_one_wall();  delay(1000);
 //  TestPattern5_swipe_wall_up();  delay(1000);
   //CubeAllOn(); delay(1000);
@@ -105,8 +108,8 @@ void loop(void) {
   //delay(1000);
   //LeftRight();
   //OneWall();  delay(1000);
-  CubeAllOn(); delay(1000);
-  CubeAllOff(); delay(1000);
+  //CubeAllOn(); delay(3000);
+  //CubeAllOff(); delay(3000);
 }
 
 void BottomUp()
@@ -149,7 +152,7 @@ void LeftRight()
 
 void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 8052 microseconds
 {
-//  noInterrupts();
+  noInterrupts();
 
   //-- Compute new layer --
   int8_t prevLayer = gZ;
@@ -165,13 +168,14 @@ void Refresh(void) // WITHOUT the added delayMicroseconds, this routine takes 80
   //-- Turn off previous layer --
   digitalWrite(2+prevLayer,LOW); // Turn off prev layer
 
-  // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
-  digitalWrite(latchPin, HIGH);
-
   //-- Turn on this layer --
   digitalWrite(2+gZ,HIGH); // Turn on this layer
 
-//  interrupts();
+
+  // All data ready. Instantly reflect all 64 bits on all 8 shift registers to the led layer.
+  digitalWrite(latchPin, HIGH);
+
+  interrupts();
 }
 
 void TurnOnLayer(int8_t z)
