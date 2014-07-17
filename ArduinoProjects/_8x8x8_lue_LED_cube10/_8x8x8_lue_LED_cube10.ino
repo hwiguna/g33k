@@ -6,11 +6,12 @@
 // v06 - Using MsTimer2
 // v07 - Don't turn off previous layer until the very last moment for brighter display
 // v09 - Pedal to the metal, no timer libraries!
+// v10 - Invert shift register output in DrawLayers() because we longer use transistors there.
 
 //-- Shift Register pins --
-int latchPin = 13;
-int clockPin = 12;
-int dataPin  = 11;
+int latchPin = 13; // Arduino D13 to IC pin 12 (ST_CP) -- White
+int clockPin = 12; // Arduino D12 to IC pin 11 (SH_CP) -- Yelow
+int dataPin  = 11; // Arduino D11 to IC pin 14 (DS) -- Blue
 
 //-- Globals --
 volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
@@ -95,32 +96,30 @@ void TestPattern3()
 }
 
 void loop(void) {
-//  CubeAllOn();  delay(1000);
-//  CubeAllOff();  delay(1000);
+  //CubeAllOn(); delay(3000);
+  //CubeAllOff(); delay(1000);
+  //One_Pixel_Up_a_wall(7);
+  //Line_Up_a_wall(7);
+  BottomUp();
+
   //CubeUp();  //delay(1000);
-//CubeLeftRight();  delay(1000);
-  //TestPattern2_Scan_one_layer(1);  //delay(1000);
-  TestPattern_scan_all_layers();  //delay(1000);
-  //Up_a_wall(7);
-//  TestPattern4_Scan_one_wall();  delay(1000);
+  //CubeLeftRight();  delay(1000);
+  //TestPattern2_Scan_one_layer(0);  //delay(1000);
+  //TestPattern_scan_all_layers();  //delay(1000);
+  //TestPattern4_Scan_one_wall();  delay(1000);
   //TestPattern5_swipe_wall_up();  //delay(1000);
   //CubeAllOn(); delay(1000);
   //BottomCorner();
-  //BottomUp();
-  //delay(1000);
   //LeftRight();
   //OneWall();  delay(1000);
   //LayerOn(0); delay(4000);
-  //CubeAllOn(); delay(3000);
-  //CubeAllOff(); delay(1000);
-  
 }
 
 void BottomUp()
 {
   for (int8_t z=0; z<8; z++) {
     for (int8_t x=0; x<8; x++) {
-      for (int8_t y=7; y<8; y++) {
+      for (int8_t y=0; y<8; y++) {
         SetDot(x,y,z); 
       }
     }
@@ -209,7 +208,7 @@ void DrawLayer(int8_t z)
 {
   // Spit out all 64 bits for the layer.
   for (int8_t y=0; y<8; y++) {
-    shiftOut(dataPin, clockPin, MSBFIRST, ~cube[y][z]); // Push Most significant BYTE first   
+    shiftOut(dataPin, clockPin, LSBFIRST, ~cube[y][z]); // Push Most significant BYTE first   
   }  
 }
 
@@ -292,15 +291,15 @@ void TestPattern1()
 void TestPattern2_Scan_one_layer(int8_t z)
 {
   for (int8_t y=0; y<8; y++) {
-    for (int8_t x=7; x>=0; x--) {
+    for (int8_t x=0; x<8; x++) {
       SetDot(x,y,z);
-      delay(32);
+      delay(300);
       ClearDot(x,y,z);
     }
   }
 }
 
-void Up_a_wall(int8_t y)
+void One_Pixel_Up_a_wall(int8_t y)
 {
   for (int8_t z=0; z<8; z++) {
     for (int8_t x=7; x>=0; x--) {
@@ -310,6 +309,18 @@ void Up_a_wall(int8_t y)
     }
   }
 }
+
+void Line_Up_a_wall(int8_t y)
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=7; x>=0; x--) {
+      SetDot(x,y,z);
+    }
+    delay(64);
+    CubeAllOff();
+  }
+}
+
 
 void TestPattern_scan_all_layers()
 {
