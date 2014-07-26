@@ -1,3 +1,5 @@
+#include <CapacitiveSensor.h>
+
 // 8x8x8x Blue LED Cube
 // by Hari Wiguna 2014
 //
@@ -7,6 +9,7 @@
 // v07 - Don't turn off previous layer until the very last moment for brighter display
 // v09 - Pedal to the metal, no timer libraries!
 // v10 - Invert shift register output in DrawLayers() because we longer use transistors there.
+// v11 - Add Capsense library
 
 //-- Shift Register pins --
 int latchPin = 13; // Arduino D13 to IC pin 12 (ST_CP) -- White
@@ -16,6 +19,11 @@ int dataPin  = 11; // Arduino D11 to IC pin 14 (DS) -- Blue
 //-- Globals --
 volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
 volatile int8_t gZ = 0;
+
+//-- CapSense --
+CapacitiveSensor   cs_14_15 = CapacitiveSensor(14,15);
+CapacitiveSensor   cs_14_16 = CapacitiveSensor(14,16);
+CapacitiveSensor   cs_14_17 = CapacitiveSensor(14,17);
 
 void SetupPins()
 {
@@ -28,11 +36,24 @@ void SetupPins()
   }
 }
 
+void SetupCapSense()
+{
+  pinMode(14+0,OUTPUT);
+  pinMode(14+1,OUTPUT); //15
+  pinMode(14+2,OUTPUT); //16
+  pinMode(14+3,OUTPUT); //17
+  pinMode(14+4,OUTPUT); //18
+  pinMode(14+5,OUTPUT); //19
+  //cs_14_15.set_CS_AutocaL_Millis(0xFFFFFFFF);     // turn off autocalibrate on channel 1 - just as an example
+}
+
 void setup(void) {
   SetupPins();
+  SetupCapSense();
   CubeAllOff();
   //RunTests();
   SetupTimer();
+  Serial.begin(9600);
 }
 
 void SetupTimer()
@@ -407,12 +428,12 @@ void loop(void) {
   //Line_Up_a_wall(1);
   //BottomUp();
   
-  CubeRightLeft();  //delay(1000);
-  CubeLeftRight();  //delay(1000);
-  CubeUp();  //delay(1000);
-  CubeDown();  //delay(1000);
-  CubeAllOn(); delay(2000);
-  CubeAllOff();
+  //CubeRightLeft();  //delay(1000);
+  //CubeLeftRight();  //delay(1000);
+  //CubeUp();  //delay(1000);
+  //CubeDown();  //delay(1000);
+  //CubeAllOn(); delay(2000);
+  //CubeAllOff();
 
   //TestPattern2_Scan_one_layer(0);  //delay(1000);
   //TestPattern_scan_all_layers();  //delay(1000);
@@ -423,4 +444,16 @@ void loop(void) {
   //LeftRight();
   //OneWall();  delay(1000);
   //LayerOn(0); delay(4000);
+
+  //-- CapSense --
+  long total1 =  cs_14_15.capacitiveSensor(30);
+  long total2 =  cs_14_16.capacitiveSensor(30);
+  long total3 =  cs_14_17.capacitiveSensor(30);
+  //Serial.print(total1);                  // print sensor output 1
+  //Serial.print("\t");
+  Serial.println(total2);
+  if (total1>200) CubeUp();
+  if (total2>200) CubeLeftRight();
+  if (total3>200) CubeAllOn();
+  CubeAllOff();
 }
