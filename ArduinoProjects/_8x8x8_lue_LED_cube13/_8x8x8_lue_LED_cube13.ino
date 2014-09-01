@@ -24,6 +24,10 @@ volatile int8_t gZ = 0;
 int pot0; // Left Potentiometer (A4)
 int pot1; // Right Potentiometer (A5)
 int animSpeed; // Animation speed controlled by pot0
+float pi = 3.14;
+float pi2 = 6.28;
+const int8_t sineMaxIndex = 32;
+int8_t sineArray[sineMaxIndex];
 
 //-- CapSense --
 CapacitiveSensor   cs_14_15 = CapacitiveSensor(14,15);
@@ -55,6 +59,7 @@ void SetupCapSense()
 void setup(void) {
   SetupPins();
   SetupCapSense();
+  PreComputes();
   CubeAllOff();
   DrawRect(7,0,0, 7,7,7);
   //RunTests();
@@ -758,7 +763,7 @@ void CollapseToFloor()
 
 void RaiseSeaLevel()
 {
-  for (int8_t z=0; z<3; z++)
+  for (int8_t z=0; z<7; z++)
   {
     EraseRect(0,0,z, 7,7,z);
     DrawRect(0,0,z+1, 7,7,z+1);
@@ -767,18 +772,43 @@ void RaiseSeaLevel()
 }
 
 
+void DrawSine(int8_t offset, int8_t y)
+{
+  for (int8_t x=0; x<8; x++)
+  {
+    SetDot(x, y, sineArray[ (offset+x) % sineMaxIndex ]);
+  }
+}
+
 void RippleToRight()
 {
-  for (byte n=0; n<4; n++) // Three times
+//  for (int8_t index=0; index < sineMaxIndex ; index++)
+//  {
+//    Serial.print("index="); Serial.print(index);
+//    Serial.print(" sine="); Serial.println(sineArray[ index ]);
+//  }
+  
+  for (byte n=0; n<8; n++) // repeat animation n times
   {
-    for (int8_t x=1; x<8; x++) // Ripple left to right
+    for (byte offset=0; offset<sineMaxIndex; offset++)
     {
-      EraseLine(x,0,3, x,7,3); 
-      DrawLine(x,0,4, x,7,4); // Raise line one pixel higher than sea surface
-      delay(64);
-      EraseLine(x,0,4, x,7,4); 
-      DrawLine(x,0,3, x,7,3); // Lower line back down
+      CubeAllOff();
+      for (int8_t y=0; y<8; y++)
+      {
+        DrawSine(offset, y); 
+      }
+      delay(32);
     }
+  }
+}
+
+void PreComputes()
+{
+  
+  for (int8_t index=0; index < sineMaxIndex; index++)
+  {
+    float a = pi*2 * index / sineMaxIndex;
+    sineArray[ index ] = 4 + (sin(a) * 3.5);
   }
 }
 
