@@ -689,23 +689,24 @@ void BumpRight()
 
 void ShellThenShrink()
 {
-  FillLayerLeftToRight(0);
-  FillWallDownUp(7);
-  FillLayerRightLeft(7);
-  DropOneCenterLine(0);
-  FillWallFromCenter(0);
-  FillFrontAndBackRightLeft();
-  delay(250);
-  CubeShrink();
-  DropFromCenter();
-  delay(250);
-  SpreadFromCenter(0);
-  RaiseCorners();
-  ZipTop();
-  delay(500);
-  CollapseToFloor();
+//  FillLayerLeftToRight(0);
+//  FillWallDownUp(7);
+//  FillLayerRightLeft(7);
+//  DropOneCenterLine(0);
+//  FillWallFromCenter(0);
+//  FillFrontAndBackRightLeft();
+//  delay(250);
+//  CubeShrink();
+//  DropFromCenter();
+//  delay(250);
+//  SpreadFromCenter(0);
+//  RaiseCorners();
+//  ZipTop();
+//  delay(500);
+//  CollapseToFloor();
   RaiseSeaLevel();
   delay(500);
+  RippleFadeIn();
   RippleToRight();
 }
 
@@ -763,7 +764,7 @@ void CollapseToFloor()
 
 void RaiseSeaLevel()
 {
-  for (int8_t z=0; z<7; z++)
+  for (int8_t z=0; z<5; z++)
   {
     EraseRect(0,0,z, 7,7,z);
     DrawRect(0,0,z+1, 7,7,z+1);
@@ -780,6 +781,29 @@ void DrawSine(int8_t offset, int8_t y)
   }
 }
 
+void RippleFadeIn()
+{
+  for (int8_t x1=7; x1>=0; x1--)
+  {
+    int8_t index = 0;
+    CubeAllOff();
+    
+    for (int8_t x=0; x<8; x++)
+    {
+      for (int8_t y=0; y<8; y++)
+      {
+        if (x<x1)
+          SetDot(x, y, 5);
+        else
+          SetDot(x, y, sineArray[ index ]);
+      }
+      index++;
+    }
+    delay(32);
+  }
+}
+
+
 void RippleToRight()
 {
 //  for (int8_t index=0; index < sineMaxIndex ; index++)
@@ -788,7 +812,7 @@ void RippleToRight()
 //    Serial.print(" sine="); Serial.println(sineArray[ index ]);
 //  }
   
-  for (byte n=0; n<8; n++) // repeat animation n times
+  for (byte n=0; n<2; n++) // repeat animation n times
   {
     for (byte offset=0; offset<sineMaxIndex; offset++)
     {
