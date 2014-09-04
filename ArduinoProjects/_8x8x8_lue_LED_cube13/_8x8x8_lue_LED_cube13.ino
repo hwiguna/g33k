@@ -59,12 +59,14 @@ void SetupCapSense()
 void setup(void) {
   SetupPins();
   SetupCapSense();
+  Serial.begin(9600);
   PreComputes();
   CubeAllOff();
-  DrawRect(7,0,0, 7,7,7);
+  //LineTest();
+  
   //RunTests();
   SetupTimer();
-  Serial.begin(9600);
+  for (byte n=0; n<3; n++) Wiper();
 }
 
 void SetupTimer()
@@ -392,7 +394,7 @@ void TestPattern5_swipe_wall_up()
 }
 
 
-void SetDot(int8_t x,int8_t y,int8_t z)
+void SetDot(int8_t x,int8_t y, int8_t z)
 {
   //noInterrupts();
   bitSet(cube[y][z], x);
@@ -704,11 +706,185 @@ void ShellThenShrink()
 //  ZipTop();
 //  delay(500);
 //  CollapseToFloor();
-  RaiseSeaLevel();
-  delay(500);
-  RippleFadeIn();
-  RippleToRight();
+//  RaiseSeaLevel();
+//  delay(500);
+//  RippleFadeIn();
+//  RippleToRight();
+  /*TunnelOuter();*/
+  
 }
+
+void Wiper()
+{
+  int dly = 32;
+  for (int8_t y=0; y<8; y++) { DrawLine3(0,0, 7,y, 0); delay(dly); EraseLine3(0,0, 7,y, 0); }
+  for (int8_t x=7; x>=0; x--){ DrawLine3(0,0, x,7, 0); delay(dly); EraseLine3(0,0, x,7, 0); }
+  for (int8_t x=0; x<8; x++){ DrawLine3(0,0, x,7, 0); delay(dly); EraseLine3(0,0, x,7, 0); }
+  for (int8_t y=7; y>=0; y--) { DrawLine3(0,0, 7,y, 0); delay(dly); EraseLine3(0,0, 7,y, 0); }
+}
+
+
+void LineTest()
+{
+  DrawLine3(0,0, 7,0, 0);
+  DrawLine3(0,7, 0,0, 1);
+  DrawLine3(0,0, 7,7, 2);
+  DrawLine3(0,0, 4,7, 3);
+
+  DrawLine3(7,0, 0,0, 4);
+  DrawLine3(7,0, 0,4, 5);
+  DrawLine3(7,0, 0,7, 6);
+  DrawLine3(7,0, 4,7, 7);
+}
+
+/*
+plotLine(x0,y0, x1,y1)
+  dx=x1-x0
+  dy=y1-y0
+
+  D = 2*dy - dx
+  plot(x0,y0)
+  y=y0
+
+  for x from x0+1 to x1
+    if D > 0
+      y = y+1
+      plot(x,y)
+      D = D + (2*dy-2*dx)
+    else
+      plot(x,y)
+      D = D + (2*dy)
+
+*/
+
+void Swap(int8_t *x,int8_t *y)
+  {
+    int8_t t;
+    t=*x;
+    *x = *y;
+    *y = t;
+  }
+  
+void DrawLine3(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
+{
+    boolean steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) { Swap(&x0, &y0); Swap(&x1, &y1); }
+    if (x0 > x1) { Swap(&x0, &x1); Swap(&y0,&y1); }
+    int dX = (x1 - x0);
+    int dY = abs(y1 - y0);
+    int err = (dX / 2);
+    int ystep = (y0 < y1 ? 1 : -1);
+    int y = y0;
+ 
+    for (int x = x0; x <= x1; ++x)
+    {
+        if (steep) SetDot(y, x, z); else SetDot(x, y, z);
+        err = err - dY;
+        if (err < 0) { y += ystep;  err += dX; }
+    }
+}
+
+void EraseLine3(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
+{
+    boolean steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) { Swap(&x0, &y0); Swap(&x1, &y1); }
+    if (x0 > x1) { Swap(&x0, &x1); Swap(&y0,&y1); }
+    int dX = (x1 - x0);
+    int dY = abs(y1 - y0);
+    int err = (dX / 2);
+    int ystep = (y0 < y1 ? 1 : -1);
+    int y = y0;
+ 
+    for (int x = x0; x <= x1; ++x)
+    {
+        if (steep) ClearDot(y, x, z); else ClearDot(x, y, z);
+        err = err - dY;
+        if (err < 0) { y += ystep;  err += dX; }
+    }
+}
+
+void DrawLine2(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
+{
+   int dx = abs(x1-x0);
+   int dy = abs(y1-y0);
+   int sx = (x0 < x1) ? 1 : -1;
+   int sy = (y0 < y1) ? 1 : -1;
+   int err = dx-dy;
+
+  Serial.print("dx, dy, sx, sy, err =");
+  Serial.print(dx);  Serial.print(", ");
+  Serial.print(dy);  Serial.print(", ");
+  Serial.print(sx);  Serial.print(", ");
+  Serial.print(sy);  Serial.print(", ");
+  Serial.println(err);
+ 
+   while (true)
+   {
+//     Serial.print("x0,y0 = ");
+//     Serial.print(x0);  Serial.print(", ");
+//     Serial.println(y0);
+     SetDot(x0,y0, z);
+     if ((x0 == x1) && (y0 == y1)) exit;
+     int e2 = 2*err;
+     if (e2 > -dy)
+    { 
+       err = err - dy;
+       x0 = x0 + sx;
+    }
+     if (e2 < dx) 
+     {
+       err = err + dx;
+       y0 = y0 + sy;
+     }
+   }
+}
+
+void DrawLine_buggy(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
+{
+  int dx = x1-x0;
+  int dy = y1-y0;
+  
+  int D = 2*dy - dx;
+  SetDot(x0,y0, z);
+  int8_t y=y0;
+  
+  for (int8_t x=x0; x<=x1; x++)
+  {
+    if (D > 0)
+    {
+      y++;
+      SetDot(x,y, z);
+      D = D + (2*dy-2*dx);
+    }
+    else
+    {
+      SetDot(x,y, z);
+      D = D + (2*dy);
+    }
+  }
+}
+
+/*
+void TunnelOuter()
+{
+  for (int8_t f=0; f<16; f++)
+  {
+    int8_t c=32+f;
+    for (int8_t y=0; y<8; y++)
+    {
+      if ( (c % 3) == 0) {
+        //SetDot(7,y,0);
+        DrawRect(0,y,0, 7,y,7); 
+      }
+      else
+        //ClearDot(7,y,0);
+        EraseRect(0,y,0, 7,y,7); 
+      c--;
+    }
+    delay(64);
+  }
+}
+*/
 
 void DropFromCenter()
 {
@@ -874,7 +1050,7 @@ void loop(void) {
 
   animSpeed = map(pot0, 0,1023, 16,256);
 
-  CubeAllOff();
+  //CubeAllOff();
   //NormalState();
 }
 
