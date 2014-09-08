@@ -66,7 +66,32 @@ void setup(void) {
   
   //RunTests();
   SetupTimer();
-  for (byte n=0; n<3; n++) Wiper();
+  //for (byte n=0; n<3; n++) Wiper();
+  //TestBresenham3D();
+  CenterDiagonals();
+}
+
+void TestBresenham3D()
+{
+  // Edges
+//  Bresenham3D(0,0,0, 7,0,0);
+//  Bresenham3D(0,0,0, 0,7,0);
+//  Bresenham3D(0,0,0, 0,0,7);
+//
+//  // XY Plane
+//  Bresenham3D(0,0,0, 7,4,0);
+//  Bresenham3D(0,0,0, 7,7,0);
+//  Bresenham3D(0,0,0, 4,7,0);
+//
+//  // XZ Plane
+//  Bresenham3D(0,0,0, 7,0,4);
+//  Bresenham3D(0,0,0, 7,0,7);
+//  Bresenham3D(0,0,0, 4,0,7);
+//
+//  // YZ Plan
+//  Bresenham3D(0,0,0, 0,7,4);
+//  Bresenham3D(0,0,0, 0,7,7);
+//  Bresenham3D(0,0,0, 0,4,7);
 }
 
 void SetupTimer()
@@ -398,6 +423,12 @@ void SetDot(int8_t x,int8_t y, int8_t z)
 {
   //noInterrupts();
   bitSet(cube[y][z], x);
+
+  Serial.print("X,Y,Z = ");
+  Serial.print(x);  Serial.print(",");
+  Serial.print(y);  Serial.print(",");
+  Serial.println(z);
+
   //interrupts();
 }
 
@@ -803,6 +834,90 @@ void EraseLine3(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
     }
 }
 
+void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t y2, const int8_t z2)
+{
+  // This routine is from:
+  //https://gist.github.com/yamamushi/5823518
+  // I only adapted it for my sketch.
+  
+  int8_t i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
+  int8_t point[3];
+  
+  point[0] = x1;
+  point[1] = y1;
+  point[2] = z1;
+  dx = x2 - x1;
+  dy = y2 - y1;
+  dz = z2 - z1;
+  x_inc = (dx < 0) ? -1 : 1;
+  l = abs(dx);
+  y_inc = (dy < 0) ? -1 : 1;
+  m = abs(dy);
+  z_inc = (dz < 0) ? -1 : 1;
+  n = abs(dz);
+  dx2 = l << 1;
+  dy2 = m << 1;
+  dz2 = n << 1;
+  
+  if ((l >= m) && (l >= n)) {
+      err_1 = dy2 - l;
+      err_2 = dz2 - l;
+      for (i = 0; i < l; i++) {
+          //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
+          SetDot(point[0], point[1], point[2]);
+          if (err_1 > 0) {
+              point[1] += y_inc;
+              err_1 -= dx2;
+          }
+          if (err_2 > 0) {
+              point[2] += z_inc;
+              err_2 -= dx2;
+          }
+          err_1 += dy2;
+          err_2 += dz2;
+          point[0] += x_inc;
+      }
+  } else if ((m >= l) && (m >= n)) {
+      err_1 = dx2 - m;
+      err_2 = dz2 - m;
+      for (i = 0; i < m; i++) {
+          //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
+          SetDot(point[0], point[1], point[2]);
+          if (err_1 > 0) {
+              point[0] += x_inc;
+              err_1 -= dy2;
+          }
+          if (err_2 > 0) {
+              point[2] += z_inc;
+              err_2 -= dy2;
+          }
+          err_1 += dx2;
+          err_2 += dz2;
+          point[1] += y_inc;
+      }
+  } else {
+      err_1 = dy2 - n;
+      err_2 = dx2 - n;
+      for (i = 0; i < n; i++) {
+          //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
+          SetDot(point[0], point[1], point[2]);
+          if (err_1 > 0) {
+              point[1] += y_inc;
+              err_1 -= dz2;
+          }
+          if (err_2 > 0) {
+              point[0] += x_inc;
+              err_2 -= dz2;
+          }
+          err_1 += dy2;
+          err_2 += dx2;
+          point[2] += z_inc;
+      }
+  }
+  //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
+  SetDot(point[0], point[1], point[2]);
+}
+
 void DrawLine2(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
 {
    int dx = abs(x1-x0);
@@ -837,6 +952,15 @@ void DrawLine2(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
        y0 = y0 + sy;
      }
    }
+}
+
+void CenterDiagonals()
+{
+//  Bresenham3D(0,0,0, 7,7,7); // FrontBottomLeft - BackRightTop
+//  Bresenham3D(7,0,0, 0,7,7); // FrontBottomRight - BackLeftTop
+
+//  Bresenham3D(0,0,7, 7,7,0);  // FrontTopLeft - BackRightBottom
+//  Bresenham3D(7,0,7, 0,7,0);  // FrontTopRight - BackLeftBottom
 }
 
 void DrawLine_buggy(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
