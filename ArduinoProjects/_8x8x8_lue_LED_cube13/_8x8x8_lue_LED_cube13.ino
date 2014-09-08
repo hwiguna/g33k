@@ -23,6 +23,7 @@ volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
 volatile int8_t gZ = 0;
 int pot0; // Left Potentiometer (A4)
 int pot1; // Right Potentiometer (A5)
+int oldPot0;
 int animSpeed; // Animation speed controlled by pot0
 float pi = 3.14;
 float pi2 = 6.28;
@@ -68,30 +69,73 @@ void setup(void) {
   SetupTimer();
   //for (byte n=0; n<3; n++) Wiper();
   //TestBresenham3D();
-  CenterDiagonals();
+  //CenterDiagonals();
+  //Pyramid3();
 }
 
-void TestBresenham3D()
+void Pyramid3()
+{
+  if (abs(pot0-oldPot0)>100)
+  {
+    oldPot0 = pot0;
+    CubeAllOff();
+    for (int8_t n=0; n<4; n++)
+    {
+      int8_t z = n * map(pot0, 200,1000, 1,7) / 3;
+      DrawRect(n,n,z, 7-n,7-n,z); // XY plane
+      if (z+1<8) DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
+    }
+  }
+}
+
+void Pyramid2()
+{
+  for (int8_t n=0; n<4; n++)
+  {
+    int8_t z = n*2;
+    DrawRect(n,n,z, 7-n,7-n,z); // XY plane
+    DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
+  }
+}
+
+void Pyramid1()
+{
+  int8_t h = 4;
+  
+  // Base
+  DrawLine3D(0,0,0, 6,0,0);
+  DrawLine3D(6,6,0, 6,0,0);
+  DrawLine3D(6,6,0, 0,6,0);
+  DrawLine3D(0,0,0, 0,6,0);
+  
+  // Sides
+  DrawLine3D(0,0,0, 3,3,h);
+  DrawLine3D(6,0,0, 3,3,h);
+  DrawLine3D(6,6,0, 3,3,h);
+  DrawLine3D(0,6,0, 3,3,h);
+}
+
+void TestDrawLine3D()
 {
   // Edges
-//  Bresenham3D(0,0,0, 7,0,0);
-//  Bresenham3D(0,0,0, 0,7,0);
-//  Bresenham3D(0,0,0, 0,0,7);
+//  DrawLine3D(0,0,0, 7,0,0);
+//  DrawLine3D(0,0,0, 0,7,0);
+//  DrawLine3D(0,0,0, 0,0,7);
 //
 //  // XY Plane
-//  Bresenham3D(0,0,0, 7,4,0);
-//  Bresenham3D(0,0,0, 7,7,0);
-//  Bresenham3D(0,0,0, 4,7,0);
+//  DrawLine3D(0,0,0, 7,4,0);
+//  DrawLine3D(0,0,0, 7,7,0);
+//  DrawLine3D(0,0,0, 4,7,0);
 //
 //  // XZ Plane
-//  Bresenham3D(0,0,0, 7,0,4);
-//  Bresenham3D(0,0,0, 7,0,7);
-//  Bresenham3D(0,0,0, 4,0,7);
+//  DrawLine3D(0,0,0, 7,0,4);
+//  DrawLine3D(0,0,0, 7,0,7);
+//  DrawLine3D(0,0,0, 4,0,7);
 //
 //  // YZ Plan
-//  Bresenham3D(0,0,0, 0,7,4);
-//  Bresenham3D(0,0,0, 0,7,7);
-//  Bresenham3D(0,0,0, 0,4,7);
+//  DrawLine3D(0,0,0, 0,7,4);
+//  DrawLine3D(0,0,0, 0,7,7);
+//  DrawLine3D(0,0,0, 0,4,7);
 }
 
 void SetupTimer()
@@ -424,10 +468,10 @@ void SetDot(int8_t x,int8_t y, int8_t z)
   //noInterrupts();
   bitSet(cube[y][z], x);
 
-  Serial.print("X,Y,Z = ");
-  Serial.print(x);  Serial.print(",");
-  Serial.print(y);  Serial.print(",");
-  Serial.println(z);
+//  Serial.print("X,Y,Z = ");
+//  Serial.print(x);  Serial.print(",");
+//  Serial.print(y);  Serial.print(",");
+//  Serial.println(z);
 
   //interrupts();
 }
@@ -722,27 +766,26 @@ void BumpRight()
 
 void ShellThenShrink()
 {
-//  FillLayerLeftToRight(0);
-//  FillWallDownUp(7);
-//  FillLayerRightLeft(7);
-//  DropOneCenterLine(0);
-//  FillWallFromCenter(0);
-//  FillFrontAndBackRightLeft();
-//  delay(250);
-//  CubeShrink();
-//  DropFromCenter();
-//  delay(250);
-//  SpreadFromCenter(0);
-//  RaiseCorners();
-//  ZipTop();
-//  delay(500);
-//  CollapseToFloor();
-//  RaiseSeaLevel();
-//  delay(500);
-//  RippleFadeIn();
-//  RippleToRight();
+  FillLayerLeftToRight(0);
+  FillWallDownUp(7);
+  FillLayerRightLeft(7);
+  DropOneCenterLine(0);
+  FillWallFromCenter(0);
+  FillFrontAndBackRightLeft();
+  delay(250);
+  CubeShrink();
+  DropFromCenter();
+  delay(250);
+  SpreadFromCenter(0);
+  RaiseCorners();
+  ZipTop();
+  delay(500);
+  CollapseToFloor();
+  RaiseSeaLevel();
+  delay(500);
+  RippleFadeIn();
+  RippleToRight();
   /*TunnelOuter();*/
-  
 }
 
 void Wiper()
@@ -834,7 +877,7 @@ void EraseLine3(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
     }
 }
 
-void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t y2, const int8_t z2)
+void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t y2, const int8_t z2, const byte mode)
 {
   // This routine is from:
   //https://gist.github.com/yamamushi/5823518
@@ -864,7 +907,7 @@ void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t 
       err_2 = dz2 - l;
       for (i = 0; i < l; i++) {
           //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
-          SetDot(point[0], point[1], point[2]);
+          if (mode) SetDot(point[0], point[1], point[2]); else ClearDot(point[0], point[1], point[2]);
           if (err_1 > 0) {
               point[1] += y_inc;
               err_1 -= dx2;
@@ -882,7 +925,7 @@ void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t 
       err_2 = dz2 - m;
       for (i = 0; i < m; i++) {
           //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
-          SetDot(point[0], point[1], point[2]);
+          if (mode) SetDot(point[0], point[1], point[2]); else ClearDot(point[0], point[1], point[2]);
           if (err_1 > 0) {
               point[0] += x_inc;
               err_1 -= dy2;
@@ -900,7 +943,7 @@ void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t 
       err_2 = dx2 - n;
       for (i = 0; i < n; i++) {
           //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
-          SetDot(point[0], point[1], point[2]);
+          if (mode) SetDot(point[0], point[1], point[2]); else ClearDot(point[0], point[1], point[2]);
           if (err_1 > 0) {
               point[1] += y_inc;
               err_1 -= dz2;
@@ -915,7 +958,22 @@ void Bresenham3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t 
       }
   }
   //output->getTileAt(point[0], point[1], point[2])->setSymbol(symbol);
-  SetDot(point[0], point[1], point[2]);
+  if (mode) SetDot(point[0], point[1], point[2]); else ClearDot(point[0], point[1], point[2]);
+}
+
+void CalcLine3D(int8_t x1, int8_t y1, int8_t z1, const int8_t x2, const int8_t y2, const int8_t z2, byte mode)
+{
+  Bresenham3D(x1,y1,z1, x2,y2,z2, mode);
+}
+
+void DrawLine3D(int8_t x0, int8_t y0, int8_t z0, const int8_t x1, const int8_t y1, const int8_t z1)
+{
+  CalcLine3D(x0,y0,z0, x1,y1,z1, 1);
+}
+
+void EraseLine3D(int8_t x0, int8_t y0, int8_t z0, const int8_t x1, const int8_t y1, const int8_t z1)
+{
+  CalcLine3D(x0,y0,z0, x1,y1,z1, 0);
 }
 
 void DrawLine2(int8_t x0,int8_t y0, int8_t x1,int8_t y1, int8_t z)
@@ -1176,5 +1234,160 @@ void loop(void) {
 
   //CubeAllOff();
   //NormalState();
+  //Pyramid3();
+  //Fans();
+  //EdgesRandom();
+  while (true) 
+  { 
+    EdgeBurst2(0);  FollowLine(0,7,0, 1,0,0);
+    EdgeBurst2(1);  FollowLine(7,7,0, 0,-1,0);
+    EdgeBurst2(2);  FollowLine(7,0,0, -1,0,0);
+    EdgeBurst2(3);  FollowLine(0,0,0, 0,1,0);
+  }
 }
+
+void FollowLine(int8_t x0, int8_t y0, int8_t z0, int8_t dx, int8_t dy, int8_t dz)
+{
+  for (int8_t n=0; n<8; n++)
+  {
+    SetDot(x0,y0,z0);
+    delay(64);
+    ClearDot(x0,y0,z0);
+    x0 = x0 + dx;
+    y0 = y0 + dy;
+    z0 =z0 + dz;
+  }
+}
+
+void EdgeBurst()
+{
+  for (int8_t n=0; n<8; n++)
+  {
+    DrawLine3D(n,7,0, 0,7-n,0);
+    DrawLine3D(0,7-n,0, 0,7,n);
+    DrawLine3D(0,7,n, n,7,0);
+    delay(64);
+    EraseLine3D(n,7,0, 0,7-n,0);
+    EraseLine3D(0,7-n,0, 0,7,n);
+    EraseLine3D(0,7,n, n,7,0);
+  }
+
+  for (int8_t n=7; n>=0; n--)
+  {
+    DrawLine3D(n,7,0, 0,7-n,0);
+    DrawLine3D(0,7-n,0, 0,7,n);
+    DrawLine3D(0,7,n, n,7,0);
+    delay(64);
+    EraseLine3D(n,7,0, 0,7-n,0);
+    EraseLine3D(0,7-n,0, 0,7,n);
+    EraseLine3D(0,7,n, n,7,0);
+  }
+}
+
+void EdgeBurst2(int8_t corner)
+{
+  for (int8_t dir=0; dir<2; dir++)
+  {
+    for (int8_t n=0; n<8; n++)
+    {
+      int8_t up = (dir==0) ? n : 7-n;
+      int8_t down = (dir==0) ? 7-up : n;
+
+      for (int8_t mode=1; mode>=0; mode--)
+      {
+        switch (corner)
+        {
+        case 0:
+          //-- Bottom Left --      
+          CalcLine3D(up,7,0, 0,down,0, mode);
+          CalcLine3D(0,down,0, 0,7,up, mode);
+          CalcLine3D(0,7,up, up,7,0, mode);
+          break;
+  
+        case 1:
+          //-- Bottom Right --
+          CalcLine3D(down,7,0, 7,down,0, mode);
+          CalcLine3D(7,down,0, 7,7,up, mode);
+          CalcLine3D(7,7,up, down,7,0, mode);
+          break;
+        
+        case 2:
+        //-- Front Right
+        CalcLine3D(down,0,0, 7,up,0, mode);
+        CalcLine3D(7,up,0, 7,0,up, mode);
+        CalcLine3D(7,0,up, down,0,0, mode);
+        break;
+        
+      case 3:
+        //-- Front Left
+        CalcLine3D(up,0,0, 0,up,0, mode);
+        CalcLine3D(0,up,0, 0,0,up, mode);
+        CalcLine3D(0,0,up, up,0,0, mode);
+        break;
+        }
+        if (mode==1) delay(64);
+      }
+    }
+  }
+}
+
+void EdgesRandom()
+{
+  int8_t x, y, z;
+  while (true)
+  {
+    x += -1 + random(0,3);
+    y += -1 + random(0,3);
+    z += -1 + random(0,3);
+    if (x<0) x=7; if (x>7)x=0;
+    if (y<0) y=7; if (y>7)y=0;
+    if (z<0) z=7; if (z>7)z=0;
+    DrawLine3D(x,7,0, 0,y,0);
+    DrawLine3D(0,y,0, 0,7,z);
+    DrawLine3D(0,7,z, x,7,0);
+    delay(64);
+    EraseLine3D(x,7,0, 0,y,0);
+    EraseLine3D(0,y,0, 0,7,z);
+    EraseLine3D(0,7,z, x,7,0);
+  }
+}
+
+void Fans()
+{
+  // Fan out
+  for (int8_t dx=0; dx<4; dx++)
+  {
+    for (int8_t y=0; y<8; y++)
+    {
+      DrawLine3D(4,y,7, 4+dx,y,0);
+      DrawLine3D(3,y,7, 3-dx,y,0);
+    }
+    delay(64);
+    if (dx==3) delay(128);
+    CubeAllOff();//    for (int8_t y=0; y<8; y++)
+//    {
+//      EraseLine3D(4,y,7, 4+dx,y,0);
+//      EraseLine3D(3,y,7, 3-dx,y,0);
+//    }
+  }
+
+  // Fan in
+  for (int8_t dx=3; dx>=0; dx--)
+  {
+    for (int8_t y=0; y<8; y++)
+    {
+      DrawLine3D(4,y,7, 4+dx,y,0);
+      DrawLine3D(3,y,7, 3-dx,y,0);
+    }
+    delay(64);
+    if (dx==0) delay(128);
+    CubeAllOff();
+//    for (int8_t y=0; y<8; y++)
+//    {
+//      EraseLine3D(4,y,7, 4+dx,y,0);
+//      EraseLine3D(3,y,7, 3-dx,y,0);
+//    }
+  }
+}
+
 
