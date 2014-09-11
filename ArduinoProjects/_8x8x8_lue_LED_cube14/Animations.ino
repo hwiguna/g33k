@@ -43,6 +43,8 @@ void MainShow()
   EdgeBurst2(2);  FollowLine(7,0,0, -1,0,0);
   EdgeBurst2(3);  //FollowLine(0,0,0, 0,1,0);
 
+  for (byte n=0; n<3; n++) WallJump();
+  
 //  DotToRect();
 //  FillBottom();
 }
@@ -943,3 +945,126 @@ void SnakeSpiralDown()
     }
   }
 }
+
+void WallJump()
+{
+  int8_t d = 50;
+  
+  // 2x2 rect on left wall
+  // Expand left to full left wall
+  for (int8_t n=0; n<4; n++)
+  {
+    DrawRect(0,3-n,3-n, 0,4+n,4+n);
+    delay(d);
+  }
+  
+  // Pull right into 2x2 rect
+  int8_t pattern[] = {0,1,2,2,2,3,3,3};
+  for (int8_t n=0; n<8+3; n++)
+  {
+    int8_t e = n-3;
+    if (e>=0) {
+      int8_t de = pattern[e];
+      EraseRect(e, de,de, e,7-de,7-de);
+    }
+    
+    if (n<8) {
+      int8_t dd = pattern[n];
+      DrawRect(n,dd,dd, n,7-dd,7-dd);
+      delay(d);
+    }
+  }
+  
+  // Expand right to full right wall
+  for (int8_t n=0; n<4; n++)
+  {
+    DrawRect(7,3-n,3-n, 7,4+n,4+n);
+    delay(d);
+  }
+
+  // Pull left into 2x2 rect
+//  int8_t pattern[] = {0,1,2,2,2,3,3,3};
+  for (int8_t n=0; n<8+3; n++)
+  {
+    int8_t e = n-3;
+    if (e>=0) {
+      int8_t de = pattern[e];
+      EraseRect(7-e, de,de, 7-e,7-de,7-de);
+    }
+    
+    if (n<8) {
+      int8_t dd = pattern[n];
+      DrawRect(7-n,dd,dd, 7-n,7-dd,7-dd);
+      delay(d);
+    }
+  }
+  
+}
+
+void AnArrow()
+{  
+  for (int8_t x=0; x<8; x++)
+  {
+    int8_t v = arrow[x];
+    for (int8_t y=0; y<8; y++)
+    {
+      if (bitRead(v,y)) SetDot(x,0,y);
+    }
+  }
+  delay(1000);
+  CubeAllOff();
+}
+
+void AnimatedDot()
+{
+  int8_t iMax = sizeof(pathSquare)/2;
+  for (int8_t i=0; i<iMax; i++)
+  {
+    int8_t x = pathSquare[i][0];
+    int8_t y = pathSquare[i][1];
+    //SetDot(x,y,0);
+    DrawLine3D(5,5,0, x,Crop(y-2),7);
+    DrawLine3D(5,5,0, x,Crop(y+2),7);
+    DrawLine3D(5,5,0, Crop(x-2),y,7);
+    DrawLine3D(5,5,0, Crop(x+2),y,7);
+    delay(64);
+    //ClearDot(x,y,7);
+    EraseLine3D(5,5,0, x,Crop(y-2),7);
+    EraseLine3D(5,5,0, x,Crop(y+2),7);
+    EraseLine3D(5,5,0, Crop(x-2),y,7);
+    EraseLine3D(5,5,0, Crop(x+2),y,7);
+  }
+}
+
+
+void Tornado()
+{
+  int8_t eye = (sizeof(pathSmallCircle)/2) - 1;
+  int8_t iMax = sizeof(pathSquare)/2;
+  for (int8_t i=0; i<iMax; i++)
+  {
+    int8_t x = pathSquare[i][0];
+    int8_t y = pathSquare[i][1];
+
+    int8_t x0 = pathSmallCircle[eye][0];
+    int8_t y0 = pathSmallCircle[eye][1];
+    int8_t z0 = 0;
+    
+    if ((i % 5)==0) {
+      eye = eye - 1;
+      if (eye<0) eye = (sizeof(pathSmallCircle)/2) - 1;
+    }
+
+    DrawLine3D(x0,y0,z0, x,Crop(y-2),7);
+    DrawLine3D(x0,y0,z0, x,Crop(y+2),7);
+    DrawLine3D(x0,y0,z0, Crop(x-2),y,7);
+    DrawLine3D(x0,y0,z0, Crop(x+2),y,7);
+    delay(64);
+    //ClearDot(x,y,7);
+    EraseLine3D(x0,y0,z0, x,Crop(y-2),7);
+    EraseLine3D(x0,y0,z0, x,Crop(y+2),7);
+    EraseLine3D(x0,y0,z0, Crop(x-2),y,7);
+    EraseLine3D(x0,y0,z0, Crop(x+2),y,7);
+  }
+}
+
