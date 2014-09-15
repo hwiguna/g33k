@@ -183,6 +183,7 @@ void SetDot(int8_t x,int8_t y, int8_t z)
 //  Serial.println(z);
 
   //interrupts();
+  if (slomo) delay(64);
 }
 
 void ClearDot(int8_t x,int8_t y,int8_t z)

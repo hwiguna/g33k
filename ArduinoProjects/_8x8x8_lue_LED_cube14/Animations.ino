@@ -1,5 +1,6 @@
 void MainShow()
 {
+  OpeningAnt();
   SnakeSpiralDown();
 
   FillLayerLeftToRight(0);
@@ -1068,3 +1069,102 @@ void Tornado()
   }
 }
 
+void MarchingAnts(int z)
+{
+  int mSec = 200 - (z*20);
+  int8_t iMax = sizeof(pathSquare)/2;
+  for (int8_t frame=0; frame<3; frame++)
+  {
+    for (int8_t i=0; i<iMax; i=i+3)
+    {
+      int8_t drawIndex = (frame+i);
+      int8_t eraseIndex = (frame+i-1);
+      drawIndex = (drawIndex >= iMax) ? drawIndex-iMax : drawIndex;
+      eraseIndex = eraseIndex < 0 ? iMax-eraseIndex : eraseIndex;
+
+      int8_t x = pathSquare[eraseIndex][0];
+      int8_t y = pathSquare[eraseIndex][1];
+      //ClearDot(x,0,y);
+      ClearDot(x,y,z);
+      //EraseLine3D(x,y,0, x,y,7);
+      //EraseLine3D(x,0,y, x,4,y);
+
+      x = pathSquare[drawIndex][0];
+      y = pathSquare[drawIndex][1];
+      //SetDot(x,0,y);
+      SetDot(x,y,z);
+      //DrawLine3D(x,y,0, x,y,7);
+      //DrawLine3D(x,0,y, x,4,y);
+    }
+    delay(mSec);
+  }
+}
+
+void OpeningAnt()
+{
+  for (int8_t z=0; z<8; z++)
+  {
+    for (int8_t n=0; n<3; n++)
+      MarchingAnts(z);
+    CubeAllOff();
+  }
+  //DrawRect(0,0,7, 7,7,7);
+}
+
+void FleaJump(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
+{
+  int8_t xRange = x1-x0;
+  float xMin = -xRange/2;
+  float xMax = xRange/2;
+  float c = height;
+  float a = -c / pow(xMax, 2);
+  for (float dx=0; dx<xRange; dx++)
+  {
+    float x = xMin + dx;
+    float y = a * pow(x,2) + c;
+    if (rotation==0)
+    {
+      SetDot(x0+dx,y0,y);
+      delay(64);
+      ClearDot(x0+dx,y0,y);
+    }
+    else
+    {
+      SetDot(y0, x0+dx,y);
+      delay(64);
+      ClearDot(y0, x0+dx,y);
+    }
+  }
+}
+void FleaJumpBack(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
+{
+  int8_t xRange = x1-x0;
+  float xMin = -xRange/2;
+  float xMax = xRange/2;
+  float c = height;
+  float a = -c / pow(xMax, 2);
+//  Serial.print("xMax = "); Serial.println(xMax);
+//  Serial.print("xMin = "); Serial.println(xMin);
+//  Serial.print("c = "); Serial.println(c);
+//  Serial.print("a = "); Serial.println(a);
+  for (float dx=xRange-1; dx>=0; dx--)
+  {
+    float x = xMin + dx;
+    float y = a * pow(x,2) + c;
+    //Serial.print("X = "); Serial.println(x);
+    if (rotation==0)
+    {
+//      Serial.print("x,y = "); Serial.print(floor(x0+dx));
+//      Serial.print(","); Serial.println(y);
+      SetDot(x0+dx,y0,y);
+      delay(64);
+      ClearDot(x0+dx,y0,y);
+    }
+    else
+    {
+      SetDot(y0, x0+dx,y);
+      delay(64);
+      ClearDot(y0, x0+dx,y);
+    }
+  }
+}

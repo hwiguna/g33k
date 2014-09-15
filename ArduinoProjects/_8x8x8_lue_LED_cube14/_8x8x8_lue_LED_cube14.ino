@@ -12,7 +12,7 @@
 // v11 - Add Capsense library
 // v12 - Add two potentiometers on Analog 4 and 5
 // v13 - Working on patterns
-// v14 - Split code into multiple tabs
+// v14 - Split code into multiple tabs, Flea Jump
 
 //-- Shift Register pins --
 int latchPin = 13; // Arduino D13 to IC pin 12 (ST_CP) -- White
@@ -20,6 +20,7 @@ int clockPin = 12; // Arduino D12 to IC pin 11 (SH_CP) -- Yelow
 int dataPin  = 11; // Arduino D11 to IC pin 14 (DS) -- Blue
 
 //-- Globals --
+byte slomo = 0;
 volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
 volatile int8_t gZ = 0;
 int pot0; // Left Potentiometer (A4)
@@ -133,6 +134,10 @@ void loop(void) {
   //while (true) WallJump();
   //AnArrow();
   //while (true) AnimatedDot();
-    while (true) Tornado();
+    //while (true) Tornado();
+  FleaJump    (1, 7, 4, 1, 0); // front
+  FleaJump    (1, 7, 3, 6, 1); // right
+  FleaJumpBack(1, 7, 3, 6, 0); // back
+  FleaJumpBack(1, 7, 4, 1, 1); // left
 }
 
