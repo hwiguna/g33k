@@ -1111,6 +1111,7 @@ void OpeningAnt()
   //DrawRect(0,0,7, 7,7,7);
 }
 
+/*
 void FleaJump(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
 {
   int8_t xRange = x1-x0;
@@ -1136,6 +1137,7 @@ void FleaJump(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
     }
   }
 }
+
 void FleaJumpBack(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
 {
   int8_t xRange = x1-x0;
@@ -1168,3 +1170,52 @@ void FleaJumpBack(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotatio
     }
   }
 }
+*/
+
+void FleaJmp(
+  int8_t x0, int8_t y0,
+  int8_t x1, int8_t y1, int8_t height)
+{
+  int8_t range;
+  int8_t rotation;
+  int8_t bgn,enz,stp, strt, loopMax;
+  if (y0==y1) {rotation=0; range=abs(x1-x0); loopMax=range; if (x1>x0) {strt=x0; bgn=0; enz=loopMax+1; stp=1;} else {strt=x1; bgn=loopMax; enz=-1; stp=-1;}};
+  if (x0==x1) {rotation=1; range=abs(y1-y0); loopMax=range; if (y1>y0) {strt=y0; bgn=0; enz=loopMax+1; stp=1;} else {strt=y1; bgn=loopMax; enz=-1; stp=-1;}};
+
+  float xMin = -range/2.0;
+  float xMax = range/2.0;
+  float xStp = 1.0;
+  float c = height;
+  float a = -c / pow(xMax, 2);
+
+//  Serial.println();
+//  Serial.print("bgn, enz = "); Serial.print(bgn);    
+//  Serial.print(", "); Serial.println(enz);
+//  Serial.print("xMin, xMax, xStp = "); Serial.print(xMin);    
+//  Serial.print(", "); Serial.print(xMax);
+//  Serial.print(", "); Serial.println(xStp);
+  float x = xMin;
+  for (int8_t dx=bgn; dx!=enz; dx=dx+stp)
+  {
+    int8_t p = strt + dx;
+    float z = a * pow(x,2) + c;
+//    Serial.print("dx, x,p,z = "); Serial.print(dx);
+//    Serial.print(", "); Serial.print(x);
+//    Serial.print(", "); Serial.print(p);
+//    Serial.print(", "); Serial.println(z);
+    if (rotation==0)
+    {
+      SetDot(p,y0, z);
+      delay(64);
+      ClearDot(p,y0, z);
+    }
+    else
+    {
+      SetDot(x0,p, z);
+      delay(64);
+      ClearDot(x0,p, z);
+    }
+    x = x + xStp;
+  }
+}
+
