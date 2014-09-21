@@ -1111,68 +1111,7 @@ void OpeningAnt()
   //DrawRect(0,0,7, 7,7,7);
 }
 
-/*
-void FleaJump(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
-{
-  int8_t xRange = x1-x0;
-  float xMin = -xRange/2;
-  float xMax = xRange/2;
-  float c = height;
-  float a = -c / pow(xMax, 2);
-  for (float dx=0; dx<xRange; dx++)
-  {
-    float x = xMin + dx;
-    float y = a * pow(x,2) + c;
-    if (rotation==0)
-    {
-      SetDot(x0+dx,y0,y);
-      delay(64);
-      ClearDot(x0+dx,y0,y);
-    }
-    else
-    {
-      SetDot(y0, x0+dx,y);
-      delay(64);
-      ClearDot(y0, x0+dx,y);
-    }
-  }
-}
-
-void FleaJumpBack(int8_t x0, int8_t x1, int8_t height, int8_t y0, int8_t rotation)
-{
-  int8_t xRange = x1-x0;
-  float xMin = -xRange/2;
-  float xMax = xRange/2;
-  float c = height;
-  float a = -c / pow(xMax, 2);
-//  Serial.print("xMax = "); Serial.println(xMax);
-//  Serial.print("xMin = "); Serial.println(xMin);
-//  Serial.print("c = "); Serial.println(c);
-//  Serial.print("a = "); Serial.println(a);
-  for (float dx=xRange-1; dx>=0; dx--)
-  {
-    float x = xMin + dx;
-    float y = a * pow(x,2) + c;
-    //Serial.print("X = "); Serial.println(x);
-    if (rotation==0)
-    {
-//      Serial.print("x,y = "); Serial.print(floor(x0+dx));
-//      Serial.print(","); Serial.println(y);
-      SetDot(x0+dx,y0,y);
-      delay(64);
-      ClearDot(x0+dx,y0,y);
-    }
-    else
-    {
-      SetDot(y0, x0+dx,y);
-      delay(64);
-      ClearDot(y0, x0+dx,y);
-    }
-  }
-}
-*/
-
-void FleaJmp(
+void FleaJump(
   int8_t x0, int8_t y0,
   int8_t x1, int8_t y1, int8_t height)
 {
@@ -1217,5 +1156,87 @@ void FleaJmp(
     }
     x = x + xStp;
   }
+}
+
+void RandomFleaJumps()
+{
+  int8_t x0;
+  int8_t y0;
+  int8_t x1 = random(8);
+  int8_t y1 = random(8);
+  int8_t height;
+  int8_t nTimes = 20;
+
+  for (int8_t n=0; n<nTimes; n++)
+  {
+    int8_t jumps = random(4,9);
+    for (int8_t j=0; j<jumps; j++)
+    {
+      x0=x1; y0=y1;
+      if (random(2) == 0) {
+        x1 = Crop(x1 + random(-7,8));
+      }
+      else {
+        y1 = Crop(y1 + random(-7,8));
+      }
+      height = random(3,6);
+      FleaJump(x0,y0, x1,y1, height);
+    }
+    SetDot(x1,y1,0);
+    delay(500+random(500));
+  }
+  ClearDot(x1,y1,0);
+}
+
+void Rain()
+{
+  //-- Draw plane --
+  DrawRect(0,0,7, 7,7,7); // Draw top plane
+  
+  //-- Create an array of those pixels --
+  int8_t plane[8][8]; // z position of each dot on the plane
+  for (int8_t x=0; x<8; x++)
+    for (int8_t y=0; y<8; y++) {
+      plane[x][y] = 7;
+    }
+      
+  int8_t floorCount = 0;
+  while (floorCount<64)
+  {
+    //-- Pick a random dot on the plane to start moving --
+    boolean found = false;
+    byte tryCount = 0;
+    while (!found && tryCount++<20) {       
+      int8_t x = random(8);
+      int8_t y = random(8);
+      int8_t z = plane[x][y];
+      if (z==7) {
+        ClearDot(x,y,7);
+        plane[x][y]--;
+        found = true;
+      }
+    }
+    
+    //-- Fly pixels \that is no longer on plane to opposite side
+    floorCount = 0;
+    for (int8_t x=0; x<8; x++)
+    {
+      for (int8_t y=0; y<8; y++) {
+        int8_t z = plane[x][y];
+        if (z<7 && z>0) {
+          ClearDot(x,y,z);
+          z--;
+          SetDot(x,y,z);
+          plane[x][y] = z;
+        }
+        
+        if (plane[x][y]==0) floorCount++;
+      }
+    }
+    delay(64);
+  }
+  
+  delay(1000);
+  EraseRect(0,0,0, 7,7,0);
 }
 

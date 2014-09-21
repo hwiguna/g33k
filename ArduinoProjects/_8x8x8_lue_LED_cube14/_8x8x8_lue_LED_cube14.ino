@@ -135,15 +135,12 @@ void loop(void) {
   //AnArrow();
   //while (true) AnimatedDot();
     //while (true) Tornado();
-    /*
-  FleaJump    (1, 7, 4, 1, 0); // front
-  FleaJump    (1, 7, 3, 6, 1); // right
-  FleaJumpBack(1, 7, 3, 6, 0); // back
-  FleaJumpBack(1, 7, 4, 1, 1); // left
-  */
-    FleaJmp(1,1, 6,1, 4); // Front
-    FleaJmp(6,1, 6,7, 3); // Right
-    FleaJmp(6,7, 1,7, 3); // Back
-    FleaJmp(1,7, 1,1, 4); // left
+//    FleaJump(1,1, 6,1, 2); // Front
+//    FleaJump(6,1, 6,7, 3); // Right
+//    FleaJump(6,7, 1,7, 3); // Back
+//    FleaJump(1,7, 1,1, 7); // left
+  //RandomFleaJumps();
+  Rain();
+  delay(1000);
 }
 
