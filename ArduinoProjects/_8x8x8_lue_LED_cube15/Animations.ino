@@ -1188,6 +1188,48 @@ void RandomFleaJumps()
   ClearDot(x1,y1,0);
 }
 
+void FleaParty()
+{
+  byte n = 5;
+  int8_t x0[n];
+  int8_t y0[n];
+  int8_t x1[n];
+  int8_t y1[n];
+  int8_t height;
+  int8_t nTimes = 20;
+
+  //-- Initial flea positions --
+  for (int8_t f=0; f<n; f++)
+  {
+    x1[f] = random(8);
+    y1[f] = random(8);
+  }
+
+  for (int8_t r=0; r<nTimes; r++)
+  {
+    int8_t jumps = random(4,9);
+    for (int8_t j=0; j<jumps; j++)
+    {
+      for (int8_t f=0; f<n; f++)
+      {
+        x0[f]=x1[f]; y0[f]=y1[f];
+        if (random(2) == 0) {
+          x1[f] = Crop(x1[f] + random(-7,8));
+        }
+        else {
+          y1[f] = Crop(y1[f] + random(-7,8));
+        }
+        height = random(3,6);
+        FleaJump(x0[f],y0[f], x1[f],y1[f], height);
+
+        SetDot(x1[f],y1[f],0);
+        //delay(500+random(500));
+        //ClearDot(x1[f],y1[f],0);
+      }
+    }
+  }
+}
+
 void Rain()
 {
   //-- Draw plane --

@@ -333,7 +333,7 @@ void EraseRect(int8_t x1, int8_t y1, int8_t z1, int8_t x2, int8_t y2, int8_t z2)
 void SetCubeByString(int8_t cubeFromPC[8][8])
 {
   // byte bits = X, 1st index=Y, 2nd index = Z
-  for (int8_t y=0; y<8; y++) {
+  for (int8_t y=0; y<1; y++) {
     for (int8_t z=0; z<8; z++) {
       cube[y][z] = cubeFromPC[y][z];
     }

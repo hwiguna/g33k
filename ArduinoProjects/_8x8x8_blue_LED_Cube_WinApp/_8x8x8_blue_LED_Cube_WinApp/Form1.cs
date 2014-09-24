@@ -14,7 +14,7 @@ namespace _8x8x8_blue_LED_Cube_WinApp
 {
     public partial class Form1 : Form
     {
-        private const int baudRate = 19200;
+        private const int baudRate = 9600;
 
         public SerialPort serialPort;
 
@@ -159,7 +159,7 @@ namespace _8x8x8_blue_LED_Cube_WinApp
         {
             int idx = 0;
             byte[] cube64 = new byte[64];
-            for (int y = 0; y < 8; y++)
+            for (int y = 0; y < 1; y++)
             {
                 for (int z = 0; z < 8; z++)
                 {
@@ -176,20 +176,34 @@ namespace _8x8x8_blue_LED_Cube_WinApp
 
         private void AnimateBtn_Click(object sender, EventArgs e)
         {
-            for (int z = 0; z < 8; z++)
+            Thread t = new Thread(new ThreadStart(AnimationThread));
+            t.IsBackground = true;
+            t.Start();
+        }
+
+        private void AnimationThread()
+        {
+            Invoke(new AnimationDelegate(Animation), new object[] { "Hello from the thread" });
+        }
+
+        private void Animation(string p)
+        {
+            for (int z = 7; z >=0; z--)
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 8; i++)
                     cube[i, 0, z] = true;
                 SendCube();
 
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 8; i++)
                     cube[i, 0, z] = false;
                 SendCube();
 
-                Thread.Sleep(100);
+                Thread.Sleep(500);
             }
         }
     }
 }
+
+public delegate void AnimationDelegate(string msg);

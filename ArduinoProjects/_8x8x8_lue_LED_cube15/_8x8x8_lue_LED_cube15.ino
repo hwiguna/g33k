@@ -21,6 +21,7 @@ int clockPin = 12; // Arduino D12 to IC pin 11 (SH_CP) -- Yelow
 int dataPin  = 11; // Arduino D11 to IC pin 14 (DS) -- Blue
 
 //-- Globals --
+int baudRate = 9600;
 byte slomo = 0;
 volatile int8_t cube[8][8]; // byte bits = X, 1st index=Y, 2nd index = Z
 volatile int8_t gZ = 0;
@@ -80,7 +81,7 @@ boolean stringComplete = false;  // whether the string is complete
 void setup(void) {
   SetupPins();
   SetupCapSense();
-  Serial.begin(19200);
+  Serial.begin(baudRate);
   inputString.reserve(600);
   PreComputes();
   CubeAllOff();
@@ -162,16 +163,17 @@ void loop(void) {
 //    FleaJump(6,7, 1,7, 3); // Back
 //    FleaJump(1,7, 1,1, 7); // left
   //RandomFleaJumps();
+  FleaParty();
   //Rain();
   //delay(1000);
   
-    if (Serial.available()) {
-      byte receivedCount;
-      int8_t buffer[8][8];
-      
-      receivedCount = Serial.readBytesUntil('\n', (char*)buffer, 64);
-      Serial.println(receivedCount);
-      if (receivedCount==64) SetCubeByString(buffer);
+//    if (Serial.available()) {
+//      byte receivedCount;
+//      int8_t buffer[8][8];
+//      
+//      receivedCount = Serial.readBytesUntil('\n', (char*)buffer, 8);
+//      Serial.println(receivedCount);
+//      if (receivedCount==8) SetCubeByString(buffer);
       
 //      receivedCount = Serial.readBytesUntil('\n', buffer, 128);
 //      Serial.print(receivedCount);  Serial.print(", "); 
@@ -184,7 +186,7 @@ void loop(void) {
 //      receivedCount = Serial.readBytesUntil('\n', buffer, 128);
 //      Serial.println(receivedCount); 
 //      if (receivedCount==128) SetCubeByString(3, buffer);
-  }
+//  }
 /*
   if (stringComplete) {
     Serial.println(inputString.length()); 
