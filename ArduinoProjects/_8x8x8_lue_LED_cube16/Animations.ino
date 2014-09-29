@@ -954,57 +954,61 @@ void SnakeSpiralDown()
 
 void WallJump()
 {
-  int8_t d = 50;
-  
+  int8_t dly = 50;
+  WallJumpToRight(dly);
+  WallJumpToLeft(dly);
+}
+
+void WallJumpToRight(int8_t dly)
+{
   // 2x2 rect on left wall
   // Expand left to full left wall
   for (int8_t n=0; n<4; n++)
   {
     DrawRect(0,3-n,3-n, 0,4+n,4+n);
-    delay(d);
+    delay(dly);
   }
   
   // Pull right into 2x2 rect
-  int8_t pattern[] = {0,1,2,2,2,3,3,3};
   for (int8_t n=0; n<8+3; n++)
   {
     int8_t e = n-3;
     if (e>=0) {
-      int8_t de = pattern[e];
+      int8_t de = funnelPath[e];
       EraseRect(e, de,de, e,7-de,7-de);
     }
     
     if (n<8) {
-      int8_t dd = pattern[n];
+      int8_t dd = funnelPath[n];
       DrawRect(n,dd,dd, n,7-dd,7-dd);
-      delay(d);
+      delay(dly);
     }
   }
-  
-  // Expand right to full right wall
+}
+
+void WallJumpToLeft(int8_t dly)
+{  // Expand right to full right wall
   for (int8_t n=0; n<4; n++)
   {
     DrawRect(7,3-n,3-n, 7,4+n,4+n);
-    delay(d);
+    delay(dly);
   }
 
   // Pull left into 2x2 rect
-//  int8_t pattern[] = {0,1,2,2,2,3,3,3};
   for (int8_t n=0; n<8+3; n++)
   {
     int8_t e = n-3;
     if (e>=0) {
-      int8_t de = pattern[e];
+      int8_t de = funnelPath[e];
       EraseRect(7-e, de,de, 7-e,7-de,7-de);
     }
     
     if (n<8) {
-      int8_t dd = pattern[n];
+      int8_t dd = funnelPath[n];
       DrawRect(7-n,dd,dd, 7-n,7-dd,7-dd);
-      delay(d);
+      delay(dly);
     }
   }
-  
 }
 
 void AnArrow()
@@ -1400,16 +1404,59 @@ void Cardboard(int analog0, int analog1)
   }
 }
 
+void Telekinesis_Poor(int pot)
+{
+  int8_t d = 7 - map(pot, 100,300, -1,7);
+  if (d == prevD) {dCount++;} else {prevD=d; dCount=0;}
+  if (dCount>3)
+  {
+    dCount=0;
+    if (d>=0 && d<=7)
+    {
+      if (d!=drawD) EraseRect(drawD,0,0, drawD,7,7);
+      EraseRect(drawD,0,0, drawD,7,7);
+      DrawRect(d,0,0, d,7,7);
+      drawD = d;
+    }
+    else {
+      CubeAllOff();
+    }
+  }
+  delay(1);
+}
+
+void Telekinesis(int pot)
+{
+  if ( pot>250 )
+  {
+    animSpeed = 32;
+    CubeRightLeft();
+    //delay(64);
+    //CubeAllOff();
+    delay(1000);
+  }
+}
 void Bounce()
 {
-  float freq = 1;
-  float amp = 35;
-  float decay = 1;
-  
+//  float freq = 1;
+//  float amp = 35;
+//  float decay = 1;
+//  
+//  while (true)
+//  {
+//    float posCos = abs(cos(freq*time*2*PI));
+//    y = amplitude*posCos/exp(decay*time);
+//    SetDot(0,y);
+//  }
+}
+
+void Blinky()
+{
   while (true)
   {
-    float posCos = abs(cos(freq*time*2*PI));
-    y = amplitude*posCos/Math.exp(decay*time);
-    SetDot(0,y);
+    CubeAllOn();
+    //delay(1000);
+    //CubeAllOff();
+    //delay(1000);
   }
 }

@@ -163,8 +163,10 @@ void loop(void) {
 //    FleaJump(6,7, 1,7, 3); // Back
 //    FleaJump(1,7, 1,1, 7); // left
   //RandomFleaJumps();
-  FleaParty();
+  //FleaParty();
   //Rain();
+  //StringTheory1();
+  //Stir();
   //delay(1000);
   
 //    if (Serial.available()) {
@@ -196,5 +198,9 @@ void loop(void) {
     stringComplete = false;
   }
   */
+  //Droplets();
+  //UseTheForce(pot1);
+  //Cardboard(pot0,pot1);  // Potentiometers move two planes
+  Bounce();
 }
 
