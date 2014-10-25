@@ -1,199 +1,22 @@
-void MainShow()
-{
-  FleaParty();
-  OpeningAnt();
-  SnakeSpiralDown();
+//-- List of effects --
+//void FillBottom()
+//void FoldUp()
+//void FoldFromLeft()
+//void FoldTopToRight()
+//void SnakeSpiralDown()
+//void WallJump()
+//void AnArrow()
+//void AnimatedDot()
+//void Tornado()
+//void OpeningAnt()
+//void RandomFleaJumps()
+//void FleaParty()
+//void Rain()
+//void StringTheory1()
+//void Stir()
+//void Droplets()
 
-  FillLayerLeftToRight(0);
-  FillWallDownUp(7);
-  FillLayerRightLeft(7);
-  DropOneCenterLine(0);
-  FillWallFromCenter(0);
-  FillFrontAndBackRightLeft();
-  delay(250);
-  CubeShrink();
-  DropFromCenter();
-  delay(250);
-  SpreadFromCenter(0);
-  RaiseCorners();
-  ZipTop();
-  delay(500);
-  CollapseToFloor();
-
-//  RaiseSeaLevel();
-//  delay(500);
-//  RippleFadeIn();
-//  RippleToRight();
-
-  FoldUp();
-  delay(500);
-  FoldFromLeft();
-  delay(500);
-  FoldTopToRight();
-  delay(500);
-  
-  PinWheel(7);
-  delay(500);
-  PinWheel(0);
-
-  CubeShrink();
-  delay(64);
-  Rain();
-  CubeAllOff();
-  Droplets();
-  delay(500);
-  CubeAllOff();
-
-  EdgeBurst2(0);  FollowLine(0,7,0, 1,0,0);
-  EdgeBurst2(1);  FollowLine(7,7,0, 0,-1,0);
-  EdgeBurst2(2);  FollowLine(7,0,0, -1,0,0);
-  EdgeBurst2(3);  //FollowLine(0,0,0, 0,1,0);
-
-  for (byte n=0; n<4; n++) WallJump();
-  
-//  DotToRect();
-//  FillBottom();
-}
-
-void Pyramid3()
-{
-  if (abs(pot0-oldPot0)>100)
-  {
-    oldPot0 = pot0;
-    CubeAllOff();
-    for (int8_t n=0; n<4; n++)
-    {
-      int8_t z = n * map(pot0, 200,1000, 1,7) / 3;
-      DrawRect(n,n,z, 7-n,7-n,z); // XY plane
-      if (z+1<8) DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
-    }
-  }
-}
-
-void Pyramid2()
-{
-  for (int8_t n=0; n<4; n++)
-  {
-    int8_t z = n*2;
-    DrawRect(n,n,z, 7-n,7-n,z); // XY plane
-    DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
-  }
-}
-
-void Pyramid1()
-{
-  int8_t h = 4;
-  
-  // Base
-  DrawLine3D(0,0,0, 6,0,0);
-  DrawLine3D(6,6,0, 6,0,0);
-  DrawLine3D(6,6,0, 0,6,0);
-  DrawLine3D(0,0,0, 0,6,0);
-  
-  // Sides
-  DrawLine3D(0,0,0, 3,3,h);
-  DrawLine3D(6,0,0, 3,3,h);
-  DrawLine3D(6,6,0, 3,3,h);
-  DrawLine3D(0,6,0, 3,3,h);
-}
-
-void TestDrawLine3D()
-{
-  // Edges
-//  DrawLine3D(0,0,0, 7,0,0);
-//  DrawLine3D(0,0,0, 0,7,0);
-//  DrawLine3D(0,0,0, 0,0,7);
-//
-//  // XY Plane
-//  DrawLine3D(0,0,0, 7,4,0);
-//  DrawLine3D(0,0,0, 7,7,0);
-//  DrawLine3D(0,0,0, 4,7,0);
-//
-//  // XZ Plane
-//  DrawLine3D(0,0,0, 7,0,4);
-//  DrawLine3D(0,0,0, 7,0,7);
-//  DrawLine3D(0,0,0, 4,0,7);
-//
-//  // YZ Plan
-//  DrawLine3D(0,0,0, 0,7,4);
-//  DrawLine3D(0,0,0, 0,7,7);
-//  DrawLine3D(0,0,0, 0,4,7);
-}
-void RunTests()
-{
-  Serial.begin(9600);
-
-  Serial.print("TestCubeAllOff = ");
-  Serial.println(TestCubeAllOff());
-
-  Serial.print("TestRefresh = ");
-  Serial.println(TestRefresh());    // 8052 micro seconds
-
-  Serial.end();
-}
-
-long TestCubeAllOff()
-{
-  long start = micros();
-  CubeAllOff();
-  long finish = micros();
-  return finish-start;
-}
-
-long TestRefresh()
-{
-  long start = micros();
-  Refresh();
-  long finish = micros();
-  return finish-start;
-}
-
-void TestPattern3()
-{
-  CubeAllOff();
-  delay(500);
-  CubeAllOn();
-  delay(500);
-}
-
-
-void BottomUp()
-{
-  for (int8_t z=0; z<8; z++) {
-    for (int8_t x=0; x<8; x++) {
-      for (int8_t y=0; y<8; y++) {
-        SetDot(x,y,z); 
-      }
-    }
-    delay(64);
-    CubeAllOff();
-  }
-}
-
-
-void OneWall()
-{
-  for (int8_t z=0; z<8; z++) {
-    for (int8_t x=0; x<8; x++) {
-      for (int8_t y=7; y<8; y++) {
-        SetDot(x,y,z); 
-      }
-    }
-  }
-}
-
-void LeftRight()
-{
-  for (int8_t x=0; x<8; x++) {
-    for (int8_t z=0; z<8; z++) {
-      for (int8_t y=7; y<8; y++) {
-        SetDot(x,y,z); 
-      }
-    }
-    delay(64);
-    CubeAllOff();
-  }
-}
+//=== BASIC OPERATIONS ===
 
 void TurnOnLayer(int8_t z)
 {
@@ -235,62 +58,6 @@ void LayerOn(int8_t z)
   }  
 }
 
-void CubeAllOn()
-{
-  //noInterrupts();
-  for (int8_t z=0; z<8; z++) {
-    for (int8_t y=0; y<8; y++) {
-      for (int8_t x=0; x<8; x++) {
-        SetDot(x,y,z);
-      }  
-    }  
-  }  
-  //interrupts();
-}
-
-void CubeAllOff()
-{
-  for (int8_t z=0; z<8; z++) {
-    SetLayer(z, 0x00);
-  }  
-}
-
-void CubeUp()
-{
-  for (int8_t z=0; z<8; z++) {
-    SetLayer(z, 0xFF);
-    delay(animSpeed);
-    SetLayer(z, 0x00);
-  }  
-}
-
-void CubeDown()
-{
-  for (int8_t z=7; z>=0; z--) {
-    SetLayer(z, 0xFF);
-    delay(animSpeed);
-    SetLayer(z, 0x00);
-  }  
-}
-
-void CubeLeftRight()
-{
-  for (int8_t x=0; x<8; x++) {
-    SetXPlane(x);
-    delay(animSpeed);
-    CubeAllOff();
-  }  
-}
-
-void CubeRightLeft()
-{
-  for (int8_t x=7; x>=0; x--) {
-    SetXPlane(x);
-    delay(animSpeed);
-    CubeAllOff();
-  }  
-}
-
 void SetXPlane(int8_t x)
 {
   x = Wrap(x);
@@ -298,35 +65,6 @@ void SetXPlane(int8_t x)
   for (int8_t z=0; z<8; z++) {
     for (int8_t y=0; y<8; y++) {
       cube[y][z] = xPattern;
-    }
-  }
-}
-
-void TestPattern1()
-{
-  //int8_t y = 7;
-  for (int8_t x=0; x<8; x++) {
-    for (int8_t y=0; y<8; y++) {
-      SetDot(x,y,0); 
-      SetDot(7-x,y,1);
-    }
-
-    delay(20);
-
-    for (int8_t y=0; y<8; y++) {
-      ClearDot(x,y,0); 
-      ClearDot(7-x,y,1);
-    }
-  }
-}
-
-void TestPattern2_Scan_one_layer(int8_t z)
-{
-  for (int8_t y=0; y<8; y++) {
-    for (int8_t x=0; x<8; x++) {
-      SetDot(x,y,z);
-      delay(300);
-      ClearDot(x,y,z);
     }
   }
 }
@@ -353,58 +91,9 @@ void Line_Up_a_wall(int8_t y)
   }
 }
 
-
-void TestPattern_scan_all_layers()
-{
-  for (int8_t z=0; z<8; z++) {
-    for (int8_t y=0; y<8; y++) {
-      for (int8_t x=0; x<8; x++) {
-        SetDot(x,y,z);
-        delay(64);
-        ClearDot(x,y,z);
-      }
-    }
-  }
-}
-
-void TestPattern4_Scan_one_wall()
-{
-  for (int8_t z=0; z<8; z++) {
-    for (int8_t x=7; x>=0; x--) {
-      SetDot(x,7,z);
-      delay(64);
-      ClearDot(x,7,z);
-    }
-  }
-}
-
-void TestPattern5_swipe_wall_up()
-{
-  for (int8_t z=0; z<8; z++) {
-    SetLayer(z,0xFF);
-    //for (int8_t x=0; x<8; x++) SetDot(x,7,z);
-    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) SetDot(x,y,z);
-    delay(64);
-    //SetLayer(z,0x00);
-    CubeAllOff();
-    //for (int8_t x=0; x<8; x++) ClearDot(x,7,z);
-    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) ClearDot(x,y,z);
-  }
-}
-
-
-void BottomCorner()
-{
-  for (int8_t x=0; x<1; x++) {
-    for (int8_t y=7; y<8; y++) {
-      SetDot(x,y,1); 
-    }
-  }
-}
-
 void FillLayerLeftToRight(int8_t z)
 {
-  for (int8_t x=1; x<8; x++) {
+  for (int8_t x=0; x<8; x++) {
     for (int8_t y=0; y<8; y++) {
       SetDot(x,y,z);
     }
@@ -453,6 +142,30 @@ void FillWallFromCenter(int8_t x)
   }
 }
 
+void PinWheel(int8_t y)
+{
+  for (int8_t n=0; n<8; n++)
+  {
+    DrawLine3D(0,y,n, 7,y,7-n);
+    delay(64);
+  }  
+
+  for (int8_t n=0; n<8; n++)
+  {
+    DrawLine3D(n,y,7, 7-n,y,0);
+    delay(64);
+  }  
+}
+
+void DrawCircle(int8_t z)
+{
+  for (int8_t n=0; n<20; n++)
+  {
+    SetDot(circle[n][0], circle[n][1], z);
+    delay(128);
+  }
+}
+
 void FillFrontAndBackRightLeft()
 {
   for (int8_t x=0; x<8; x++) {
@@ -463,7 +176,6 @@ void FillFrontAndBackRightLeft()
     delay(64);
   }
 }
-
 
 void CubeShrink()
 {
@@ -478,6 +190,185 @@ void CubeShrink()
     delay(128);
   }
 }
+
+void CubeAllOn()
+{
+  //noInterrupts();
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t y=0; y<8; y++) {
+      for (int8_t x=0; x<8; x++) {
+        SetDot(x,y,z);
+      }  
+    }  
+  }  
+  //interrupts();
+}
+
+void CubeAllOff()
+{
+  for (int8_t z=0; z<8; z++) {
+    SetLayer(z, 0x00);
+  }  
+}
+
+//=== SHAPES ===
+
+void Pyramid3()
+{
+  if (abs(pot0-oldPot0)>100)
+  {
+    oldPot0 = pot0;
+    CubeAllOff();
+    for (int8_t n=0; n<4; n++)
+    {
+      int8_t z = n * map(pot0, 200,1000, 1,7) / 3;
+      DrawRect(n,n,z, 7-n,7-n,z); // XY plane
+      if (z+1<8) DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
+    }
+  }
+}
+
+void Pyramid2()
+{
+  for (int8_t n=0; n<4; n++)
+  {
+    int8_t z = n*2;
+    DrawRect(n,n,z, 7-n,7-n,z); // XY plane
+    DrawRect(n,n,z+1, 7-n,7-n,z+1); // XY plane
+  }
+}
+
+void Pyramid1()
+{
+  int8_t h = 4;
+  
+  // Base
+  DrawLine3D(0,0,0, 6,0,0);
+  DrawLine3D(6,6,0, 6,0,0);
+  DrawLine3D(6,6,0, 0,6,0);
+  DrawLine3D(0,0,0, 0,6,0);
+  
+  // Sides
+  DrawLine3D(0,0,0, 3,3,h);
+  DrawLine3D(6,0,0, 3,3,h);
+  DrawLine3D(6,6,0, 3,3,h);
+  DrawLine3D(0,6,0, 3,3,h);
+}
+
+void BottomUp()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t y=0; y<8; y++) {
+      for (int8_t x=0; x<8; x++) {
+        SetDot(x,y,z); 
+        delay(32);
+        ClearDot(x,y,z); 
+      }
+    }
+  }
+}
+
+
+void OneWall()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=0; x<8; x++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+  }
+}
+
+void LeftRight()
+{
+  for (int8_t x=0; x<8; x++) {
+    for (int8_t z=0; z<8; z++) {
+      for (int8_t y=7; y<8; y++) {
+        SetDot(x,y,z); 
+      }
+    }
+    delay(64);
+    CubeAllOff();
+  }
+}
+
+void CubeUp()
+{
+  for (int8_t z=0; z<8; z++) {
+    SetLayer(z, 0xFF);
+    delay(animSpeed);
+    SetLayer(z, 0x00);
+  }  
+}
+
+void CubeDown()
+{
+  for (int8_t z=7; z>=0; z--) {
+    SetLayer(z, 0xFF);
+    delay(animSpeed);
+    SetLayer(z, 0x00);
+  }  
+}
+
+void CubeLeftRight()
+{
+  for (int8_t x=0; x<8; x++) {
+    SetXPlane(x);
+    delay(animSpeed);
+    CubeAllOff();
+  }  
+}
+
+void CubeRightLeft()
+{
+  for (int8_t x=7; x>=0; x--) {
+    SetXPlane(x);
+    delay(animSpeed);
+    CubeAllOff();
+  }  
+}
+
+void Scan_all_layers()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t y=0; y<8; y++) {
+      pot1 = analogRead(A5);
+      animSpeed = map(pot1, 0,1023, 16,256);
+      for (int8_t x=0; x<8; x++) {
+        SetDot(x,y,z);
+        delay(animSpeed);
+        ClearDot(x,y,z);
+      }
+    }
+  }
+}
+
+void Scan_one_wall()
+{
+  for (int8_t z=0; z<8; z++) {
+    for (int8_t x=7; x>=0; x--) {
+      SetDot(x,7,z);
+      delay(64);
+      ClearDot(x,7,z);
+    }
+  }
+}
+
+void Swipe_wall_up()
+{
+  for (int8_t z=0; z<8; z++) {
+    SetLayer(z,0xFF);
+    //for (int8_t x=0; x<8; x++) SetDot(x,7,z);
+    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) SetDot(x,y,z);
+    delay(64);
+    //SetLayer(z,0x00);
+    CubeAllOff();
+    //for (int8_t x=0; x<8; x++) ClearDot(x,7,z);
+    //for (int8_t y=3; y<8; y++) for (int8_t x=0; x<8; x++) ClearDot(x,y,z);
+  }
+}
+
 
 //void DrawCube(int2_t x0, int2_t y0, int2_t z0, int2_t cubeSize)
 //{
@@ -534,20 +425,6 @@ void Wiper()
   for (int8_t x=7; x>=0; x--){ DrawLine3(0,0, x,7, 0); delay(dly); EraseLine3(0,0, x,7, 0); }
   for (int8_t x=0; x<8; x++){ DrawLine3(0,0, x,7, 0); delay(dly); EraseLine3(0,0, x,7, 0); }
   for (int8_t y=7; y>=0; y--) { DrawLine3(0,0, 7,y, 0); delay(dly); EraseLine3(0,0, 7,y, 0); }
-}
-
-
-void LineTest()
-{
-  DrawLine3(0,0, 7,0, 0);
-  DrawLine3(0,7, 0,0, 1);
-  DrawLine3(0,0, 7,7, 2);
-  DrawLine3(0,0, 4,7, 3);
-
-  DrawLine3(7,0, 0,0, 4);
-  DrawLine3(7,0, 0,4, 5);
-  DrawLine3(7,0, 0,7, 6);
-  DrawLine3(7,0, 4,7, 7);
 }
 
 
@@ -915,29 +792,6 @@ void FoldTopToRight()
   }
 }
 
-void PinWheel(int8_t y)
-{
-  for (int8_t n=0; n<8; n++)
-  {
-    DrawLine3D(0,y,n, 7,y,7-n);
-    delay(64);
-  }  
-
-  for (int8_t n=0; n<8; n++)
-  {
-    DrawLine3D(n,y,7, 7-n,y,0);
-    delay(64);
-  }  
-}
-
-void DrawCircle(int8_t z)
-{
-  for (int8_t n=0; n<20; n++)
-  {
-    SetDot(circle[n][0], circle[n][1], z);
-    delay(128);
-  }
-}
 
 void SnakeSpiralDown()
 {
@@ -1174,7 +1028,7 @@ void RandomFleaJumps()
   int8_t x1 = random(8);
   int8_t y1 = random(8);
   int8_t height;
-  int8_t nTimes = 20;
+  int8_t nTimes = 3;
 
   for (int8_t n=0; n<nTimes; n++)
   {
@@ -1313,24 +1167,27 @@ void StringTheory1()
     z1[m] = random(8);
   }
 
-  while (true)
+  for (int8_t r=0; r<5; r++)
   {
-    
-    for (int8_t m=0; m<n; m++)
+    for (int8_t n=0; n<10; n++)
     {
-      // Draw line between those two points
-      DrawLine3D(x0[m],y0[m],z0[m], x1[m],y1[m],z1[m]);
-      delay(64);
-      EraseLine3D(x0[m],y0[m],z0[m], x1[m],y1[m],z1[m]);
       
-      // Move both points randomly
-      x0[m] = Crop(x0[m] + random(-1,2));
-      y0[m] = Crop(y0[m] + random(-1,2));
-      z0[m] = Crop(z0[m] + random(-1,2));
-  
-      x1[m] = Crop(x1[m] + random(-1,2));
-      y1[m] = Crop(y1[m] + random(-1,2));
-      z1[m] = Crop(z1[m] + random(-1,2));
+      for (int8_t m=0; m<n; m++)
+      {
+        // Draw line between those two points
+        DrawLine3D(x0[m],y0[m],z0[m], x1[m],y1[m],z1[m]);
+        delay(64);
+        EraseLine3D(x0[m],y0[m],z0[m], x1[m],y1[m],z1[m]);
+        
+        // Move both points randomly
+        x0[m] = Crop(x0[m] + random(-1,2));
+        y0[m] = Crop(y0[m] + random(-1,2));
+        z0[m] = Crop(z0[m] + random(-1,2));
+    
+        x1[m] = Crop(x1[m] + random(-1,2));
+        y1[m] = Crop(y1[m] + random(-1,2));
+        z1[m] = Crop(z1[m] + random(-1,2));
+      }
     }
   }
 }
@@ -1425,9 +1282,50 @@ void Telekinesis_Poor(int pot)
   delay(1);
 }
 
-void Telekinesis(int pot)
+void Telekinesis2(int pot)
 {
-  if ( pot>250 )
+  static int running[5];
+  static int count;
+  static int tresh;
+
+  if (pot>100)
+  {
+    count++;
+    if (count>=5) count=0;
+    running[count] = pot;
+  
+    int total = 0;  
+    for (int8_t n=0; n<5; n++)
+     total = total + running[n];
+     
+    int average = total/5;
+    
+    //if (count>9) SetDot(7,7,0);
+    
+    Serial.print(count);   Serial.print(" ");
+    Serial.print(average);   Serial.print(" ");
+    Serial.print(pot);   Serial.print(" ");
+    Serial.println(pot-average);
+    if ( (pot-average)>50 )
+    {
+      animSpeed = 32;
+      CubeRightLeft();
+      //delay(64);
+      //CubeAllOff();
+      delay(1000);
+    }
+  }
+  delay(10);
+}
+
+void Telekinesis3(int pot)
+{
+  static int count;
+
+  Serial.print(pot);   Serial.print(" ");
+  Serial.println(count);
+  if ( pot>200 ) count++; else count=0;
+  if (count>3)
   {
     animSpeed = 32;
     CubeRightLeft();
@@ -1435,7 +1333,10 @@ void Telekinesis(int pot)
     //CubeAllOff();
     delay(1000);
   }
+
+  delay(10);
 }
+
 void Bounce()
 {
 //  float freq = 1;
@@ -1452,11 +1353,119 @@ void Bounce()
 
 void Blinky()
 {
-  while (true)
+  for (int8_t n=0; n<3; n++)
   {
+    CubeAllOff();
+    delay(500);
     CubeAllOn();
-    //delay(1000);
-    //CubeAllOff();
-    //delay(1000);
+    delay(500);
   }
 }
+
+//-----------------------------------------------------------
+
+void Everything()
+{
+  BottomUp(); delay(500); CubeAllOff();
+  FillBottom(); delay(2000); CubeAllOff();
+  Pyramid1(); delay(2000); CubeAllOff();
+  Pyramid2(); delay(2000); CubeAllOff();
+  //Pyramid3(); delay(1000); CubeAllOff();
+  OneWall(); delay(500); CubeAllOff();
+  LeftRight(); delay(500); CubeAllOff();
+  CubeUp(); delay(500); CubeAllOff();
+  CubeDown(); delay(500); CubeAllOff();
+  CubeLeftRight(); delay(500); CubeAllOff();
+  CubeRightLeft(); delay(500); CubeAllOff();
+  //Scan_all_layers(); delay(500); CubeAllOff();
+  //Scan_one_wall(); delay(500); CubeAllOff();
+  //Swipe_wall_up(); delay(500); CubeAllOff();
+
+  FoldUp(); delay(500); CubeAllOff();
+  FoldFromLeft(); delay(500); CubeAllOff();
+  FoldTopToRight(); delay(500); CubeAllOff();
+  SnakeSpiralDown(); delay(500); CubeAllOff();
+  WallJump(); delay(500); CubeAllOff();
+  AnArrow(); delay(2000); CubeAllOff();
+  AnimatedDot(); delay(500); CubeAllOff();
+  Tornado(); delay(500); CubeAllOff();
+  OpeningAnt(); delay(500); CubeAllOff();
+  RandomFleaJumps(); delay(500); CubeAllOff();
+  FleaParty(); delay(500); CubeAllOff();
+  Rain(); delay(500); CubeAllOff();
+  StringTheory1(); delay(500); CubeAllOff();
+  Stir(); delay(500); CubeAllOff();
+  Droplets(); //delay(500); CubeAllOff();
+  
+  CubeAllOn();
+}
+
+void Demo1()
+{
+  Blinky();            CubeAllOff();
+  Scan_all_layers();   CubeAllOff();
+  Droplets();          delay(500);
+  CubeShrink();        CubeAllOff();
+}
+
+void Demo2()
+{
+  //-- Clean slate --
+  CubeShrink();    CubeAllOff();
+
+  //-- Start show --
+  FleaParty();    CubeAllOff();
+  
+  OpeningAnt();
+  SnakeSpiralDown();
+
+  FillLayerLeftToRight(0);
+  FillWallDownUp(7);
+  FillLayerRightLeft(7);
+  DropOneCenterLine(0);
+  FillWallFromCenter(0);
+  FillFrontAndBackRightLeft();
+  delay(250);
+  CubeShrink();
+  DropFromCenter();
+  delay(250);
+  SpreadFromCenter(0);
+  RaiseCorners();
+  ZipTop();
+  delay(500);
+  CollapseToFloor();
+
+//  RaiseSeaLevel();
+//  delay(500);
+//  RippleFadeIn();
+//  RippleToRight();
+
+  FoldUp();
+  delay(500);
+  FoldFromLeft();
+  delay(500);
+  FoldTopToRight();
+  delay(500);
+  
+  PinWheel(7);
+  delay(500);
+  PinWheel(0);
+
+  CubeShrink(); CubeAllOff();
+  delay(500);
+
+  Rain();
+  CubeAllOff();
+
+  EdgeBurst2(0);  FollowLine(0,7,0, 1,0,0);
+  EdgeBurst2(1);  FollowLine(7,7,0, 0,-1,0);
+  EdgeBurst2(2);  FollowLine(7,0,0, -1,0,0);
+  EdgeBurst2(3);  //FollowLine(0,0,0, 0,1,0);
+
+  for (byte n=0; n<4; n++) WallJump();
+  
+  CubeAllOn();
+//  DotToRect();
+//  FillBottom();
+}
+

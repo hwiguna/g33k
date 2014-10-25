@@ -104,8 +104,8 @@ void setup(void) {
   SetupTimer();
   
   //-- Insert test pattern here --
-  //Bounce();
   CubeAllOn();
+  //Everything();
 }
 
 void loop(void) {
@@ -114,13 +114,13 @@ void loop(void) {
   long total2 =  cs_14_16.capacitiveSensor(30);
   long total3 =  cs_14_17.capacitiveSensor(30);
   if (total1>200) CubeLeftRight(); // Left touchpad
-  if (total2>200) MainShow(); // Front touchpad
+  if (total2>200) Demo1(); // Front touchpad
   if (total3>200) CubeRightLeft(); // Right touchpad
 
   pot0 = analogRead(A4);
   pot1 = analogRead(A5);
   animSpeed = map(pot1, 0,1023, 16,256);
   
-  //Telekinesis(pot0);
+  //Telekinesis3(pot0);
 }
 
