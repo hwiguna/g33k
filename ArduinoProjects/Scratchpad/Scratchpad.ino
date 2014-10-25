@@ -18,7 +18,7 @@ void loop()
 
 void AnalogDump()
 {
-  int a = analogRead(A5);
+  int a = analogRead(A4);
   Serial.print(a);
   if (a>200) Serial.print(" ***");
   Serial.println();
