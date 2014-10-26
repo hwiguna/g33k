@@ -24,11 +24,10 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(5, 4, 3);
 // Note with hardware SPI MISO and SS pins aren't used but will still be read
 // and written to during SPI transfer.  Be careful sharing these pins!
 
-#define NUMFLAKES 10
-#define XPOS 0
-#define YPOS 1
-#define DELTAY 2
-
+//#define NUMFLAKES 10
+//#define XPOS 0
+//#define YPOS 1
+//#define DELTAY 2
 
 #define LOGO16_GLCD_HEIGHT 16
 #define LOGO16_GLCD_WIDTH  16
@@ -42,18 +41,64 @@ const char keys[][4] = {
   {'*','0','#','D'},
 };
 
+char board[9][9];
+
+//-- Cursor --
+int8_t cursorX = 0;
+int8_t cursorY = 0;
+unsigned long timeToUpdateCursor = millis();
+bool cursorIsShown = false;
+
 void setup()   {
   Serial.begin(9600);
   SetupScreen();
   SetupKeypad();
+  SetupBoard();
 
   //TestPattern();
-  delay(2000);
+  DrawBoard();
 }
 
 
 void loop() {
   ScanKeypad();
+  RefreshCursor();
+}
+
+void RefreshCursor()
+{
+  if (millis() > timeToUpdateCursor) {
+    cursorIsShown = !cursorIsShown;
+
+//    Serial.print("cursorX="); Serial.print(cursorX);
+//    Serial.print(" cursorY="); Serial.print(cursorY);
+//    Serial.print(" cursorIsShown="); Serial.println(cursorIsShown);
+
+    if (cursorIsShown)
+      DrawCursor(cursorX, cursorY);
+    else
+      ReDrawCell();
+    display.display();
+    
+    timeToUpdateCursor = millis() + 250; 
+  }
+}
+
+void ReDrawCell()
+{
+  EraseCell(cursorX, cursorY);
+  DrawCell(cursorX, cursorY);
+}
+
+void SetupBoard()
+{
+  for (byte r=0; r<9; r++)
+  {
+    for (byte c=0; c<9; c++)
+    {
+      board[r][c] = '*';
+    }
+  }
 }
 
 void SetupScreen()
@@ -90,9 +135,10 @@ void ScanKeypad()
     {
       byte val = digitalRead(row0Pin+row);
       if (val==LOW) {
-        Serial.print("row="); Serial.print(row);
-        Serial.print(" col="); Serial.print(3-col);
-        Serial.print(" key="); Serial.println(keys[row][3-col]);
+        //Serial.print("row="); Serial.print(row);
+        //Serial.print(" col="); Serial.print(3-col);
+        //Serial.print(" key="); Serial.println(keys[row][3-col]);
+        ProcessKeypress(keys[row][3-col]);
         delay(200);
       }
     }
@@ -100,36 +146,113 @@ void ScanKeypad()
   }
 }
 
+void ProcessKeypress(char key)
+{
+  switch (key)
+  {
+    case 'A': MoveCursor(+1,0); break;
+    case 'B': MoveCursor(-1,0); break;
+    case 'C': MoveCursor(0,-1); break;
+    case 'D': MoveCursor(0,+1); break;
+    default: SetCell(cursorX,cursorY, key); break;
+  }
+}
+
+void MoveCursor(int8_t xD, int8_t yD)
+{
+  //-- Replace cursor with the digit before moving cursor --
+  if (cursorIsShown) {
+    ReDrawCell();
+    display.display();
+  }
+  
+  cursorX += xD;
+  cursorY += yD;
+  if (cursorX>8) cursorX=0;
+  if (cursorX<0) cursorX=8;
+  if (cursorY>8) cursorY=0;
+  if (cursorY<0) cursorY=8;
+}
+
+void SetCell(byte x, byte y, char val)
+{
+  board[x][y] = val;
+  //DrawCell(x,y);
+}
+
+void EraseCell(byte x, byte y)
+{
+  byte x0 = x*5 + CellOffset(x);
+  byte y0 = y*6 + CellOffset(y);
+  display.fillRect(x0, y0, 4,5, WHITE);
+}
+
+void DrawCursor(byte x, byte y)
+{
+  byte x0 = x*5 + CellOffset(x);
+  byte y0 = y*6 + CellOffset(y);
+  display.fillRect(x0, y0, 4,5, BLACK);
+}
+
+byte CellOffset(byte x)
+{
+  return ((x>2) ? 2 : 0) + ((x>5) ? 2 : 0);
+}
+
 void TestPattern()
 {
   byte num = 1;
   for (byte x=0; x<9; x++)
   {
-    byte xD = ((x>2) ? 2 : 0) + ((x>5) ? 2 : 0);
+    //byte xD = ((x>2) ? 2 : 0) + ((x>5) ? 2 : 0); //TODO: replace with CellOffset
     for (byte y=0; y<9; y++)
     {
-      byte yD = ((y>2) ? 2 : 0) + ((y>5) ? 2 : 0);
+      //byte yD = ((y>2) ? 2 : 0) + ((y>5) ? 2 : 0); //TODO: replace with CellOffset
       num = random(1,9);
-      DrawDigit(xD+x*5,yD+y*6, num);
+      DrawCell(x,y, num);
     }
   }
+  display.display();
 }
 
-void DrawDigit(int16_t x, int16_t y, byte num)
+void DrawBoard()
 {
+  byte num = 1;
+  for (byte x=0; x<9; x++)
+  {
+    //byte xD = ((x>2) ? 2 : 0) + ((x>5) ? 2 : 0);
+    for (byte y=0; y<9; y++)
+    {
+      //byte yD = ((y>2) ? 2 : 0) + ((y>5) ? 2 : 0);
+      num = random(1,9);
+      DrawCell(x,y, '*');
+    }
+  }
+  display.display();
+}
+
+void DrawCell(int16_t x, int16_t y)
+{
+  DrawCell(x, y, board[x][y]);
+}
+
+void DrawCell(int16_t x, int16_t y, char ch)
+{
+  x = x*5 + CellOffset(x); 
+  y = y*6 + CellOffset(y); 
   int16_t w=3;
   int16_t h=4;
   uint16_t color = BLACK;
 
-  switch (num)
+  switch (ch)
   {
-  case 0:
+  case '0':
     display.drawRect(x,y, w+1,h+1, color);
     break;
-  case 1:
+  case '1':
     display.drawLine(x+2,y, x+2, y+h, color);
     break;
-  case 2:
+  case '2':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     display.drawLine(x,y+2, x+w, y+2, color);
@@ -138,7 +261,7 @@ void DrawDigit(int16_t x, int16_t y, byte num)
     display.drawLine(x+w,y, x+w, y+2, color);
     display.drawLine(x,y+h-2, x, y+h, color);
     break;
-  case 3:
+  case '3':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     display.drawLine(x,y+2, x+w, y+2, color);
@@ -146,14 +269,14 @@ void DrawDigit(int16_t x, int16_t y, byte num)
     // verticals
     display.drawLine(x+w,y, x+w, y+h, color);
     break;
-  case 4:
+  case '4':
     // horizontals
     display.drawLine(x,y+2, x+w, y+2, color);
     // verticals
     display.drawLine(x,y, x, y+2, color);
     display.drawLine(x+w,y, x+w, y+h, color);
     break;
-  case 5:
+  case '5':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     display.drawLine(x,y+2, x+w, y+2, color);
@@ -162,7 +285,7 @@ void DrawDigit(int16_t x, int16_t y, byte num)
     display.drawLine(x,y, x, y+2, color);
     display.drawLine(x+w,y+h-2, x+w, y+h, color);
     break;
-  case 6:
+  case '6':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     display.drawLine(x,y+2, x+w, y+2, color);
@@ -171,17 +294,17 @@ void DrawDigit(int16_t x, int16_t y, byte num)
     display.drawLine(x,y, x, y+h, color);
     display.drawLine(x+w,y+h-2, x+w, y+h, color);
     break;
-  case 7:
+  case '7':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     // verticals
     display.drawLine(x+w,y, x+w, y+h, color);
     break;
-  case 8:
+  case '8':
     display.drawRect(x,y, w+1,h+1, color);
     display.drawLine(x,y+2, x+w, y+2, color);
     break;
-  case 9:
+  case '9':
     // horizontals
     display.drawLine(x,y, x+w, y, color);
     display.drawLine(x,y+2, x+w, y+2, color);
@@ -190,10 +313,16 @@ void DrawDigit(int16_t x, int16_t y, byte num)
     display.drawLine(x,y, x, y+2, color);
     display.drawLine(x+w,y, x+w, y+h, color);
     break;
+  case '*':
+//    display.drawPixel(x,y, color);
+//    display.drawPixel(x,y+h, color);
+//    display.drawPixel(x+w,y, color);
+//    display.drawPixel(x+w,y+h, color);
+    display.drawLine(x+1,y+2, x+2, y+2, color);
+    break;
   default:
     display.drawRect(x,y, w+1,h+1, color);
     break;
   }
-  display.display();
 }
 
