@@ -31,7 +31,8 @@ void DrawBoard()
     {
       //byte yD = ((y>2) ? 2 : 0) + ((y>5) ? 2 : 0);
       num = random(1,9);
-      DrawCell(x,y, '*');
+      //DrawCell(x,y, '*');
+      DrawCell(x,y);
     }
   }
   display.display();

@@ -10,11 +10,9 @@ void setup()   {
 
 void SetupBoard()
 {
-  for (byte r=0; r<9; r++)
-  {
-    for (byte c=0; c<9; c++)
-    {
-      board[r][c] = '*';
+  for (int x=0; x<9; x++) {
+    for (int y=0; y<9; y++) {
+      board[x][y] = puzzle[y][x];
     }
   }
 }
