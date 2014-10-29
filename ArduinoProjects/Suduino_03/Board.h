@@ -65,10 +65,9 @@ void Board::Solve()
     
     // ?? Find Known Numbers within row
     List knownVals = GetKnownNumbersByRow(row);
-    DebugNum("Knowns within that row = ", knownVals.Length());
 
     // .. Iterate through known numbers
-    for (int knownIndex=0; knownIndex<knownVals.Length(); knownIndex++)
+    //for (int knownIndex=0; knownIndex<knownVals.Length(); knownIndex++)
     {
       // .. Iterate through rows within current rowFlock
       int flock = Flock(row);
