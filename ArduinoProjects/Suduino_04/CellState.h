@@ -3,53 +3,60 @@ const byte SOLVED_BIT = 15;
 class CellState
 {
 public:
-  void Set(char ch);
-  char Get();
-  void AddCandidate(int num);
-  void AddCandidate(char ch);
-  void RemoveCandidate(char ch);
+  void Set(byte num);
+  byte Get();
+  void AddCandidate(byte num);
+  void RemoveCandidate(byte num);
   boolean IsSolved();
   void Solved();
-  boolean Maybe(char ch);
+  boolean Maybe(byte num);
   boolean UnitTests();
-  int CharToNum(char ch);
+  void FindWinner();
 private:
   int _vals;
 };
 
-void CellState::Set(char ch)
+void CellState::Set(byte num)
 {
-  _vals = 0;
-  bitSet(_vals, CharToNum(ch) );
-  Solved();
+  if (num==0)
+  {
+    _vals = 0x01FF; //Not solved and 9 lowest bits on meaning all # are possible candidates
+  }
+  else
+  {
+    _vals = 0;
+    bitSet(_vals, num );
+    Solved();
+  }
 }
 
-char CellState::Get()
+byte CellState::Get()
 {
-  char ch = '*';
+  byte num = 0;
   if (IsSolved())
   {
     for (byte i=1; i<=9; i++)
     {
       if (bitRead(_vals,i)) {
-        ch = '0' + i;
+        num = i;
         break;
       }
     }
   }
-  return ch;
+  return num;
 }
 
-void CellState::AddCandidate(int num)
+void CellState::AddCandidate(byte num)
 {
   if (!IsSolved())
     bitSet(_vals, num);
 }
 
-void CellState::RemoveCandidate(char ch)
+void CellState::RemoveCandidate(byte num)
 {
-  if (!IsSolved())
+  if (!IsSolved()) {
     bitClear(_vals, num);
+  }
 }
 
 boolean CellState::IsSolved()
@@ -62,14 +69,9 @@ void CellState::Solved()
   bitSet(_vals,SOLVED_BIT);
 }
 
-void CellState::AddCandidate(char ch)
+boolean CellState::Maybe(byte num)
 {
-  AddCandidate( CharToNum(ch) );
-}
-
-boolean CellState::Maybe(char ch)
-{
-  return bitRead( _vals, CharToNum(ch)) == 0;
+  return bitRead( _vals, num) == 0;
 }
 
 boolean CellState::UnitTests()
@@ -81,9 +83,17 @@ boolean CellState::UnitTests()
   return allPassed;
 }
 
-int CellState::CharToNum(char ch)
+void CellState::FindWinner()
 {
-  int num;
-  if (ch=='*') num = 0; else num = ch-48;
-  return num;
+  if (!IsSolved())
+  {
+    byte candidateCount = 0;
+    for (byte i=1; i<=9; i++)
+    {
+      if (bitRead(_vals,i)==1)
+        candidateCount++;
+    }
+    if (candidateCount==1)
+      Solved();
+  }
 }

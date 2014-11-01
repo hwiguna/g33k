@@ -4,11 +4,13 @@ class Cell
 {
   public:
     Cell();
-    Cell(int x, int y, char val);
+    Cell(byte x, byte y, byte val);
     void begin();
-    char Val();
+    byte Val();
     boolean IsSolved();
-    void SetVal(char ch);
+    void SetVal(byte num);
+    void RemoveCandidate(byte num);
+    void FindWinner();
   private:
     int _x;
     int _y;
@@ -25,11 +27,11 @@ Cell::Cell()
   cellState.Set('*');
 };
 
-Cell::Cell(int x, int y, char val)
+Cell::Cell(byte x, byte y, byte num)
 {
   _x = x;
   _y = y;
-  cellState.Set(val);
+  cellState.Set(num);
 };
 
 void Cell::begin()
@@ -37,18 +39,28 @@ void Cell::begin()
   // Initialize pins if necessary
 }
 
-char Cell::Val()
+byte Cell::Val()
 {
   return cellState.Get();
 }
 
-void Cell::SetVal(char ch)
+void Cell::SetVal(byte num)
 {
-  cellState.Set(ch);
+  cellState.Set(num);
 }
 
 boolean Cell::IsSolved()
 {
   return cellState.IsSolved();
+}
+
+void Cell::RemoveCandidate(byte num)
+{
+  cellState.RemoveCandidate(num);
+}
+
+void Cell::FindWinner()
+{
+  cellState.FindWinner();
 }
 
