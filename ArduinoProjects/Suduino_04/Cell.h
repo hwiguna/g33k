@@ -1,4 +1,3 @@
-#include "Arduino.h"
 #include "CellState.h"
 
 class Cell

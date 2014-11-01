@@ -1,6 +1,11 @@
+#include "Arduino.h"
+#include "Debug.h"
 #include "Board.h"
+#include "Scanner.h"
 
-Board board;
+Debug debug;
+Board board(debug);
+Scanner scanner(debug, board);
 
 char puzzle[][9] = {
   {'*','*','*', '*','*','5', '3','4','7'},
@@ -23,7 +28,7 @@ void setup() {
   board.Print();
 
   Serial.println("Solving...");
-  board.Solve();
+  scanner.Solve();
   
   Serial.println("SOLVED:");
   board.Print();

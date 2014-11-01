@@ -3,8 +3,6 @@ const byte SOLVED_BIT = 15;
 class CellState
 {
 public:
-  CellState();
-
   void Set(char ch);
   char Get();
   void AddCandidate(int num);
@@ -17,10 +15,6 @@ public:
 private:
   int _vals;
 };
-
-CellState::CellState()
-{
-}
 
 void CellState::Set(char ch)
 {

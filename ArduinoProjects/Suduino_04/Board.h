@@ -3,7 +3,7 @@
 class Board
 {
   public:
-    Board();
+    Board(Debug inDebug);
     void Init(char puzzle[][9]);
     Cell GetCell(int x, int y);
     void SetCell(int x, int y, char ch);
@@ -11,13 +11,13 @@ class Board
     void Solve();
   private:
     Cell _cells[9][9];
-    void DebugNum(char label[], int num);
-    void DebugNum2(char label[], int num1, int num2);
     int Flock(int row);
+    Debug debug;
 };
 
-Board::Board()
+Board::Board(Debug inDebug)
 {
+  debug = inDebug;
 }
 
 void Board::Init(char puzzle[][9])
@@ -55,28 +55,6 @@ void Board::Print()
 
 void Board::Solve()
 {
-  // .. Iterate through all rows
-  for (int row=0; row<9; row++)
-  {
-    for (int col=0; col<9; col++)
-    {
-      DebugNum2("Scanning row,col=", row, col);
-    }
-  }
-}
-
-void Board::DebugNum(char label[], int num)
-{
-  Serial.print(label);
-  Serial.println(num);
-}
-
-void Board::DebugNum2(char label[], int num1, int num2)
-{
-  Serial.print(label);
-  Serial.print(num1);
-  Serial.print(", ");
-  Serial.println(num2);
 }
 
 int Board::Flock(int row)
