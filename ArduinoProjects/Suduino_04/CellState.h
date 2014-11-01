@@ -7,8 +7,9 @@ public:
   char Get();
   void AddCandidate(int num);
   void AddCandidate(char ch);
-  void Remove(char ch);
+  void RemoveCandidate(char ch);
   boolean IsSolved();
+  void Solved();
   boolean Maybe(char ch);
   boolean UnitTests();
   int CharToNum(char ch);
@@ -20,6 +21,7 @@ void CellState::Set(char ch)
 {
   _vals = 0;
   bitSet(_vals, CharToNum(ch) );
+  Solved();
 }
 
 char CellState::Get()
@@ -41,12 +43,23 @@ char CellState::Get()
 void CellState::AddCandidate(int num)
 {
   if (!IsSolved())
+    bitSet(_vals, num);
+}
+
+void CellState::RemoveCandidate(char ch)
+{
+  if (!IsSolved())
     bitClear(_vals, num);
 }
 
 boolean CellState::IsSolved()
 {
   return bitRead(_vals, SOLVED_BIT) != 0;
+}
+
+void CellState::Solved()
+{
+  bitSet(_vals,SOLVED_BIT);
 }
 
 void CellState::AddCandidate(char ch)

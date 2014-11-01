@@ -5,12 +5,14 @@ class Scanner
     void Solve();
   private:
     Debug debug;
+    Board board;
     void FindCandidates();
 };
 
-Scanner::Scanner(Debug inDebug, Board board)
+Scanner::Scanner(Debug inDebug, Board inBoard)
 {
   debug = inDebug;
+  board = inBoard;
 }
 
 void Scanner::Solve()
@@ -21,11 +23,28 @@ void Scanner::Solve()
 void Scanner::FindCandidates()
 {
   // .. Iterate through all rows
-  for (int row=0; row<9; row++)
+  for (byte y=0; y<9; y++)
   {
-    for (int col=0; col<9; col++)
+    for (byte x=0; x<9; x++)
     {
-      debug.DebugNum2("Scanning row,col=", row, col);
+      debug.DebugNum2("Scanning x,y=", x, y);
+      if (!board.GetCell(x,y).IsSolved())
+      {
+        CheckY(y);
+      }
+    }
+  }
+}
+
+void Scanner::CheckY(byte y)
+{
+  for (byte x=0; x<9; x++)
+  {
+    if (board.Getcell(x,y).IsSolved() {
+        for (byte x2=0; x2<9; x2++)
+        {
+          board.Getcell(x,y).IsSolved()
+        }
     }
   }
 }

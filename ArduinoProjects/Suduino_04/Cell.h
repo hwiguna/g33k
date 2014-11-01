@@ -7,6 +7,7 @@ class Cell
     Cell(int x, int y, char val);
     void begin();
     char Val();
+    boolean IsSolved();
     void SetVal(char ch);
   private:
     int _x;
@@ -44,5 +45,10 @@ char Cell::Val()
 void Cell::SetVal(char ch)
 {
   cellState.Set(ch);
+}
+
+boolean Cell::IsSolved()
+{
+  return cellState.IsSolved();
 }
 
