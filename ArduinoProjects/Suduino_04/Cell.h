@@ -14,7 +14,7 @@ class Cell
     void Solved();
     boolean Maybe(byte num);
     boolean UnitTests();
-    void FindWinner();
+    boolean FindWinner();
   private:
     unsigned int _vals;
     Debug debug;
@@ -110,8 +110,10 @@ boolean Cell::UnitTests()
   return allPassed;
 }
 
-void Cell::FindWinner()
+boolean Cell::FindWinner()
 {
+  boolean found = false;
+  
   if (!IsSolved())
   {
     byte candidateCount = 0;
@@ -124,7 +126,10 @@ void Cell::FindWinner()
     if (candidateCount==1) {
       Solved();
       debug.DebugNum("*** Found winner *** val=", Get());
+      found = true;
     }
   }
+  
+  return found;
 }
 

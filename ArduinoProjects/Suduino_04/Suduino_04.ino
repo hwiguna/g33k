@@ -10,7 +10,8 @@ Scanner scanner(debug, &board);
 char* puzzle[] = {
   "*****5347",
   "*564*12**",
-  "***7**56*",
+//  "***7**56*",
+  "***7**561",
   "*81*49*26",
 //"381*49726",
   "**7***9**",
@@ -22,7 +23,7 @@ char* puzzle[] = {
 
 void setup() {
   // initialize serial:
-  Serial.begin(9600);
+  Serial.begin(57600); //
   
   Serial.println("Puzzle:");
   board.Init(puzzle);

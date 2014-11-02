@@ -11,8 +11,9 @@ class Scanner
     void GetXCells(byte x, Cell* cells[]);
     void GetBoxCells(byte x, byte y, Cell* cells[]);
     void PruneCells(Cell* cells[]);
-    void Deduce1Missing(Cell* cells[]);
-    void FindWinners();
+    boolean Deduce();
+    boolean Deduce1Missing(Cell* cells[]);
+    boolean FindWinners();
 };
 
 Scanner::Scanner(Debug inDebug, Board *inBoard)
@@ -23,8 +24,30 @@ Scanner::Scanner(Debug inDebug, Board *inBoard)
 
 void Scanner::Solve()
 {
-  PruneCandidates();
-  FindWinners();
+  boolean found = true;
+  boolean success = true;
+  while (found || success)
+  {
+    PruneCandidates();
+    found = FindWinners();
+    success = Deduce();
+    debug.DebugNum2("Solve status: found,success = ", found,success);
+  }
+}
+
+boolean Scanner::Deduce()
+{
+  boolean success = false;
+  Cell* cells[9];
+
+  for (byte y=0; y<3; y++)
+    for (byte x=0; x<3; x++) {
+      GetBoxCells(x,y, cells); 
+      if (Deduce1Missing( cells ))
+        success = true;
+      //board->Print2();
+    }
+  return success;
 }
 
 void Scanner::PruneCandidates()
@@ -47,13 +70,6 @@ void Scanner::PruneCandidates()
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
       PruneCells(cells);
-      //board->Print2();
-    }
-     
-  for (byte y=0; y<3; y++)
-    for (byte x=0; x<3; x++) {
-      GetBoxCells(x,y, cells); 
-      Deduce1Missing( cells );
       //board->Print2();
     }
 }
@@ -102,28 +118,44 @@ void Scanner::PruneCells(Cell* cells[])
   }
 }
 
-void Scanner::Deduce1Missing(Cell* cells[])
+boolean Scanner::Deduce1Missing(Cell* cells[])
 {
   debug.DebugStr("Deduce1Missing", "");
-  byte missingCount = 9;
-  byte missingNum = 0;
+  unsigned int foundFlags;
+  boolean success = false;
+  byte foundCount = 0;
+  byte deducedIndex = 0;
   for (byte i=0; i<9; i++)
   {
-    if (cells[i]->IsSolved())
-      missingCount--;
+    if (cells[i]->IsSolved()) {
+      bitSet(foundFlags, cells[i]->Get());
+      foundCount++;
+    }
     else
-      missingNum = cells[i]->Get();
+      deducedIndex = i;
   }
-  if (missingCount == 1)
+
+  if (foundCount == 8)
   {
-    debug.DebugNum("It's missing a ", missingNum);
+    for (byte num=1; num<=9; num++)
+    {
+      if (bitRead(foundFlags,num)==0) {
+        debug.DebugNum("Deduce1Missing deduced that this is the missing num ", num);
+        cells[ deducedIndex ]->Set(num);
+        success = true;
+      }
+    }
   }
+  
+  return success;
 }
 
 //------------------------
 
-void Scanner::FindWinners()
+boolean Scanner::FindWinners()
 {
+  boolean found = false;
+  
   // .. Iterate through all rows and columns
   for (byte y=0; y<9; y++)
   {
@@ -131,10 +163,13 @@ void Scanner::FindWinners()
     {
       debug.DebugNum2("Finding Winners x,y=", x, y);
       // If not solved, prune against numbers on that row
-      board->GetCell(x,y)->FindWinner();
+      if (board->GetCell(x,y)->FindWinner())
+        found = true;
       //board->Print2();
     }
   }
+  
+  return found;
 }
 
 
