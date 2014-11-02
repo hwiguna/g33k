@@ -71,7 +71,13 @@ void Board::Print2()
   for (int y=0; y<9; y++) {
     for (int x=0; x<9; x++) {
       Serial.print( " " );
-      Serial.print( _cells[x][y].GetBits(), BIN );
+      //Serial.print( _cells[x][y].GetBits(), BIN );
+      unsigned int val = _cells[x][y].GetBits();
+      for (int b=11; b>=0; b--)
+      {
+        byte ch = (bitRead(val,b)==1) ? 48 + b : 46; // digit or period
+        Serial.write(ch);
+      }
       if (x==2 || x==5) Serial.print( "  " );
     }
     Serial.println();

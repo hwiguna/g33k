@@ -33,6 +33,7 @@ void Scanner::Solve()
     success = Deduce();
     debug.DebugNum2("Solve status: found,success = ", found,success);
   }
+  board->Print2();
 }
 
 boolean Scanner::Deduce()
@@ -40,12 +41,20 @@ boolean Scanner::Deduce()
   boolean success = false;
   Cell* cells[9];
 
+  for (byte y=0; y<9; y++) {
+    GetYCells(y, cells);
+    if (Deduce1Missing( cells )) success = true;
+  }
+
+  for (byte x=0; x<9; x++) {
+    GetXCells(x, cells);
+    if (Deduce1Missing( cells )) success = true;
+  }
+
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
-      if (Deduce1Missing( cells ))
-        success = true;
-      //board->Print2();
+      if (Deduce1Missing( cells )) success = true;
     }
   return success;
 }
@@ -120,7 +129,7 @@ void Scanner::PruneCells(Cell* cells[])
 
 boolean Scanner::Deduce1Missing(Cell* cells[])
 {
-  debug.DebugStr("Deduce1Missing", "");
+  //debug.DebugStr("Deduce1Missing", "");
   unsigned int foundFlags;
   boolean success = false;
   byte foundCount = 0;
@@ -161,7 +170,7 @@ boolean Scanner::FindWinners()
   {
     for (byte x=0; x<9; x++)
     {
-      debug.DebugNum2("Finding Winners x,y=", x, y);
+      //debug.DebugNum2("Finding Winners x,y=", x, y);
       // If not solved, prune against numbers on that row
       if (board->GetCell(x,y)->FindWinner())
         found = true;
