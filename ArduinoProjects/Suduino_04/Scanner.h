@@ -11,6 +11,7 @@ class Scanner
     void PruneByX(byte x);
     void PruneByBox(byte x, byte y);
     void PruneCells(Cell* cells[]);
+    void Deduce1Missing(Cell* cells[]);
     void FindWinners();
 };
 
@@ -36,47 +37,29 @@ void Scanner::PruneCandidates()
 
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++)
-      PruneByBox(x,y);  
+      PruneByBox(x,y); 
+     
+  //Deduce1Missing( cells );
 }
 
 void Scanner::PruneByY(byte y)
 {
   debug.DebugNum("Pruning row ", y);
-  // Scan every column in row y
+  Cell* cells[9];
   for (byte x=0; x<9; x++)
-  {
-    Cell* cell = board->GetCell(x,y);
-    if ( cell->IsSolved() ) 
-    {
-      byte val = cell->Get();
-      debug.DebugNum2("At column x found a solved value of val = ", x, val);
-      // Because this column has been solved, then none of the other columns in that row can be that number.
-      for (byte x2=0; x2<9; x2++)
-      {
-        board->GetCell(x2,y)->RemoveCandidate( val );
-      }
-    }
-  }
+    cells[x] = board->GetCell(x,y);
+
+  PruneCells( cells );
 }
 
 void Scanner::PruneByX(byte x)
 {
   debug.DebugNum("Pruning column ", x);
-  // Scan every column in row y
+  Cell* cells[9];
   for (byte y=0; y<9; y++)
-  {
-    Cell* cell = board->GetCell(x,y);
-    if ( cell->IsSolved() ) 
-    {
-      byte val = cell->Get();
-      debug.DebugNum2("At row y found a solved value of val = ", y, val);
-      // Because this column has been solved, then none of the other columns in that row can be that number.
-      for (byte y2=0; y2<9; y2++)
-      {
-        board->GetCell(x,y2)->RemoveCandidate( val );
-      }
-    }
-  }
+    cells[y] = board->GetCell(x,y);
+
+  PruneCells( cells );
 }
 
 void Scanner::PruneByBox(byte x0, byte y0)
@@ -118,6 +101,23 @@ void Scanner::PruneCells(Cell* cells[])
   }
 }
 
+void Scanner::Deduce1Missing(Cell* cells[])
+{
+  debug.DebugStr("Deduce1Missing", "");
+  byte missingCount = 9;
+  byte missingNum = 0;
+  for (byte i=0; i<9; i++)
+  {
+    if (cells[i]->IsSolved())
+      missingCount--;
+    else
+      missingNum = cells[i]->Get();
+  }
+  if (missingCount == 1)
+  {
+    debug.DebugNum("It's missing a ", missingNum);
+  }
+}
 
 //------------------------
 
