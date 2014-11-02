@@ -6,7 +6,7 @@ class Board
     Board();
     Board(Debug inDebug);
     void Init(char* puzzle[]);
-    Cell GetCell(byte x, byte y);
+    Cell* GetCell(byte x, byte y);
     void SetCell(byte x, byte y, byte num);
     void Print();
     void Solve();
@@ -33,18 +33,16 @@ void Board::Init(char* puzzle[])
     for (int x=0; x<9; x++) 
     {
       byte num = CharToNum( (puzzle[y])[x] );
-      Cell cell = _cells[x][y];
-      cell.SetDebug(debug);
-      cell.Set( num );
-      //debug.DebugNum("Immediately after SET. cell num = ", cell.Get());
-      _cells[x][y] = cell;
+      Cell *cell = GetCell(x,y);
+      cell->SetDebug(debug);
+      cell->Set( num );
     }
   }
 }
 
-Cell Board::GetCell(byte x, byte y)
+Cell* Board::GetCell(byte x, byte y)
 {
-  return _cells[x][y];
+  return &(_cells[x][y]);
 }
 
 

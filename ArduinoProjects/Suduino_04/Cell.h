@@ -48,7 +48,6 @@ void Cell::Set(byte num)
     bitSet(_vals, num);
     Solved();
   }
-  //debug.DebugNum2("Set num,vals = ", num, _vals);
 }
 
 byte Cell::Get()
@@ -64,7 +63,6 @@ byte Cell::Get()
       }
     }
   }
-  //debug.DebugNum("Cell.Get() vals, num = ", num);
   return num;
 }
 
