@@ -34,55 +34,58 @@ void Scanner::PruneCandidates()
   for (byte y=0; y<9; y++) {
     GetYCells(y, cells);
     PruneCells(cells);
+    //board->Print2();
   }
 
   for (byte x=0; x<9; x++) {
     GetXCells(x, cells);
     PruneCells(cells);
+    //board->Print2();
   }
   
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
       PruneCells(cells);
+      //board->Print2();
     }
      
-  //Deduce1Missing( cells );
+  for (byte y=0; y<3; y++)
+    for (byte x=0; x<3; x++) {
+      GetBoxCells(x,y, cells); 
+      Deduce1Missing( cells );
+      //board->Print2();
+    }
 }
 
-void Scanner::GetYCells(byte y, Cell *cells[])
+void Scanner::GetYCells(byte y, Cell* cells[])
 {
-  debug.DebugNum("Pruning row ", y);
+  debug.DebugNum("GetYCells y=", y);
   for (byte x=0; x<9; x++)
     cells[x] = board->GetCell(x,y);
 }
 
-void Scanner::GetXCells(byte x, Cell *cells[])
+void Scanner::GetXCells(byte x, Cell* cells[])
 {
-  debug.DebugNum("Pruning column ", x);
+  debug.DebugNum("GetXCells x=", x);
   for (byte y=0; y<9; y++)
     cells[y] = board->GetCell(x,y);
 }
 
-void Scanner::GetBoxCells(byte x0, byte y0, Cell *cells[])
+void Scanner::GetBoxCells(byte x0, byte y0, Cell* cells[])
 {
-  debug.DebugNum2("Pruning box x0,y0 = ", x0,y0);
+  debug.DebugNum2("GetBoxCells x0,y0 = ", x0,y0);
   byte i = 0;
   x0 = x0*3;
   y0 = y0*3;
   for (byte y=0; y<3; y++)
-  {
     for (byte x=0; x<3; x++)
-    {
       cells[i++] = board->GetCell(x0+x,y0+y);
-    }
-  }
 }
 
 void Scanner::PruneCells(Cell* cells[])
 {
   debug.DebugStr("PruneCells", "");
-  // Scan every column in row y
   for (byte i=0; i<9; i++)
   {
     Cell* cell = cells[i];
@@ -126,9 +129,10 @@ void Scanner::FindWinners()
   {
     for (byte x=0; x<9; x++)
     {
-      //debug.DebugNum2("Finding Winners x,y=", x, y);
+      debug.DebugNum2("Finding Winners x,y=", x, y);
       // If not solved, prune against numbers on that row
       board->GetCell(x,y)->FindWinner();
+      //board->Print2();
     }
   }
 }

@@ -9,6 +9,7 @@ class Board
     Cell* GetCell(byte x, byte y);
     void SetCell(byte x, byte y, byte num);
     void Print();
+    void Print2();
     void Solve();
   private:
     Cell _cells[9][9];
@@ -38,6 +39,7 @@ void Board::Init(char* puzzle[])
       cell->Set( num );
     }
   }
+  Print2();
 }
 
 Cell* Board::GetCell(byte x, byte y)
@@ -63,6 +65,20 @@ void Board::Print()
     if (y==2 || y==5) Serial.println();
   }
 }
+
+void Board::Print2()
+{
+  for (int y=0; y<9; y++) {
+    for (int x=0; x<9; x++) {
+      Serial.print( " " );
+      Serial.print( _cells[x][y].GetBits(), BIN );
+      if (x==2 || x==5) Serial.print( "  " );
+    }
+    Serial.println();
+    if (y==2 || y==5) Serial.println();
+  }
+}
+
 
 int Board::Flock(int row)
 {

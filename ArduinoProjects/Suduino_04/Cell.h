@@ -1,4 +1,4 @@
-const byte SOLVED_BIT = 14;
+const byte SOLVED_BIT = 11;
 
 class Cell
 {
@@ -7,6 +7,7 @@ class Cell
     void SetDebug(Debug inDebug);
     void Set(byte num);
     byte Get();
+    unsigned int GetBits();
     void AddCandidate(byte num);
     void RemoveCandidate(byte num);
     boolean IsSolved();
@@ -34,13 +35,14 @@ void Cell::SetDebug(Debug inDebug)
 }
 
 //-----------------------------
-// 5  4  3  2  1  0
-// 32 16 8  4  2  1
+//S 98 7654 3210      
+//0011 1111 1111
+//3    F    F
 void Cell::Set(byte num)
 {
   if (num==0)
   {
-    _vals = 0x01FF; //Not solved and 9 lowest bits on meaning all # are possible candidates
+    _vals = 0x03FF; //Not solved and 9 lowest bits on meaning all # are possible candidates
   }
   else
   {
@@ -48,6 +50,11 @@ void Cell::Set(byte num)
     bitSet(_vals, num);
     Solved();
   }
+}
+
+unsigned int Cell::GetBits()
+{
+  return _vals;
 }
 
 byte Cell::Get()
@@ -110,11 +117,14 @@ void Cell::FindWinner()
     byte candidateCount = 0;
     for (byte i=1; i<=9; i++)
     {
+      //debug.DebugNum2("i,bitval ",i,bitRead(_vals,i));
       if (bitRead(_vals,i)==1)
         candidateCount++;
     }
-    if (candidateCount==1)
+    if (candidateCount==1) {
       Solved();
+      debug.DebugNum("*** Found winner *** val=", Get());
+    }
   }
 }
 
