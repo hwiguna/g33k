@@ -23,7 +23,7 @@ char* puzzle[] = {
 
 void setup() {
   // initialize serial:
-  Serial.begin(19200); //
+  Serial.begin(57600); //
   
   Serial.println("Puzzle:");
   board.Init(puzzle);

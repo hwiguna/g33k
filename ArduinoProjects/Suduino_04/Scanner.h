@@ -6,13 +6,20 @@ class Scanner
   private:
     Debug debug;
     Board *board;
-    void PruneCandidates();
+
     void GetYCells(byte y, Cell* cells[]);
     void GetXCells(byte x, Cell* cells[]);
     void GetBoxCells(byte x, byte y, Cell* cells[]);
+
+    void PruneCandidates();
     void PruneCells(Cell* cells[]);
+
     boolean Deduce();
     boolean Deduce1Missing(Cell* cells[]);
+
+    boolean ElectSingles();
+    boolean ElectSingleCandidates(Cell* cells[]);
+
     boolean FindWinners();
 };
 
@@ -26,11 +33,13 @@ void Scanner::Solve()
 {
   boolean found = true;
   boolean success = true;
+  boolean success2 = true;
   while (found || success)
   {
     PruneCandidates();
     found = FindWinners();
     success = Deduce();
+    success2 = ElectSingles();
     debug.DebugNum2("Solve status: found,success = ", found,success);
   }
   board->Print2();
@@ -82,6 +91,31 @@ void Scanner::PruneCandidates()
       //board->Print2();
     }
 }
+
+
+boolean Scanner::ElectSingles()
+{
+  boolean success = false;
+  Cell* cells[9];
+
+  for (byte y=0; y<9; y++) {
+    GetYCells(y, cells);
+    if (ElectSingleCandidates( cells )) success = true;
+  }
+
+  for (byte x=0; x<9; x++) {
+    GetXCells(x, cells);
+    if (ElectSingleCandidates( cells )) success = true;
+  }
+
+  for (byte y=0; y<3; y++)
+    for (byte x=0; x<3; x++) {
+      GetBoxCells(x,y, cells); 
+      if (ElectSingleCandidates( cells )) success = true;
+    }
+  return success;
+}
+
 
 void Scanner::GetYCells(byte y, Cell* cells[])
 {
@@ -180,5 +214,33 @@ boolean Scanner::FindWinners()
   
   return found;
 }
+
+boolean Scanner::ElectSingleCandidates(Cell* cells[])
+{
+  debug.DebugStr("ElectSingleCandidates", "");
+  boolean success = false;
+  for (byte num=1; num<=9; num++)
+  {
+    byte candidateCount = 0;
+    byte candidateIndex = 0;
+    for (byte i=0; i<9; i++)
+    {
+      if (!cells[i]->IsSolved()) {
+        unsigned int foundFlags = cells[i]->GetBits();
+        if (bitRead(foundFlags,num)) {
+          candidateCount++;
+          candidateIndex = i;
+        }
+      }
+    }
+    
+    if (candidateCount==1) {
+      debug.DebugNum2("*** ElectSingleCandidates success *** index,num = ", candidateIndex, num);
+      success = true;
+      cells[ candidateIndex ]->Set(num);
+    }
+  }
+}
+
 
 
