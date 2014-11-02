@@ -7,9 +7,9 @@ class Scanner
     Debug debug;
     Board *board;
     void PruneCandidates();
-    void PruneByY(byte y);
-    void PruneByX(byte x);
-    void PruneByBox(byte x, byte y);
+    void GetYCells(byte y, Cell* cells[]);
+    void GetXCells(byte x, Cell* cells[]);
+    void GetBoxCells(byte x, byte y, Cell* cells[]);
     void PruneCells(Cell* cells[]);
     void Deduce1Missing(Cell* cells[]);
     void FindWinners();
@@ -29,44 +29,44 @@ void Scanner::Solve()
 
 void Scanner::PruneCandidates()
 {
-  for (byte y=0; y<9; y++)
-    PruneByY(y);
+  Cell* cells[9];
 
-  for (byte x=0; x<9; x++)
-    PruneByX(x);
+  for (byte y=0; y<9; y++) {
+    GetYCells(y, cells);
+    PruneCells(cells);
+  }
 
+  for (byte x=0; x<9; x++) {
+    GetXCells(x, cells);
+    PruneCells(cells);
+  }
+  
   for (byte y=0; y<3; y++)
-    for (byte x=0; x<3; x++)
-      PruneByBox(x,y); 
+    for (byte x=0; x<3; x++) {
+      GetBoxCells(x,y, cells); 
+      PruneCells(cells);
+    }
      
   //Deduce1Missing( cells );
 }
 
-void Scanner::PruneByY(byte y)
+void Scanner::GetYCells(byte y, Cell *cells[])
 {
   debug.DebugNum("Pruning row ", y);
-  Cell* cells[9];
   for (byte x=0; x<9; x++)
     cells[x] = board->GetCell(x,y);
-
-  PruneCells( cells );
 }
 
-void Scanner::PruneByX(byte x)
+void Scanner::GetXCells(byte x, Cell *cells[])
 {
   debug.DebugNum("Pruning column ", x);
-  Cell* cells[9];
   for (byte y=0; y<9; y++)
     cells[y] = board->GetCell(x,y);
-
-  PruneCells( cells );
 }
 
-void Scanner::PruneByBox(byte x0, byte y0)
+void Scanner::GetBoxCells(byte x0, byte y0, Cell *cells[])
 {
   debug.DebugNum2("Pruning box x0,y0 = ", x0,y0);
-  Cell* cells[9];
-  
   byte i = 0;
   x0 = x0*3;
   y0 = y0*3;
@@ -77,8 +77,6 @@ void Scanner::PruneByBox(byte x0, byte y0)
       cells[i++] = board->GetCell(x0+x,y0+y);
     }
   }
-  
-  PruneCells( cells );
 }
 
 void Scanner::PruneCells(Cell* cells[])
