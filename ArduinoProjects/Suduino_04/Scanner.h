@@ -14,19 +14,16 @@ class Scanner
     void PruneCandidates();
     void PruneCells(Cell* cells[]);
 
-    boolean Deduce();
-    boolean Deduce1Missing(Cell* cells[]);
-
-    boolean ElectSingles();
-    boolean ElectSingleCandidates(Cell* cells[]);
-
     boolean FindWinners();
+
+    boolean FindMissingDigits();
+    boolean FindMissingDigit(Cell* cells[]);
     
+    boolean FindOnlyOptions();
+    boolean FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells[]);
+
     boolean AreValid();
     boolean IsValid(Cell* cells[]);
-
-    boolean Election();
-    boolean FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells[]);
 };
 
 Scanner::Scanner(Debug inDebug, Board *inBoard)
@@ -45,9 +42,9 @@ void Scanner::Solve()
   {
     PruneCandidates();      AreValid();
     found1 = FindWinners(); AreValid();
-    Deduce();               AreValid();   
+    FindMissingDigits();    AreValid();   
     found2 = FindWinners(); AreValid();
-    found3 = Election();
+    found3 = FindOnlyOptions();
     
     //success2 = ElectSingles();
     debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
@@ -55,25 +52,25 @@ void Scanner::Solve()
   }
 }
 
-boolean Scanner::Deduce()
+boolean Scanner::FindMissingDigits()
 {
   boolean success = false;
   Cell* cells[9];
 
   for (byte y=0; y<9; y++) {
     GetYCells(y, cells);
-    if (Deduce1Missing( cells )) success = true;
+    if (FindMissingDigit( cells )) success = true;
   }
 
   for (byte x=0; x<9; x++) {
     GetXCells(x, cells);
-    if (Deduce1Missing( cells )) success = true;
+    if (FindMissingDigit( cells )) success = true;
   }
 
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
-      if (Deduce1Missing( cells )) success = true;
+      if (FindMissingDigit( cells )) success = true;
     }
   return success;
 }
@@ -85,13 +82,11 @@ void Scanner::PruneCandidates()
   for (byte y=0; y<9; y++) {
     GetYCells(y, cells);
     PruneCells(cells);
-    //board->Print2();
   }
 
   for (byte x=0; x<9; x++) {
     GetXCells(x, cells);
     PruneCells(cells);
-    //board->Print2();
   }
   
   for (byte y=0; y<3; y++)
@@ -101,34 +96,8 @@ void Scanner::PruneCandidates()
         board->Print2();
       }
       PruneCells(cells);
-      //board->Print2();
     }
 }
-
-
-boolean Scanner::ElectSingles()
-{
-  boolean success = false;
-  Cell* cells[9];
-
-  for (byte y=0; y<9; y++) {
-    GetYCells(y, cells);
-    if (ElectSingleCandidates( cells )) success = true;
-  }
-
-  for (byte x=0; x<9; x++) {
-    GetXCells(x, cells);
-    if (ElectSingleCandidates( cells )) success = true;
-  }
-
-  for (byte y=0; y<3; y++)
-    for (byte x=0; x<3; x++) {
-      GetBoxCells(x,y, cells); 
-      if (ElectSingleCandidates( cells )) success = true;
-    }
-  return success;
-}
-
 
 void Scanner::GetYCells(byte y, Cell* cells[])
 {
@@ -172,35 +141,39 @@ void Scanner::PruneCells(Cell* cells[])
         cells[j]->RemoveCandidate( val );
         AreValid();
       }
-      //board->Print2();
     }
   }
 }
 
-boolean Scanner::Deduce1Missing(Cell* cells[])
+boolean Scanner::FindMissingDigit(Cell* cells[])
 {
-  //debug.DebugStr("Deduce1Missing", "");
+  //debug.DebugStr("FindMissingDigit", "");
   unsigned int foundFlags;
   boolean success = false;
   byte foundCount = 0;
   byte deducedIndex = 0;
+  
+  // Walk through a given 9 cells. Count how many of them have been solved.
   for (byte i=0; i<9; i++)
   {
     if (cells[i]->IsSolved()) {
-      bitSet(foundFlags, cells[i]->Get());
+      bitSet(foundFlags, cells[i]->Get()); // Keep track of the solved numbers.
       foundCount++;
     }
     else
-      deducedIndex = i;
+      deducedIndex = i; // Index of the unsolved cell.  Value is only valid and used if only one cell is unsolved.
   }
 
+  // If all but one has been solved, then we can figure out which number is missing!
   if (foundCount == 8)
   {
+    // Go through all 9 numbers...
     for (byte num=1; num<=9; num++)
     {
+      // Find the one missing unsolved number that were not marked above.
       if (bitRead(foundFlags,num)==0) {
-        debug.DebugNum("Deduce1Missing deduced that this is the missing num ", num);
-        cells[ deducedIndex ]->Set(num);
+        debug.DebugNum("FindMissingDigits deduced that this is the missing num ", num);
+        cells[ deducedIndex ]->Set(num); // Mark this cell as solved!
         success = true;
         AreValid();
       }
@@ -231,35 +204,6 @@ boolean Scanner::FindWinners()
   }
   
   return found;
-}
-
-boolean Scanner::ElectSingleCandidates(Cell* cells[])
-{
-  debug.DebugStr("ElectSingleCandidates", "");
-  boolean success = false;
-  for (byte num=1; num<=9; num++)
-  {
-    byte candidateCount = 0;
-    byte candidateIndex = 0;
-    for (byte i=0; i<9; i++)
-    {
-      if (!cells[i]->IsSolved()) {
-        unsigned int foundFlags = cells[i]->GetBits();
-        if (bitRead(foundFlags,num)) {
-          candidateCount++;
-          candidateIndex = i;
-        }
-      }
-    }
-    
-    if (candidateCount==1) {
-      debug.DebugNum2("*** ElectSingleCandidates success *** index,num = ", candidateIndex, num);
-      success = true;
-      board->Print2();
-      cells[ candidateIndex ]->Set(num);
-      board->Print2();
-    }
-  }
 }
 
 boolean Scanner::AreValid()
@@ -319,7 +263,7 @@ boolean Scanner::IsValid(Cell* cells[])
   return isValid;
 }
 
-boolean Scanner::Election()
+boolean Scanner::FindOnlyOptions()
 {
   boolean elected = false;
   
@@ -348,12 +292,15 @@ boolean Scanner::Election()
               boolean foundInRow = FindDuplicate(0,y, cell, num, cells);
   
               if (!foundInRow) {
-                GetBoxCells(x,y, cells);
+                // Translate actual x,y to box coordinates (0..3,0..3)
+                int bx = x / 3;
+                int by = y / 3;
+                GetBoxCells(bx,by, cells);
                 boolean foundInBox = FindDuplicate(x,y, cell, num, cells);
                 
                 if (!foundInBox) {
                   elected = true;
-                  debug.DebugNum2("Election SUCCESS! x,y = ",x,y);
+                  debug.DebugNum2("FindOnlyOptions SUCCESS! x,y = ",x,y);
                   debug.DebugNum("num =",num);
                   board->Print2();
                   cell->Set(num);

@@ -65,6 +65,7 @@ void Board::Print()
     Serial.println();
     if (y==2 || y==5) Serial.println();
   }
+  Serial.println();
 }
 
 void Board::Print2()

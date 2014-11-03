@@ -10,10 +10,10 @@ Scanner scanner(debug, &board);
 char* puzzle[] = {
   "*****5347",
   "*564*12**",
-//  "***7**56*",
-  "***7**561",
+  "***7**56*",
+//"***7**561", // Test2
   "*81*49*26",
-//"381*49726",
+//"381*49726", // Test1
   "**7***9**",
   "****2***4",
   "**8356**2",
@@ -32,14 +32,11 @@ void setup() {
   Serial.println("Solving...");
   scanner.Solve();
   
+  Serial.println();
   Serial.println("SOLVED:");
   board.Print2();
 
-  Serial.print("Board(1,2)=");
-  Serial.println((board.GetCell(1,2))->Get());
-
-  Serial.print("Board(1,3)=");
-  Serial.println((board.GetCell(1,3))->Get());
+  Serial.println("DONE!");
 }
 
 void loop() {
