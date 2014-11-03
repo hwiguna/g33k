@@ -33,7 +33,7 @@ void setup() {
   scanner.Solve();
   
   Serial.println("SOLVED:");
-  board.Print();
+  board.Print2();
 
   Serial.print("Board(1,2)=");
   Serial.println((board.GetCell(1,2))->Get());

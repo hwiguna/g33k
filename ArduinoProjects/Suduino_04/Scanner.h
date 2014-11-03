@@ -21,6 +21,12 @@ class Scanner
     boolean ElectSingleCandidates(Cell* cells[]);
 
     boolean FindWinners();
+    
+    boolean AreValid();
+    boolean IsValid(Cell* cells[]);
+
+    boolean Election();
+    boolean FindDuplicate(Cell* cell, byte num, Cell* cells[]);
 };
 
 Scanner::Scanner(Debug inDebug, Board *inBoard)
@@ -33,22 +39,20 @@ void Scanner::Solve()
 {
   boolean found1 = true;
   boolean found2 = true;
-  boolean success1 = true;
-  boolean success2 = true;
-  while (found1 || found2 || success1 || success2)
+  boolean found3 = true;
+  boolean found4 = true;
+  while (found1 || found2 || found3 || found4)
   {
-    PruneCandidates();  board->Print2();
-    
-    found1 = FindWinners();    board->Print2();
-    
-    Deduce();   board->Print2();
-    
-    found2 = FindWinners();    board->Print2();
+    PruneCandidates();      AreValid();
+    found1 = FindWinners(); AreValid();
+    Deduce();               AreValid();   
+    found2 = FindWinners(); AreValid();
+    found3 = Election();
     
     //success2 = ElectSingles();
     debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
+    debug.DebugNum2("found3,found4 = ", found3,found4);
   }
-  board->Print2();
 }
 
 boolean Scanner::Deduce()
@@ -159,12 +163,12 @@ void Scanner::PruneCells(Cell* cells[])
       byte val = cell->Get();
       debug.DebugNum2("At index i found a solved value of val = ", i, val);
       // Because this column has been solved, then none of the other columns in that row can be that number.
-      board->Print2();
+      //board->Print2();
       for (byte j=0; j<9; j++)
       {
         cells[j]->RemoveCandidate( val );
       }
-      board->Print2();
+      //board->Print2();
     }
   }
 }
@@ -252,5 +256,125 @@ boolean Scanner::ElectSingleCandidates(Cell* cells[])
   }
 }
 
+boolean Scanner::AreValid()
+{
+  boolean isValid = true;
+  Cell* cells[9];
 
+  for (byte y=0; y<9; y++) {
+    GetYCells(y, cells);
+    if (!IsValid( cells )) isValid=false;
+  }
 
+  if (isValid)
+    for (byte x=0; x<9; x++) {
+      GetXCells(x, cells);
+      if (!IsValid( cells )) isValid=false;
+    }
+
+  if (isValid)
+    for (byte y=0; y<3; y++)
+      for (byte x=0; x<3; x++) {
+        GetBoxCells(x,y, cells); 
+        if (!IsValid( cells )) isValid=false;
+      }
+
+  return isValid;
+}
+
+boolean Scanner::IsValid(Cell* cells[])
+{
+  boolean isValid = true;
+
+  for (byte cellIndex=0; cellIndex<(9-1); cellIndex++)
+  {
+    Cell* cell = cells[cellIndex];
+    if ( cell->IsSolved() ) 
+    {
+      byte cellVal = cell->Get();
+      
+      for (byte chkIndex=cellIndex+1; chkIndex<9; chkIndex++)
+      {
+         if ( cells[chkIndex]->IsSolved() ) 
+         {
+            byte chkVal = cells[chkIndex]->Get();
+            if (cellVal == chkVal) {
+              isValid = false;
+              debug.DebugStr("*** B A D *** B A D *** B A D ******************************","");
+              board->Print2();
+              chkIndex = 9;
+              cellIndex = 9;
+            }
+         }
+      }
+    }
+  }
+
+  return isValid;
+}
+
+boolean Scanner::Election()
+{
+  boolean elected = false;
+  
+  // Scan all cells "C"
+  for (byte y=0; y<9; y++)
+  {
+    for (byte x=0; x<9; x++)
+    {
+      // if unsolved
+      Cell* cell = board->GetCell(x,y);
+      if (! (cell->IsSolved()) )
+      {
+          // For each possible num...
+          for (byte num=1; num<=9; num++)
+          {
+            // GetY, getX, GetBox for cell "C"
+            // if "num" is not found in cells of any of the GetX, GetY, or GetBox
+            // then "C" is solved!
+          
+            Cell* cells[9];
+            GetXCells(x, cells);      
+            boolean foundInCol = FindDuplicate(cell, num, cells);
+            
+            if (!foundInCol) {
+              GetYCells(y, cells);
+              boolean foundInRow = FindDuplicate(cell, num, cells);
+  
+              if (!foundInRow) {
+                GetBoxCells(x,y, cells);
+                boolean foundInBox = FindDuplicate(cell, num, cells);
+                
+                if (!foundInBox) {
+                  debug.DebugNum2("Election. x,y=",x,y);
+                  debug.DebugNum("SUCCESS. num =",num);
+                  cell->Set(num);
+                }
+              }
+            }
+          }
+      }
+    }
+  }
+  
+  return elected;
+}
+
+// Find potential num in cells, exclude original cell
+boolean Scanner::FindDuplicate(Cell* cell, byte num, Cell* cells[])
+{
+  boolean found = true;
+  
+  for (byte i=0; i<9; i++)
+  {
+    Cell* chkCell = cells[i];
+    if (chkCell != cell) {
+      if ( bitRead(chkCell->GetBits(), num) == 1 ) {
+        found = false;
+        break;
+      }
+    }
+  }
+  
+  return found;
+}
