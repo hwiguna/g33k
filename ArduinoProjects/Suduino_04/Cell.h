@@ -13,33 +13,33 @@ class Cell
     boolean IsSolved();
     void Solved();
     boolean Maybe(byte num);
-    boolean UnitTests();
     boolean FindWinner();
   private:
     unsigned int _vals;
     Debug debug;
 };
 
-//--------------------------
-
-
 Cell::Cell()
 {
-  //Set(0);
 };
 
 void Cell::SetDebug(Debug inDebug)
 {
   debug = inDebug;
-  // Initialize pins if necessary
 }
 
-//-----------------------------
-//S 98 7654 3210      
-//0011 1111 1111
-//3    F    F
+
 void Cell::Set(byte num)
 {
+  // Status of each cell is stored as bits in _vals
+  // bit 0: Least Significant bit represents a blank (unknown)
+  // bit 1..9: represents digits 1..9.  If a cell is not yet solved, multiple on bits represent possible values for the cell.
+  // bit 10: skipped to make bit 11 stand out from the rest of the lower bits.
+  // bit 11: 1 means this cell is solved, 0 means we don't know for sure (even if only one of bits 1..9 is on.
+  //S 98 7654 3210      
+  //0011 1111 1111
+  //3    F    F
+
   if (num==0)
   {
     _vals = 0x03FF; //Not solved and 9 lowest bits on meaning all # are possible candidates
@@ -99,15 +99,6 @@ void Cell::Solved()
 boolean Cell::Maybe(byte num)
 {
   return bitRead( _vals, num) == 0;
-}
-
-boolean Cell::UnitTests()
-{
-  bool allPassed = false;
-
-  //TODO
-
-  return allPassed;
 }
 
 boolean Cell::FindWinner()

@@ -11,6 +11,7 @@ class Board
     void Print();
     void Print2();
     void Solve();
+
   private:
     Cell _cells[9][9];
     int Flock(int row);
@@ -46,7 +47,6 @@ Cell* Board::GetCell(byte x, byte y)
 {
   return &(_cells[x][y]);
 }
-
 
 void Board::SetCell(byte x, byte y, byte num)
 {
@@ -98,6 +98,6 @@ int Board::Flock(int row)
 byte Board::CharToNum(char ch)
 {
   byte num;
-  if (ch=='*') num = 0; else num = ch-48;
+  if (ch=='.') num = 0; else num = ch-48;
   return num;
 }
