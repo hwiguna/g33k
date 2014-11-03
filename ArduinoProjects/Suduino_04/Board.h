@@ -58,7 +58,8 @@ void Board::Print()
   for (int y=0; y<9; y++) {
     for (int x=0; x<9; x++) {
       Serial.print( " " );
-      Serial.print( _cells[x][y].Get() );
+      byte num = _cells[x][y].Get();
+      if (num==0) Serial.print('.'); else Serial.print(num,DEC);
       if (x==2 || x==5) Serial.print( "  " );
     }
     Serial.println();
@@ -68,12 +69,13 @@ void Board::Print()
 
 void Board::Print2()
 {
+  Print();
   for (int y=0; y<9; y++) {
     for (int x=0; x<9; x++) {
       Serial.print( " " );
       //Serial.print( _cells[x][y].GetBits(), BIN );
       unsigned int val = _cells[x][y].GetBits();
-      for (int b=11; b>=0; b--)
+      for (int b=11; b>0; b--)
       {
         byte ch = (bitRead(val,b)==1) ? 48 + b : 46; // digit or period
         Serial.write(ch);
@@ -83,6 +85,7 @@ void Board::Print2()
     Serial.println();
     if (y==2 || y==5) Serial.println();
   }
+  Serial.println();
 }
 
 

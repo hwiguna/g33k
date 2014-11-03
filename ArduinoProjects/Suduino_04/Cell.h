@@ -123,6 +123,7 @@ boolean Cell::FindWinner()
       if (bitRead(_vals,i)==1)
         candidateCount++;
     }
+    
     if (candidateCount==1) {
       Solved();
       debug.DebugNum("*** Found winner *** val=", Get());

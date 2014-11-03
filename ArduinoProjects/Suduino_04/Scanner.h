@@ -31,16 +31,22 @@ Scanner::Scanner(Debug inDebug, Board *inBoard)
 
 void Scanner::Solve()
 {
-  boolean found = true;
-  boolean success = true;
+  boolean found1 = true;
+  boolean found2 = true;
+  boolean success1 = true;
   boolean success2 = true;
-  while (found || success)
+  while (found1 || found2 || success1 || success2)
   {
-    PruneCandidates();
-    found = FindWinners();
-    success = Deduce();
-    success2 = ElectSingles();
-    debug.DebugNum2("Solve status: found,success = ", found,success);
+    PruneCandidates();  board->Print2();
+    
+    found1 = FindWinners();    board->Print2();
+    
+    Deduce();   board->Print2();
+    
+    found2 = FindWinners();    board->Print2();
+    
+    //success2 = ElectSingles();
+    debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
   }
   board->Print2();
 }
@@ -153,10 +159,12 @@ void Scanner::PruneCells(Cell* cells[])
       byte val = cell->Get();
       debug.DebugNum2("At index i found a solved value of val = ", i, val);
       // Because this column has been solved, then none of the other columns in that row can be that number.
+      board->Print2();
       for (byte j=0; j<9; j++)
       {
         cells[j]->RemoveCandidate( val );
       }
+      board->Print2();
     }
   }
 }
@@ -237,7 +245,9 @@ boolean Scanner::ElectSingleCandidates(Cell* cells[])
     if (candidateCount==1) {
       debug.DebugNum2("*** ElectSingleCandidates success *** index,num = ", candidateIndex, num);
       success = true;
+      board->Print2();
       cells[ candidateIndex ]->Set(num);
+      board->Print2();
     }
   }
 }
