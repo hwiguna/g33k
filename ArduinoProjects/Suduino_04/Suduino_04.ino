@@ -30,7 +30,7 @@ void setup() {
   scanner.Solve();
   
   Serial.println();
-  Serial.println("SOLVED:");
+  Serial.println("SOLUTION:");
   board.Print2();
 
   Serial.println("DONE!");

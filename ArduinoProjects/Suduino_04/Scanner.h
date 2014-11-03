@@ -1,3 +1,5 @@
+const boolean ASSERT = false;
+
 class Scanner
 {
   public:
@@ -209,26 +211,30 @@ boolean Scanner::FindWinners()
 boolean Scanner::AreValid()
 {
   boolean isValid = true;
-  Cell* cells[9];
 
-  for (byte y=0; y<9; y++) {
-    GetYCells(y, cells);
-    if (!IsValid( cells )) isValid=false;
-  }
-
-  if (isValid)
-    for (byte x=0; x<9; x++) {
-      GetXCells(x, cells);
+  if (ASSERT)
+  {
+    Cell* cells[9];
+  
+    for (byte y=0; y<9; y++) {
+      GetYCells(y, cells);
       if (!IsValid( cells )) isValid=false;
     }
-
-  if (isValid)
-    for (byte y=0; y<3; y++)
-      for (byte x=0; x<3; x++) {
-        GetBoxCells(x,y, cells); 
+  
+    if (isValid)
+      for (byte x=0; x<9; x++) {
+        GetXCells(x, cells);
         if (!IsValid( cells )) isValid=false;
       }
-
+  
+    if (isValid)
+      for (byte y=0; y<3; y++)
+        for (byte x=0; x<3; x++) {
+          GetBoxCells(x,y, cells); 
+          if (!IsValid( cells )) isValid=false;
+        }
+  }
+  
   return isValid;
 }
 
