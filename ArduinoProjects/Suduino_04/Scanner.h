@@ -24,6 +24,10 @@ class Scanner
     boolean FindOnlyOptions();
     boolean FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells[]);
 
+    boolean FindClumps();
+    boolean FindClump(Cell* cells[]);
+    byte PatternLength( unsigned int pattern);
+
     boolean AreValid();
     boolean IsValid(Cell* cells[]);
 };
@@ -40,13 +44,14 @@ void Scanner::Solve()
   boolean found2 = true;
   boolean found3 = true;
   boolean found4 = true;
-  while (found1 || found2 || found3)
+  while (found1 || found2 || found3 | found4)
   {
     PruneCandidates();      AreValid();
     found1 = FindWinners(); AreValid();
     FindMissingDigits();    AreValid();   
     found2 = FindWinners(); AreValid();
-    found3 = FindOnlyOptions();
+    found3 = FindOnlyOptions(); AreValid();
+    found4 = FindClumps();   AreValid();
     
     //success2 = ElectSingles();
     debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
@@ -94,9 +99,6 @@ void Scanner::PruneCandidates()
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
-      if (x==2 && y==2) {
-        board->Print2();
-      }
       PruneCells(cells);
     }
 }
@@ -347,4 +349,81 @@ boolean Scanner::FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells
   
   if (verbose) debug.DebugNum("FindDuplicate ending with found = ", found);
   return found;
+}
+
+boolean Scanner::FindClumps()
+{
+  boolean found = false;
+  board->Print2();
+
+ Cell* cells[9];
+  for (byte y=0; y<9; y++) {
+    GetYCells(y, cells);
+    debug.DebugNum("\nFindClump for Y = ", y);
+    if (FindClump(cells)) found = true;
+  }
+  
+  return found;
+}
+
+boolean Scanner::FindClump(Cell* cells[])
+{
+  boolean found = false;
+  debug.DebugStr("FindClump()","");
+  
+  unsigned int patterns[9]; // What's the bit pattern look like?
+  byte numPatterns = 0; // How many unique bit patterns were there?
+  byte patternLen[9]; // How long is this bit pattern
+  byte patternCount[9]; // How many did this particular bit pattern occured within cells?
+
+  //-- Loop thru the cells, counting the unsolved patterns --
+  for (byte i=0; i<9; i++)
+  {
+    Cell* chkCell = cells[i];
+    
+    // Only count unsolved patterns
+    if (!chkCell->IsSolved()) {
+      // Mask out other bits except the flags that indicates possible numbers for the cell
+      unsigned int pattern = chkCell->GetBits() & 0x03FE;
+      debug.DebugNum2("Unsolved at index, pattern = ",i, pattern);
+      // Is this pattern in the patterns array?
+      boolean patternFound = false;
+      for (byte c=0; c<numPatterns; c++)
+      {
+        if (pattern == patterns[c])
+        {
+          // existing found, increment count for that pattern
+          patternFound = true;
+          patternCount[c]++;
+          debug.DebugNum2("Found existing: i, count = ", i, patternCount[c]);
+          break;
+        }
+      }
+      
+      if (!numPatterns) {
+        patterns[numPatterns] = pattern;
+        patternLen[numPatterns] = PatternLength(pattern);
+        patternCount[numPatterns] = 1;
+        debug.DebugNum2("Added new: i, pattern = ", i, pattern);
+        numPatterns++;
+      }
+    }
+  }
+  
+  //-- Any of the patterns have count greater than one? --
+  
+}
+
+
+byte Scanner::PatternLength( unsigned int pattern)
+{
+  byte patternLen = 0;
+  for (byte b=1; b <= 9; b++)
+  {
+    if (bitRead(pattern,b)>0)
+      patternLen++;
+  }
+  
+  debug.DebugNum("PatternLength = ", patternLen);
+  return patternLen;
 }
