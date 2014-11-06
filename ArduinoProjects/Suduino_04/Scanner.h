@@ -376,6 +376,7 @@ boolean Scanner::FindClump(Cell* cells[])
   byte patternLen[9]; // How long is this bit pattern
   byte patternCount[9]; // How many did this particular bit pattern occured within cells?
   byte unsolvedCount = 0;
+  unsigned int missingNum = 0x3FE;
   
   //-- Loop thru the cells, counting the unsolved patterns --
   for (byte i=0; i<9; i++)
@@ -383,7 +384,13 @@ boolean Scanner::FindClump(Cell* cells[])
     Cell* chkCell = cells[i];
     
     // Only count unsolved patterns
-    if (!chkCell->IsSolved()) {
+    if (chkCell->IsSolved()) {
+      byte val = chkCell->Get();
+      debug.DebugNum("Found solved val = ", val);
+      bitClear(missingNum,val);
+    }
+    else
+    {
       unsolvedCount++;
       // Mask out other bits except the flags that indicates possible numbers for the cell
       unsigned int pattern = chkCell->GetBits() & 0x03FE;
@@ -424,18 +431,54 @@ boolean Scanner::FindClump(Cell* cells[])
         case 2:
           debug.DebugNum2("patternCount, unsolvedCount = ", patternCount[p], unsolvedCount);
           if (unsolvedCount==3) {
-            debug.DebugNum2("*** p, pattern = ", p, patterns[p]);
+            unsigned int pattern = patterns[p];
+            debug.DebugNum2("*** p, pattern = ", p, pattern);
+
+            // mark the two nums as "taken" so we can find the missing num
+            for (byte b=1; b<=9; b++)
+            {
+              if (bitRead(pattern,b) != 0)
+              {
+                debug.DebugNum("Marking b as taken ", b);
+                bitClear(missingNum,b);
+              }
+            }
+            
             //-- We now know the pattern that appears twice in the cells AND we know that there is only one more unknown
-            // Prune the remaining unsolved with bits in pattern
+            // Prune the remaining unsolved cells with bits in pattern
             for (byte c=0; c<9; c++)
             {
-              if (cells[c]
+              // find the lone unsolved that has a different pattern than the double.
+              if (!cells[c]->IsSolved() && (cells[c]->GetBits() & 0x3FE) != pattern)
+              {
+//                for (byte b=1; b<=9; b++)
+//                {
+//                  if (bitRead(pattern,b) != 0)
+//                  {
+//                    debug.DebugNum2("Removing candidate b from cell c = ", b, c);
+//                    cells[c]->RemoveCandidate( b );
+//                  }
+//                }
+
+                // Translate missingNum bit into actual num
+                byte val = 0;
+                for (byte b=1; b<=9; b++)
+                {
+                  if (bitRead(missingNum,b))
+                    val = b;
+                }
+                debug.DebugNum2("cell c solved as val = ", c, val);
+                cells[c]->Set(val);
+                found = true;
+              }
             }
           }
           break;
       }
     }
   }
+  
+  return found;
 }
 
 
