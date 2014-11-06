@@ -375,7 +375,7 @@ boolean Scanner::FindClump(Cell* cells[])
   byte numPatterns = 0; // How many unique bit patterns were there?
   byte patternLen[9]; // How long is this bit pattern
   byte patternCount[9]; // How many did this particular bit pattern occured within cells?
-  byte unsolvedCount;
+  byte unsolvedCount = 0;
   
   //-- Loop thru the cells, counting the unsolved patterns --
   for (byte i=0; i<9; i++)
@@ -414,17 +414,23 @@ boolean Scanner::FindClump(Cell* cells[])
   
   //-- Any of the patterns have count greater than one? --
   debug.DebugNum("Step 2: numPatterns = ",numPatterns);
-  for (byte c=0; c<numPatterns; c++)
+  for (byte p=0; p<numPatterns; p++)
   {
-    debug.DebugNum2("patternCount, patternLen = ", patternCount[c], patternLen[c]);
-    if (patternCount[c] == patternLen[c]) 
+    debug.DebugNum2("patternCount, patternLen = ", patternCount[p], patternLen[p]);
+    if (patternCount[p] == patternLen[p]) 
     {
-      switch ( patternCount[c] )
+      switch ( patternCount[p] )
       {
         case 2:
-          debug.DebugNum2("patternCount, unsolvedCount", patternCount[c], unsolvedCount);
+          debug.DebugNum2("patternCount, unsolvedCount = ", patternCount[p], unsolvedCount);
           if (unsolvedCount==3) {
-            debug.DebugNum2("*** c, pattern = ", c, patterns[c]);
+            debug.DebugNum2("*** p, pattern = ", p, patterns[p]);
+            //-- We now know the pattern that appears twice in the cells AND we know that there is only one more unknown
+            // Prune the remaining unsolved with bits in pattern
+            for (byte c=0; c<9; c++)
+            {
+              if (cells[c]
+            }
           }
           break;
       }
