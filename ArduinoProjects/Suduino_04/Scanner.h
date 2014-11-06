@@ -375,7 +375,8 @@ boolean Scanner::FindClump(Cell* cells[])
   byte numPatterns = 0; // How many unique bit patterns were there?
   byte patternLen[9]; // How long is this bit pattern
   byte patternCount[9]; // How many did this particular bit pattern occured within cells?
-
+  byte unsolvedCount;
+  
   //-- Loop thru the cells, counting the unsolved patterns --
   for (byte i=0; i<9; i++)
   {
@@ -383,6 +384,7 @@ boolean Scanner::FindClump(Cell* cells[])
     
     // Only count unsolved patterns
     if (!chkCell->IsSolved()) {
+      unsolvedCount++;
       // Mask out other bits except the flags that indicates possible numbers for the cell
       unsigned int pattern = chkCell->GetBits() & 0x03FE;
       debug.DebugNum2("Unsolved at index, pattern = ",i, pattern);
@@ -400,7 +402,7 @@ boolean Scanner::FindClump(Cell* cells[])
         }
       }
       
-      if (!numPatterns) {
+      if (!patternFound) {
         patterns[numPatterns] = pattern;
         patternLen[numPatterns] = PatternLength(pattern);
         patternCount[numPatterns] = 1;
@@ -411,7 +413,23 @@ boolean Scanner::FindClump(Cell* cells[])
   }
   
   //-- Any of the patterns have count greater than one? --
-  
+  debug.DebugNum("Step 2: numPatterns = ",numPatterns);
+  for (byte c=0; c<numPatterns; c++)
+  {
+    debug.DebugNum2("patternCount, patternLen = ", patternCount[c], patternLen[c]);
+    if (patternCount[c] == patternLen[c]) 
+    {
+      switch ( patternCount[c] )
+      {
+        case 2:
+          debug.DebugNum2("patternCount, unsolvedCount", patternCount[c], unsolvedCount);
+          if (unsolvedCount==3) {
+            debug.DebugNum2("*** c, pattern = ", c, patterns[c]);
+          }
+          break;
+      }
+    }
+  }
 }
 
 
