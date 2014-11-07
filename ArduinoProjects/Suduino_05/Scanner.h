@@ -356,12 +356,25 @@ boolean Scanner::FindClumps()
   boolean found = false;
   board->Print2();
 
- Cell* cells[9];
+  Cell* cells[9];
   for (byte y=0; y<9; y++) {
     GetYCells(y, cells);
     debug.DebugNum("\nFindClump for Y = ", y);
     if (FindClump(cells)) found = true;
   }
+
+  for (byte x=0; x<9; x++) {
+    GetXCells(x, cells);
+    debug.DebugNum("\nFindClump for X = ", x);
+    if (FindClump( cells )) found = true;
+  }
+
+  for (byte y=0; y<3; y++)
+    for (byte x=0; x<3; x++) {
+      GetBoxCells(x,y, cells); 
+      debug.DebugNum2("\nFindClump for x,y = ", x,y);
+      if (FindClump( cells )) found = true;
+    }
   
   return found;
 }
