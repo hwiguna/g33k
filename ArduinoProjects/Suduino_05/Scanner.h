@@ -12,6 +12,7 @@ class Scanner
     void GetYCells(byte y, Cell* cells[]);
     void GetXCells(byte x, Cell* cells[]);
     void GetBoxCells(byte x, byte y, Cell* cells[]);
+    Cell* FindUnsolvedCell( Cell* cells[], byte startIndex, byte endIndex);
 
     void PruneCandidates();
     void PruneCells(Cell* cells[]);
@@ -26,7 +27,10 @@ class Scanner
 
     boolean FindClumps();
     boolean FindClump(Cell* cells[]);
-    byte PatternLength( unsigned int pattern);
+    //byte PatternLength( unsigned int pattern);
+
+    boolean FindInFlocks();
+    boolean FindInFlock(Cell* cellz[][9]);
 
     boolean AreValid();
     boolean IsValid(Cell* cells[]);
@@ -44,18 +48,21 @@ void Scanner::Solve()
   boolean found2 = true;
   boolean found3 = true;
   boolean found4 = true;
-  while (found1 || found2 || found3 | found4)
+  boolean found5 = true;
+  while (found1 || found2 || found3 || found4 || found5)
   {
     PruneCandidates();      AreValid();
     found1 = FindWinners(); AreValid();
     FindMissingDigits();    AreValid();   
     found2 = FindWinners(); AreValid();
     found3 = FindOnlyOptions(); AreValid();
-    found4 = FindClumps();   AreValid();
-    
+    found4 = FindClumps();  AreValid();
+    found5 = FindInFlocks();AreValid();
+
     //success2 = ElectSingles();
     debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
     debug.DebugNum2("found3,found4 = ", found3,found4);
+    debug.DebugNum("found5 = ", found5);
   }
 }
 
@@ -354,25 +361,25 @@ boolean Scanner::FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells
 boolean Scanner::FindClumps()
 {
   boolean found = false;
-  board->Print2();
+  //board->Print2();
 
   Cell* cells[9];
   for (byte y=0; y<9; y++) {
     GetYCells(y, cells);
-    debug.DebugNum("\nFindClump for Y = ", y);
+    //debug.DebugNum("\nFindClump for Y = ", y);
     if (FindClump(cells)) found = true;
   }
 
   for (byte x=0; x<9; x++) {
     GetXCells(x, cells);
-    debug.DebugNum("\nFindClump for X = ", x);
+    //debug.DebugNum("\nFindClump for X = ", x);
     if (FindClump( cells )) found = true;
   }
 
   for (byte y=0; y<3; y++)
     for (byte x=0; x<3; x++) {
       GetBoxCells(x,y, cells); 
-      debug.DebugNum2("\nFindClump for x,y = ", x,y);
+      //debug.DebugNum2("\nFindClump for x,y = ", x,y);
       if (FindClump( cells )) found = true;
     }
   
@@ -382,7 +389,7 @@ boolean Scanner::FindClumps()
 boolean Scanner::FindClump(Cell* cells[])
 {
   boolean found = false;
-  debug.DebugStr("FindClump()","");
+  //debug.DebugStr("FindClump()","");
 
   Pattern pattern;
   PatternList patternList = PatternList(debug);
@@ -467,4 +474,102 @@ boolean Scanner::FindClump(Cell* cells[])
 }
 
 
+boolean Scanner::FindInFlocks()
+{
+  boolean found = false;
+  board->Print2();
+
+  Cell* cellz[3][9];
+
+  for (byte x0=0; x0<3; x0++) 
+  {
+    byte x = x0*3;
+    GetXCells(x, cellz[0]);
+    GetXCells(x+1, cellz[1]);
+    GetXCells(x+2, cellz[2]);
+    debug.DebugNum("\nFindFlock for X = ", x);
+    if (FindInFlock(cellz)) found = true;
+  }
+
+  for (byte y0=0; y0<3; y0++) 
+  {
+    byte y = y0*3;
+    GetYCells(y, cellz[0]);
+    GetYCells(y+1, cellz[1]);
+    GetYCells(y+2, cellz[2]);
+    debug.DebugNum("\nFindFlock for Y = ", y);
+    if (FindInFlock(cellz)) found = true;
+  }
+
+  return found; 
+}
+
+boolean Scanner::FindInFlock(Cell* cellz[][9])
+{
+  boolean found = false;
+
+  for (byte digit=1; digit<=9; digit++)
+  {
+    debug.DebugNum("Finding digit = ", digit);
+    byte foundCount = 0;
+    boolean inFlock[3] = {0,0,0};
+    boolean inBox[3] = {0,0,0};
+    
+    for (byte flockIndex=0; flockIndex<3; flockIndex++)
+    {
+      for (byte cellIndex=0; cellIndex<9; cellIndex++)
+      {
+        Cell* cell = cellz[flockIndex][cellIndex];
+        if ( cell->Get()==digit && cell->IsSolved() )
+        {
+          foundCount++;
+          debug.DebugNum2("found digit at flockIndex, cellIndex = ", flockIndex, cellIndex);
+          inFlock[flockIndex] = true;
+          inBox[ cellIndex/3 ] = true;
+        }
+      }
+    }
+      
+    if (foundCount==2) {
+      byte flock;
+      byte box;
+      for (byte i=0; i<3; i++)
+      {
+        if (!inFlock[i]) flock=i;
+        if (!inBox[i]) box=i;
+      }
+      debug.DebugNum2("Narrowed down to flock,box = ", flock, box);
+      
+      Cell* cell = FindUnsolvedCell( cellz[flock], box*3, box*3+3 );
+      if (cell != NULL)
+      {
+        cell->Set(digit);
+      }
+    }
+  }
+  return found; 
+}
+
+Cell* Scanner::FindUnsolvedCell( Cell* cells[], byte startIndex, byte endIndex)
+{
+  Cell* foundCell;
+  byte foundCount = 0;
+  
+  for (byte cellIndex=startIndex; cellIndex<endIndex; cellIndex++)
+  {
+    if (! cells[cellIndex]->IsSolved())
+    {
+      foundCount++;
+      foundCell = cells[cellIndex];
+      debug.DebugNum2("FindUnsolvedCell. cellIndex, foundCount = ", cellIndex, foundCount);
+    }
+  }
+  
+  if (foundCount!=1) 
+  {
+    foundCell = NULL;
+  }
+  
+  return foundCell;
+}
 
