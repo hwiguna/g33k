@@ -1,4 +1,4 @@
-const boolean ASSERT = false;
+const boolean ASSERT = true;
 
 class Scanner
 {
@@ -14,26 +14,34 @@ class Scanner
     void GetBoxCells(byte x, byte y, Cell* cells[]);
     Cell* FindUnsolvedCell( Cell* cells[], byte startIndex, byte endIndex);
 
+    //-- Eliminate solved from candidates --
     void PruneCandidates();
     void PruneCells(Cell* cells[]);
 
+    //-- Mark cells with only one candidate as solved --
     boolean FindWinners();
-
+    boolean FindUniqueCandidates();
+    
+    //-- Look at rows, cells, boxes, for last unsolved number --
     boolean FindMissingDigits();
     boolean FindMissingDigit(Cell* cells[]);
     
+    //-- If a number is not in that cell's row/col/box, then that cell MUST contain that number --
     boolean FindOnlyOptions();
     boolean FindDuplicate(byte x, byte y, Cell* cell, byte num, Cell* cells[]);
 
+    //-- Use cells with identical candidates, to prune the last candidate --
     boolean FindClumps();
     boolean FindClump(Cell* cells[]);
     //byte PatternLength( unsigned int pattern);
 
+    //-- Use groups of three rows/columns to deduce the location of the missing number --
     boolean FindInFlocks();
     boolean FindInFlock(Cell* cellz[][9]);
 
+    //-- Validate that all solved numbers so far do not violate the sudoku rules --
     boolean AreValid();
-    boolean IsValid(Cell* cells[]);
+    boolean IsValid(Cell* cells[]); // Prints BAD if cells contain duplicate numbers
 };
 
 Scanner::Scanner(Debug inDebug, Board *inBoard)
@@ -49,20 +57,22 @@ void Scanner::Solve()
   boolean found3 = true;
   boolean found4 = true;
   boolean found5 = true;
+  boolean found6 = true;
   while (found1 || found2 || found3 || found4 || found5)
   {
     PruneCandidates();      AreValid();
     found1 = FindWinners(); AreValid();
+    found2 = FindUniqueCandidates(); AreValid();
     FindMissingDigits();    AreValid();   
-    found2 = FindWinners(); AreValid();
-    found3 = FindOnlyOptions(); AreValid();
-    found4 = FindClumps();  AreValid();
-    found5 = FindInFlocks();AreValid();
+    found3 = FindWinners(); AreValid();
+    found4 = FindOnlyOptions(); AreValid();
+    found5 = FindClumps();  AreValid();
+    found6 = FindInFlocks();AreValid();
 
     //success2 = ElectSingles();
     debug.DebugNum2("Solve status: found1,found2 = ", found1,found2);
     debug.DebugNum2("found3,found4 = ", found3,found4);
-    debug.DebugNum("found5 = ", found5);
+    debug.DebugNum2("found5, found6 = ", found5, found6);
   }
 }
 
@@ -210,6 +220,42 @@ boolean Scanner::FindWinners()
         debug.DebugNum2("Found Winner at x,y=", x, y);        
         found = true;
         AreValid();
+      }
+    }
+  }
+  
+  return found;
+}
+
+boolean Scanner::FindUniqueCandidates()
+{
+  boolean found = false;
+  
+  // .. Iterate through all rows and columns
+  for (byte y=0; y<9; y++)
+  {
+    for (byte x=0; x<9; x++)
+    {
+      Cell* cell = board->GetCell(x,y);
+
+      // Go through all numbers, looking for candidate that only has one option within a box
+      for (byte num=1; num<=9; num++)
+      {
+        int bx = x / 3;
+        int by = y / 3;
+        Cell* cells[9];
+        GetBoxCells(bx,by, cells);
+        boolean foundInBox = FindDuplicate(x,y, cell, num, cells);
+        
+        if (!foundInBox) {
+          found = true;
+          debug.DebugNum2("FindUniqueCandidates SUCCESS! x,y = ",x,y);
+          debug.DebugNum("num =",num);
+          board->Print2();
+          cell->Set(num);
+          AreValid();
+          break;
+        }
       }
     }
   }
@@ -425,47 +471,41 @@ boolean Scanner::FindClump(Cell* cells[])
     byte patternCount = pattern->GetCount();
     byte patternLength = pattern->Length();
     debug.DebugNum2("patternCount, patternLen = ", patternCount, patternLength);
-    if (patternCount == patternLength) 
+    if ( (patternCount == patternLength) && ((patternCount+1) == unsolvedCount) )
     {
-      switch ( patternCount )
-      {
-        case 2:
-          debug.DebugNum2("patternCount, unsolvedCount = ", patternCount, unsolvedCount);
-          if (unsolvedCount==3) {
-            unsigned int patternInt = pattern->Get();
-            debug.DebugNum2("*** p, pattern = ", p, patternInt);
+      debug.DebugNum2("patternCount, unsolvedCount = ", patternCount, unsolvedCount);
 
-            // mark the two nums as "taken" so we can find the missing num
-            for (byte b=1; b<=9; b++)
-            {
-              if (bitRead(patternInt,b) != 0)
-              {
-                debug.DebugNum("Marking b as taken ", b);
-                bitClear(missingNum,b);
-              }
-            }
-            
-            //-- We now know the pattern that appears twice in the cells AND we know that there is only one more unknown
-            // Prune the remaining unsolved cells with bits in pattern
-            for (byte c=0; c<9; c++)
-            {
-              // find the lone unsolved that has a different pattern than the double.
-              if (!cells[c]->IsSolved() && (cells[c]->GetBits() & 0x3FE) != patternInt)
-              {
-                // Translate missingNum bit into actual num
-                byte val = 0;
-                for (byte b=1; b<=9; b++)
-                {
-                  if (bitRead(missingNum,b))
-                    val = b;
-                }
-                debug.DebugNum2("cell c solved as val = ", c, val);
-                cells[c]->Set(val);
-                found = true;
-              }
-            }
+      unsigned int patternInt = pattern->Get();
+      debug.DebugNum2("*** p, pattern = ", p, patternInt);
+
+      // mark the two nums as "taken" so we can find the missing num
+      for (byte b=1; b<=9; b++)
+      {
+        if (bitRead(patternInt,b) != 0)
+        {
+          debug.DebugNum("Marking b as taken ", b);
+          bitClear(missingNum,b);
+        }
+      }
+      
+      //-- We now know the pattern that appears twice in the cells AND we know that there is only one more unknown
+      // Prune the remaining unsolved cells with bits in pattern
+      for (byte c=0; c<9; c++)
+      {
+        // find the lone unsolved that has a different pattern than the double.
+        if (!cells[c]->IsSolved() && (cells[c]->GetBits() & 0x3FE) != patternInt)
+        {
+          // Translate missingNum bit into actual num
+          byte val = 0;
+          for (byte b=1; b<=9; b++)
+          {
+            if (bitRead(missingNum,b))
+              val = b;
           }
-          break;
+          debug.DebugNum2("cell c solved as val = ", c, val);
+          cells[c]->Set(val);
+          found = true;
+        }
       }
     }
   }
@@ -543,6 +583,7 @@ boolean Scanner::FindInFlock(Cell* cellz[][9])
       Cell* cell = FindUnsolvedCell( cellz[flock], box*3, box*3+3 );
       if (cell != NULL)
       {
+        debug.DebugNum("*** *** Solved digit = ", digit);
         cell->Set(digit);
       }
     }
