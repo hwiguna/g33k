@@ -1,11 +1,18 @@
 class Debug
 {
   public:
+    //Debug(byte inLevel);
     void DebugStr(char label[], char str[]);
     void DebugNum(char label[], unsigned int num);
     void DebugNum2(char label[], unsigned int num1, unsigned int num2);
   private:
+    byte level;
 };
+
+//Debug::Debug(byte inLevel)
+//{
+//  level = inLevel;
+//}
 
 void Debug::DebugStr(char label[], char str[])
 {

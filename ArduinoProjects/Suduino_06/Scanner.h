@@ -1,4 +1,5 @@
 const boolean ASSERT = true;
+const boolean SHOW_GET_CELLS = false;
 
 class Scanner
 {
@@ -38,7 +39,7 @@ class Scanner
     //-- Use groups of three rows/columns to deduce the location of the missing number --
     boolean FindInFlocks();
     boolean FindInFlock(Cell* cellz[][9]);
-    boolean AllCandidatesAreAllInThisFlock(Cell* cellz[][9], byte flockIndex, byte digit, byte *candidateCellIndex);
+    boolean AllCandidatesAreInOneSub(Cell* cellz[][9], byte flockIndex, byte digit, byte *candidateCellIndex);
 
     //-- Validate that all solved numbers so far do not violate the sudoku rules --
     boolean AreValid();
@@ -123,21 +124,21 @@ void Scanner::PruneCandidates()
 
 void Scanner::GetYCells(byte y, Cell* cells[])
 {
-  //debug.DebugNum("GetYCells y=", y);
+  if (SHOW_GET_CELLS) debug.DebugNum("GetYCells y=", y);
   for (byte x=0; x<9; x++)
     cells[x] = board->GetCell(x,y);
 }
 
 void Scanner::GetXCells(byte x, Cell* cells[])
 {
-  //debug.DebugNum("GetXCells x=", x);
+  if (SHOW_GET_CELLS) debug.DebugNum("GetXCells x=", x);
   for (byte y=0; y<9; y++)
     cells[y] = board->GetCell(x,y);
 }
 
 void Scanner::GetBoxCells(byte x0, byte y0, Cell* cells[])
 {
-  //debug.DebugNum2("GetBoxCells x0,y0 = ", x0,y0);
+  if (SHOW_GET_CELLS) debug.DebugNum2("GetBoxCells x0,y0 = ", x0,y0);
   byte i = 0;
   x0 = x0*3;
   y0 = y0*3;
@@ -238,24 +239,26 @@ boolean Scanner::FindUniqueCandidates()
     for (byte x=0; x<9; x++)
     {
       Cell* cell = board->GetCell(x,y);
-
-      // Go through all numbers, looking for candidate that only has one option within a box
-      for (byte num=1; num<=9; num++)
+      if (! cell->IsSolved() )
       {
-        int bx = x / 3;
-        int by = y / 3;
-        Cell* cells[9];
-        GetBoxCells(bx,by, cells);
-        boolean foundInBox = FindDuplicate(x,y, cell, num, cells);
-        
-        if (!foundInBox) {
-          found = true;
-          debug.DebugNum2("FindUniqueCandidates SUCCESS! x,y = ",x,y);
-          debug.DebugNum("num =",num);
-          board->Print2();
-          cell->Set(num);
-          AreValid();
-          break;
+        // Go through all numbers, looking for candidate that only has one option within a box
+        for (byte num=1; num<=9; num++)
+        {
+          int bx = x / 3;
+          int by = y / 3;
+          Cell* cells[9];
+          GetBoxCells(bx,by, cells);
+          boolean foundInBox = FindDuplicate(x,y, cell, num, cells);
+          
+          if (!foundInBox) {
+            found = true;
+            debug.DebugNum2("FindUniqueCandidates SUCCESS! x,y = ",x,y);
+            debug.DebugNum("num =",num);
+            board->Print2();
+            cell->Set(num);
+            AreValid();
+            break;
+          }
         }
       }
     }
@@ -312,7 +315,7 @@ boolean Scanner::IsValid(Cell* cells[])
             byte chkVal = cells[chkIndex]->Get();
             if (cellVal == chkVal) {
               isValid = false;
-              debug.DebugStr("*** B A D *** B A D *** B A D ******************************","");
+              debug.DebugNum2("*** B A D *** B A D *** B A D *** cellIndex, cellVal = ",cellIndex, cellVal);
               board->Print2();
               chkIndex = 9;
               cellIndex = 9;
@@ -559,23 +562,33 @@ boolean Scanner::FindInFlock(Cell* cellz[][9])
     for (byte flockIndex=0; flockIndex<3; flockIndex++)
     {
       byte candidateCellIndex;
-      boolean allCandidatesAreInThisFlock = AllCandidatesAreAllInThisFlock(cellz, flockIndex, digit, &candidateCellIndex);
-
-      for (byte cellIndex=0; cellIndex<9; cellIndex++)
+      boolean allCandidatesAreInOneSub = AllCandidatesAreInOneSub(cellz, flockIndex, digit, &candidateCellIndex);
+      if (allCandidatesAreInOneSub)
       {
-        Cell* cell = cellz[flockIndex][cellIndex];
-        if ( cell->Get()==digit && ( allCandidatesAreInThisFlock || cell->IsSolved()) )
+        foundCount++;
+        inFlock[flockIndex] = true;
+        inBox[ candidateCellIndex/3 ] = true;
+        debug.DebugNum2("AllCandidatesAreInOneSub found digit at flockIndex, cIndex = ", flockIndex, candidateCellIndex);
+      }
+      else
+      {
+        for (byte cellIndex=0; cellIndex<9; cellIndex++)
         {
-          foundCount++;
-          inFlock[flockIndex] = true;
-          byte cIndex = allCandidatesAreInThisFlock ? candidateCellIndex :  cellIndex;
-          inBox[ cIndex/3 ] = true;
-          debug.DebugNum2("found digit at flockIndex, cIndex = ", flockIndex, cIndex);
+          Cell* cell = cellz[flockIndex][cellIndex];
+          if ( cell->Get()==digit && cell->IsSolved() )
+          {
+            foundCount++;
+            inFlock[flockIndex] = true;
+            candidateCellIndex = cellIndex;
+            inBox[ candidateCellIndex/3 ] = true;
+            debug.DebugNum2("Found Solved digit at flockIndex, cIndex = ", flockIndex, candidateCellIndex);
+          }
         }
       }
     }
       
     if (foundCount==2) {
+      debug.DebugStr("We eliminated two of the three flock members.","");
       byte flock;
       byte box;
       for (byte i=0; i<3; i++)
@@ -620,9 +633,9 @@ Cell* Scanner::FindUnsolvedCell( Cell* cells[], byte startIndex, byte endIndex)
 }
 
 // Returns true if digit is only found as candidates within ONE sub of one flockIndex.
-boolean Scanner::AllCandidatesAreAllInThisFlock(Cell* cellz[][9], byte flockIndex, byte digit, byte *candidateCellIndex)
+boolean Scanner::AllCandidatesAreInOneSub(Cell* cellz[][9], byte flockIndex, byte digit, byte *candidateCellIndex)
 {
-  boolean allCandidatesAreInThisFlock = false;
+  boolean allCandidatesAreInOneSub = false;
   byte foundInBox = 0;
   boolean inBox[3] = {0,0,0};
     
@@ -637,7 +650,7 @@ boolean Scanner::AllCandidatesAreAllInThisFlock(Cell* cellz[][9], byte flockInde
       {
         foundInSub++;
         inBox[ subIndex ] = true;
-        debug.DebugNum2("AllCandidatesAreAllInThisFlock() found digit at boxIndex, subIndex = ", boxIndex, subIndex);
+        debug.DebugNum2("AllCandidatesAreInOneSub() found digit at boxIndex, subIndex = ", boxIndex, subIndex);
       }
       else
       {
@@ -650,8 +663,10 @@ boolean Scanner::AllCandidatesAreAllInThisFlock(Cell* cellz[][9], byte flockInde
  
   if (foundInBox==1)
   {
-    debug.DebugNum2("AllCandidatesAreAllInThisFlock() SUCCESS. flockIndex, candidateCellIndex = ", flockIndex, *candidateCellIndex);
-    allCandidatesAreInThisFlock = true;
+    debug.DebugNum2("AllCandidatesAreInOneSub() SUCCESS. flockIndex, candidateCellIndex = ", flockIndex, *candidateCellIndex);
+    allCandidatesAreInOneSub = true;
   }
+  
+  return allCandidatesAreInOneSub;
 }
 
