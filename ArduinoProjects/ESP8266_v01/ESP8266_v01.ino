@@ -1,6 +1,6 @@
 //AT+RST
 //AT+CWMODE=1
-//AT+CWJAP="Firefly24","password"
+//AT+CWJAP="Firefly24","PASSWORD"
 //AT+CIPSTART="TCP","184.168.46.67",80
 //
 //  cmd = "GET /status HTTP/1.0\r\nHost: ";
@@ -14,10 +14,10 @@
   
 #include <SoftwareSerial.h>
 #define SSID "Firefly24"        //your wifi ssid here
-#define PASS "password"  //your wifi wep key here
+#define PASS "Dino&MonkeyShow"  //your wifi wep key here
  
-#define DST_IP "184.168.46.67" // www.dontpaniclabs.com
-#define HOST "www.dontpaniclabs.com"
+#define DST_IP "162.243.44.32" // "api.openweathermap.org"
+#define HOST "api.openweathermap.org"
  
 SoftwareSerial dbgSerial(10, 11); // RX, TX
  
@@ -38,7 +38,7 @@ void setup()
   }
  
   // Open serial communications for WiFi module:
-  Serial.begin(9600); // tried: 115200, 74880, 57600, 9600
+  Serial.begin(115200); // firmware v0.922 defaults to 9600. use AT+CIOBAUD=115200 to change speed.
   // Set time to wait for response strings to be found
   Serial.setTimeout(5000);
  
@@ -60,8 +60,34 @@ void setup()
   dbgSerial.println("ESP8266 Demo");
   delay(100);
   
+  char buffer[64];
+  char cr = 13;
+  char lf = 10;
+  int length;
+
+//  buffer[0]='H';
+//  buffer[1]='I';
+//  buffer[2]=0;
+//  dbgSerial.println(buffer);
+  
   //test if the module is ready
   Serial.println("AT+RST");    
+
+//  for (int i=0; i<5; i++)
+//  {
+//    length = 63;
+//    int actualRead = Serial.readBytesUntil(cr, buffer, length);
+//    buffer[actualRead] = 0; // Insert string terminating character so dbgSerial.print() would know when to stop printing.
+//    dbgSerial.print("line ");
+//    dbgSerial.print(i, DEC);
+//    dbgSerial.print(" actualRead=");
+//    dbgSerial.print(actualRead, DEC);
+//    dbgSerial.print(':');
+//    dbgSerial.print(buffer);
+//    dbgSerial.println('|');
+//  }
+  
+  delay(1000);
   if(Serial.find("ready"))
   {
     dbgSerial.println("Module is ready");
@@ -115,7 +141,11 @@ void loop()
   Serial.println(cmd);
   dbgSerial.println(cmd);
   if(Serial.find("Error")) return;
-  cmd = "GET /status HTTP/1.0\r\nHost: ";
+//  cmd = "GET /status HTTP/1.0\r\nHost: ";
+//  cmd += HOST;
+//  cmd += "\r\n\r\n";
+
+  cmd = "GET /data/2.5/weather?q=Lincoln,Ne&units=imperial HTTP/1.0\r\nHost: ";
   cmd += HOST;
   cmd += "\r\n\r\n";
  
