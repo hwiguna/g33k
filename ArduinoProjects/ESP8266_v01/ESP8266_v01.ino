@@ -14,7 +14,6 @@
   
 #include <SoftwareSerial.h>
 #define SSID "Firefly24"        //your wifi ssid here
-#define PASS "Dino&MonkeyShow"  //your wifi wep key here
  
 #define DST_IP "162.243.44.32" // "api.openweathermap.org"
 #define HOST "api.openweathermap.org"
