@@ -18,8 +18,11 @@
 #include "password.h"
 #define SSID "Firefly24"        //your wifi ssid here
  
-#define DST_IP "162.243.44.32" // "api.openweathermap.org"
-#define HOST "api.openweathermap.org"
+//#define DST_IP "162.243.44.32" // "api.openweathermap.org"
+//#define HOST "api.openweathermap.org"
+#define DST_IP "220.181.111.85" // "baidu.com"
+#define HOST "baidu.com"
+
 
 //#define WIFI_BAUD  115200
 #define WIFI_BAUD  57600
@@ -80,15 +83,22 @@ void setup()
   }
  
   delay(5000);
+  HttpGetTest();
+}
+ 
+void loop()
+{
 
-  //-- SINGLE CONNECTION MODE --
-  Println("AT+CIPMUX=0");
+}
+ 
+void WebServerTest()
+{
+  //-- WEBSERVER MODE
+  Println("AT+CIPMUX=1");
   WaitFor("OK");
   
   //-- CONNECT TO A WEBSITE --
-  String cmd = "AT+CIPSTART=\"TCP\",\"";
-  cmd += DST_IP;
-  cmd += "\",80";
+  String cmd = "AT+CIPSERVER=1,80";
   Println(cmd);
   WaitFor("OK");
 
@@ -107,9 +117,11 @@ void setup()
   //Serial.find("+IPD");
   while (true) //Serial.available())
   {
-   char c = Serial.read();
-   dbgSerial.write(c);
-   if(c=='\r') dbgSerial.print('\n');
+   int c = Serial.read();
+   if (c!=-1) {
+     dbgSerial.write(c);
+     if(c=='\r') dbgSerial.print('\n');
+   }
    delay(50);
   }
  
@@ -117,22 +129,59 @@ void setup()
  dbgSerial.println("====");
  delay(5000);
 }
- 
-void loop()
+
+void HttpGetTest()
 {
 
+  //-- SINGLE CONNECTION MODE --
+  Println("AT+CIPMUX=0");
+  WaitFor("OK");
+  
+  //-- CONNECT TO A WEBSITE --
+  String cmd = "AT+CIPSTART=\"TCP\",\"";
+  cmd += DST_IP;
+  cmd += "\",80";
+  Println(cmd);
+  WaitFor("OK");
+
+  //-- ASK FOR A WEB PAGE --
+  cmd = "GET / HTTP/1.0\r\n\r\n";
+ 
+  String len = String( cmd.length() );
+  Println("AT+CIPSEND=" + len);
+  WaitFor("> ");
+  
+  Print(cmd);
+ 
+  delay(2000);
+  //Serial.find("+IPD");
+  while (true) //Serial.available())
+  {
+   int c = Serial.read();
+   if (c!=-1) {
+     dbgSerial.write(c);
+     if(c=='\r') dbgSerial.print('\n');
+   }
+   delay(50);
+  }
+ 
+ dbgSerial.println();
+ dbgSerial.println("====");
+ delay(5000);
 }
- 
- 
+
 boolean connectWiFi()
 {
+  //-- MODE 1 = CLIENT MODE --
   Println("AT+CWMODE=1");
-  String cmd="AT+CWJAP=\"";
-  cmd+=SSID;
-  cmd+="\",\"";
-  cmd+=PASS;
-  cmd+="\"";
+  WaitFor("no chng");
   
+  //-- CONNECT TO ACCESS POINT --
+  String cmd="AT+CWJAP=\"";
+  cmd += SSID;
+  cmd += "\",\"";
+  cmd += PASS;
+  cmd += "\"";
   Println(cmd);
   WaitFor("OK");
 
