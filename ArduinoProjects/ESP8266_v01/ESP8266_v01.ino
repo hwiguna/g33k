@@ -16,7 +16,7 @@
   
 #include <SoftwareSerial.h>
 #include "password.h"
-#define SSID "Firefly24"        //your wifi ssid here
+#define SSID "-------"        //your wifi ssid here
  
 //#define DST_IP "162.243.44.32" // "api.openweathermap.org"
 //#define HOST "api.openweathermap.org"

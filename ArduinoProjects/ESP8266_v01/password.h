@@ -1,2 +1,2 @@
-#define PASS "PASSWORD"  //your wifi wep key here
+#define PASS "-----------"  //your wifi wep key here
 
