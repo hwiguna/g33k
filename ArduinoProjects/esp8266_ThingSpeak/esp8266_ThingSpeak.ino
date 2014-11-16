@@ -60,7 +60,7 @@ void SendToThingSpeak(int field1Val, int field2Val){
   }
   
   //-- The page request string (including the data as part of the URL) --
-  cmd = "GET /update";
+  cmd = "GET /update.html";
   cmd += "?key=";
   cmd += KEY;
   cmd += "&field1=";
