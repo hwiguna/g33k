@@ -20,7 +20,7 @@ void setup()
   pinMode(digitalPin,INPUT_PULLUP);
 
   //-- Setup Software Serial for debugging --
-  Serial.begin(9600);
+  Serial.begin(57600);
   Serial.println("*** NodeJS Client ***");
 
   //-- Setup Serial for ESP8266 --
@@ -48,9 +48,6 @@ boolean InitESP8266()
 {
   boolean success = false;
 
-  //  if (Send("AT", OK)) // ESP8266, are you there?
-  //    if (Send("AT+CWMODE=1")) // 1=Client, 2=Access Point, 3=Client & AP.  Returns either "OK" or "no change"
-  //      success = true;
   //SendThenListen("AT+RST", "ready"); // Reset, wait for "ready"
   SendThenListen("AT", OK); // ESP8266, are you there?
   SendThenListen("AT+CWMODE=1", OK, "no change"); // 1=Client, 2=Access Point, 3=Client & AP.  Returns either "OK" or "no change"
@@ -85,22 +82,6 @@ boolean Send(String command)
   Debug("SEND: ", command);
   Serial1.println(command);
   return true;
-}
-
-boolean Send(String command, char* waitForString)
-{
-  boolean success = false;
-
-  Debug("SEND... ", command);
-  Serial1.println(command);
-  if (Serial1.find(waitForString)) {
-    Debug(String(waitForString)," received");
-    success = true;
-  }
-  else
-    Debug(String(waitForString)," NOT received!");
-
-  return success;
 }
 
 void Debug(String label, String value )
@@ -167,9 +148,9 @@ void SendData(int value, int value2)
   //-- Tell ESP8266 the length of the request that we want to send, followed by actual request --
   String request = "AT+CIPSEND=" + String(cmd.length());
   bool success = SendThenListen(request, ">"); // IMPORTANT!!! Do not send the actual request string until ESP8266 sends ">"
-  if (success)
-    SendThenListen(cmd, OK);
+  if (success) SendThenListen(cmd, OK, "ERROR");
   
-  SendThenListen("AT+CIPCLOSE", OK);
+  // Regardless whether we succeed or not, close the connection.
+  SendThenListen("AT+CIPCLOSE", OK, "ERROR");
 }
 
