@@ -1,0 +1,40 @@
+WORKS!!
+
+GET /CMD/D/2/101 HTTP/1.1
+Host: 192.168.254.109
+Connection: keep-alive
+Pragma: no-cache
+Cache-Control: no-cache
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.65 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8
+
+HTTP/1.1 200 OK
+Date: Thu, 1 Jan 2000 12:00:00 GMT
+Server: ESP8266/0.0.0
+Last-Modified: Thu, 1 Jan 2000 12:00:00 GMT
+ETag: "000-0000000-00000000"
+Content-Type: text/html
+Content-Length:5
+Accept-Ranges: bytes
+Connection: close
+
+HELLO
+
+
+
+123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
+HTTP/1.1 200 OK**Date: Thu, 1 Jan 2000 12:00:00 GMT**Server: ESP8266/0.0.0**Last-Modified: Thu, 1 Ja
+n 2000 12:00:00 GMT**ETag: "000-0000000-00000000"**Content-Type: text/html**Content-Length:5**Accept
+-Ranges: bytes**Connection: close****HELLO
+123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
+
+
+AT+CIPSTART="TCP","192.168.254.100",80
+
+AT+CIPSEND=21
+123456789012345678901 <--includes TWO sets of CR+LFs
+GET /A.HTML?Key=2
+
+GET /update.html?key=UOJQALI5YVGH0NTR&field1=445&field2=0

@@ -1,0 +1,66 @@
+// 1=Client, 2=Access Point, 3=Client & AP
+AT+CWMODE=1
+
+// Connect to WiFi
+AT+CWJAP="WIFI_SSID","PASSWORD"
+
+// Show Module's IP Address
+AT+CIFSR
+
+// 0 = Single Connection, 1 = Multiple Connection
+AT+CIPMUX=1
+
+// 0=close, 1=open, followed by port#.
+AT+CIPSERVER=1,80
+// When request comes in it will be in this format:
++IPD,0,374:GET /HELLO/8 HTTP/1.1
+Host: 192.168.254.109
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+
+// Respond to browser request:
+// First param = IP ID
+// Second param = buffer length to send. 17 byte header + whatever data
+AT+CIPSEND=0,20
+12345678901234567
+HTTP/1.1 200 OK
+123456789012345678
+Content-Length:5
+1234567890123456789
+Connection: close
+
+123
+
+
+17+18+19+1+x
+
+
+
+SEND: AT+CIPSTART="TCP","184.106.153.149",80
+command: GET /update.html?key=UOJQALI5YVGH0NTR&field1=445&field2=0
+SEND: AT+CIPSEND=59
+SEND: GET /update.html?key=UOJQALI5YVGH0NTR&field1=445&field2=0
+
+RECEIVED: OK
+
+
+
+SEND: AT+CIPSTART="TCP","192.168.254.100",80
+RECEIVED: AT+CIPSTART="TCP","192.168.254.100",80
+
+OK
+
+SEND: AT+CIPSEND=22
+RECEIVED: Linked
+AT+CIPSEND=22
+>
+SEND: GET /update.html?d=1
+
+RECEIVED:  GET /update.html?d=1
+wrong syntax
+
+ERROR

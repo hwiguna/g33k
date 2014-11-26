@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Demo</title>
+</head>
+<body>
+    <div id="txt">???</div>
+    <a href="#">jQuery</a>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script>
+      $().ready( function() {
+	$( "a" ).click( function( event ) {
+	  $.get( "http://192.168.254.109/CMD/D/2/101", function( response ) {
+ 	    alert("ajax");
+	    $("#txt").html( response ); // server response
+	  });
+          event.preventDefault();
+        });
+      });
+    </script>
+</body>
+</html>
+
+<!--
+$.ajax({
+ url: "http://192.168.254.109/CMD/D/2/101",
+data: "",
+success: function( response, status ) {alert(response); alert(status)},
+});
+-->
