@@ -1,0 +1,31 @@
+1. Hardware tour:
+	a. No Arduino
+	b. FTDI USB Serial is only needed while programming
+	c. 5V to 3.3V resistor ladder
+	d. 1K pullup for switch, 1K current limiting resistor for LED
+
+2. NodeMCU is a complete firmware replacement
+	a. No more AT commands
+	b. LUA is an interpreted language similar to Javascript
+	c. Show the samples on NodeMCU website
+	d. Thank Hackaday and Marc and Xavi from Barcelona
+	e. Thank NodeMCU team
+
+3. Talking to the ESP
+	a. CoolTerm
+	b. Instead of AT commands, the terminal is a LUA interpreter 
+		running on the ESP!
+	c. Type snippets
+	d. Show paste error. Show line delay
+	e. Show that now paste works
+	f. Explain Blink code
+
+4. Show blink working
+	a. At 1000
+	b. At 200
+	c. GPIO 0 
+
+5. Next video
+	a. Saving LUA scripts as files
+	b. Automatically running scripts upon startup
+	c. WebServer!

@@ -1,13 +1,16 @@
--- LUA Blink using timer alarm --
+-- I/O Pin constants --
 switchPin = 8
 ledPin = 9
 
+-- Setup I/O pins --
+gpio.mode(switchPin,gpio.INPUT)
 gpio.mode(ledPin,gpio.OUTPUT)
 
--- LUA Webserver to report I/O pin status --
-gpio.mode(8,gpio.INPUT)
+-- LUA Webserver --
 srv=net.createServer(net.TCP)
+
 srv:listen(80,function(conn)
+
   conn:on("receive",function(conn,payload)
     print(node.heap())
     print(payload)
@@ -38,6 +41,7 @@ srv:listen(80,function(conn)
     conn:send("Connection:close\r\n\r\n")
     conn:send(reply)
   end)
+
   conn:on("sent",function(conn)
     conn:close()
   end)

@@ -1,10 +1,74 @@
+-- Two dashes starts a comment
+node.restart()
+print(wifi.sta.getip()) -- Print IP Address
+print(node.heap()) 		-- Print Available Memory
+
+-- File List --
+l = file.list();
+for k,v in pairs(l) do
+  print("name:"..k..", size:"..v)
+end
+
+-- Print File Content --
+filename = 'blink.lua'
+txt = ''
+file.open(filename,"r")
+repeat
+  line = file.readline()
+  if (line~=nil) then txt = txt .. line end
+until line==nil
+file.close()
+print(txt)
+
+
+-- Blink using timer alarm --
+dly = 200 -- milliseconds
+ledPin = 9
+gpio.mode(ledPin,gpio.OUTPUT)
+ledState = 0 -- gpio.HIGH=1, gpio.LOW=0
+tmr.stop() -- There's only one timer, so make sure it's stopped before we start this one.
+tmr.alarm( dly, 1, function() 
+  ledState = 1 - ledState;
+  gpio.write(ledPin, ledState)
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dofile("webserver.lua")	-- Launch Program --
+
 print(wifi.sta.getip())
 --0.0.0.0
 wifi.setmode(wifi.STATION)
 wifi.sta.config("SSID","password")
 print(wifi.sta.getip())
 --192.168.18.110
-
 
 
 file.remove("door.lua")

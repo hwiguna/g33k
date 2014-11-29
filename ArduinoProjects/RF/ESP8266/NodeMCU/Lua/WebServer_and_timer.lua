@@ -46,7 +46,7 @@ end)
 
 
 -- Blink using timer alarm --
-dly = 500
+dly = 200
 isOn = false
 led = 9
 gpio.mode(led,gpio.OUTPUT)
@@ -59,6 +59,7 @@ tmr.alarm( dly, 1, function()
     gpio.write(led,gpio.LOW)
   end
 end)
+
 
 -- Webserver to report I/O pin status --
 gpio.mode(8,gpio.INPUT)
@@ -78,14 +79,3 @@ srv:listen(80,function(conn)
     conn:close()
   end)
 end)
-
-
-
--- File List --
-l = file.list();
-for k,v in pairs(l) do
-  print("name:"..k..", size:"..v)
-end
-
--- Launch webserver --
---dofile("webserver.lua")
