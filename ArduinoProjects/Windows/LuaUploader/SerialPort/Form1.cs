@@ -28,7 +28,6 @@ namespace LearnSerialPort
             serialPort.NewLine = "\r\n"; // CR followed by LF
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
             serialPort.DataReceived += (s,ea) => output.Invoke(new System.Action(() => serialPort_DataReceived(s,ea)));
-            serialPort.Open();
         }
 
         private void RestoreUserSettings()
@@ -87,7 +86,7 @@ namespace LearnSerialPort
         private void SendLines(string[] lines)
         {
             Cursor.Current = Cursors.WaitCursor;
-            UpdateComPort();
+            OpenComPort();
 
             // Send it line by line with small delay to COM port so LUA interpreter on ESP8266 can keep up
             foreach (var line in lines)
@@ -95,6 +94,7 @@ namespace LearnSerialPort
                 Send(line);
                 System.Threading.Thread.Sleep(int.Parse(LineDelayTextbox.Text));
             }
+
             Cursor.Current = Cursors.Arrow;
         }
 
@@ -122,10 +122,10 @@ namespace LearnSerialPort
             SendLines( CommandTextbox.Text );
         }
 
-        private void UpdateComPort()
+        private void OpenComPort()
         {
+            if (serialPort.IsOpen) serialPort.Close();
             //-- Keep COM port up-to-date --
-            serialPort.Close();
             serialPort.PortName = PortTextbox.Text;
             serialPort.BaudRate = int.Parse(BaudRateBox.Text);
             serialPort.Open();
@@ -191,6 +191,23 @@ namespace LearnSerialPort
                 "end\r\n";
 
             SendLines(listFiles);
+        }
+
+        private void LoadFromESPButton_Click(object sender, EventArgs e)
+        {
+            string printFileContent =
+                "-- Print File Content --\r\n" +
+                "filename = '" + LuaFilenameTextbox.Text + "'\r\n" +
+                "file.open(filename,'r')\r\n" +
+                "txt = ''\r\n" +
+                "repeat\r\n" +
+                "  line = file.readline()\r\n" +
+                "  if (line~=nil) then txt = txt .. line end\r\n" +
+                "until line == nil\r\n" +
+                "file.close()\r\n" +
+                "print(txt)\r\n";
+
+            SendLines(printFileContent);
         }
     }
 }

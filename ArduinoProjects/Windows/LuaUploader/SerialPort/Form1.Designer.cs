@@ -54,10 +54,11 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.RunAfterSaving = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.LoadFromESPButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -229,7 +230,7 @@
             // SaveOnESPButton
             // 
             this.SaveOnESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveOnESPButton.Location = new System.Drawing.Point(586, 6);
+            this.SaveOnESPButton.Location = new System.Drawing.Point(230, 6);
             this.SaveOnESPButton.Name = "SaveOnESPButton";
             this.SaveOnESPButton.Size = new System.Drawing.Size(100, 23);
             this.SaveOnESPButton.TabIndex = 25;
@@ -243,7 +244,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LuaFilenameTextbox.Location = new System.Drawing.Point(64, 8);
             this.LuaFilenameTextbox.Name = "LuaFilenameTextbox";
-            this.LuaFilenameTextbox.Size = new System.Drawing.Size(516, 20);
+            this.LuaFilenameTextbox.Size = new System.Drawing.Size(160, 20);
             this.LuaFilenameTextbox.TabIndex = 26;
             this.LuaFilenameTextbox.Text = "door.lua";
             // 
@@ -301,6 +302,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.LoadFromESPButton);
             this.tabPage1.Controls.Add(this.RunAfterSaving);
             this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.SaveOnESPButton);
@@ -340,6 +342,25 @@
             this.tabPage2.Text = "Immediate";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(151, 11);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(45, 13);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "Macros:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(202, 11);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(42, 13);
+            this.label2.TabIndex = 22;
+            this.label2.Text = "File List";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
+            // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.label1);
@@ -365,24 +386,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
             // 
-            // label2
+            // LoadFromESPButton
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(202, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 13);
-            this.label2.TabIndex = 22;
-            this.label2.Text = "File List";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(151, 11);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(45, 13);
-            this.label4.TabIndex = 23;
-            this.label4.Text = "Macros:";
+            this.LoadFromESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LoadFromESPButton.Location = new System.Drawing.Point(336, 6);
+            this.LoadFromESPButton.Name = "LoadFromESPButton";
+            this.LoadFromESPButton.Size = new System.Drawing.Size(100, 23);
+            this.LoadFromESPButton.TabIndex = 29;
+            this.LoadFromESPButton.Text = "Load from ESP";
+            this.LoadFromESPButton.UseVisualStyleBackColor = true;
+            this.LoadFromESPButton.Click += new System.EventHandler(this.LoadFromESPButton_Click);
             // 
             // Form1
             // 
@@ -442,6 +455,7 @@
         private System.Windows.Forms.CheckBox RunAfterSaving;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button LoadFromESPButton;
     }
 }
 
