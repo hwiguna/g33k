@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SerialPort")]
+[assembly: AssemblyTitle("LuaUploader")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Nebraska Global")]
-[assembly: AssemblyProduct("SerialPort")]
-[assembly: AssemblyCopyright("Copyright © Nebraska Global 2014")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("LuaUploader")]
+[assembly: AssemblyCopyright("Copyright © Hari Wiguna 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
