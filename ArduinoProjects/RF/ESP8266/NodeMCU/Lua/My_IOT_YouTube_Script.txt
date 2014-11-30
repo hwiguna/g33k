@@ -1,0 +1,36 @@
+1. Show it working
+	a. LED on off
+	b. button poll
+	c. How to push to a web page?
+
+2. Components
+	a. Device: WIRELESS! has sensors/actuators.
+		ESP8266 instead of Arduino + Ethernet
+	b. FTDI and PC only needed while developing
+	c. WebBrowsers: Anywhere in the world
+	d. NodeJS is the server. Any PC at home.
+
+3. Options
+	a. WebBrowser <--> 1 device
+	b. WebBrowser <--> Existing website (ThinkSpeak) <--> 1 device
+	c. WebBrowser <--> Home Server <--> Multiple devices
+
+4. Server
+	a. NodeJS: Free, tons of tutorials, no special tools
+	b. Other options: Python, Apache + Php, IIS + ASP
+
+5. Data Flow
+	a. WebBrowser visits the website served by NodeJS
+	b. WebBrowser downloads: index.html, favicon.ico
+	c. WebBrowser parses index.html, downloads JQuery, index.js
+	d. User interacts with index.html
+	e. causes ajax calls to Server
+	f. Code in server.js on server fetches page served by ESP
+	g. ESP gets/sets I/O port
+	h. ESP returns data to Server
+	i. Server returns data to WebBrowser
+
+6. Next steps
+	a. Eliminate polling. WebSockets?
+	b. Code on github
+	b. I'm excited to share. Ask me questions.
