@@ -9,11 +9,13 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading.Tasks;
 
-namespace LearnSerialPort
+namespace LuaUploader
 {
     public partial class Form1 : Form
     {
         SerialPort serialPort;
+        //int StartingLinePosition;
+        //bool IsLoadingLua = false;
 
         public Form1()
         {
@@ -50,7 +52,22 @@ namespace LearnSerialPort
             output.Text += indata; // +"\r\n";
 
             output.SelectionStart = output.Text.Length;
+            output.SelectionLength = 0;
             output.ScrollToCaret();
+
+            //if (IsLoadingLua)
+            //{
+            //    output.SelectionStart = StartingLinePosition;
+            //    output.SelectionLength = output.TextLength - StartingLinePosition;
+            //    //output.Copy();
+            //    //LuaCodeTextbox.Clear();
+            //    //LuaCodeTextbox.Paste();
+            //    Clipboard.Clear();
+            //    Clipboard.SetText(output.SelectedText);
+            //    LuaCodeTextbox.Clear();
+            //    LuaCodeTextbox.Text = Clipboard.GetText();
+            //    IsLoadingLua = false;
+            //}
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -164,9 +181,9 @@ namespace LearnSerialPort
             StringBuilder stringBuilder = new StringBuilder();
 
             foreach (var line in luaCode.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-	        {
+            {
                 stringBuilder.AppendLine("file.writeline([[" + line + "]])");
-	        }
+            }
 
             return stringBuilder.ToString();
         }
@@ -180,17 +197,6 @@ namespace LearnSerialPort
         {
             if (e.Control & e.KeyCode == Keys.A)
                 LuaCodeTextbox.SelectAll();
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-            string listFiles =
-                "l = file.list()\r\n" +
-                "for k,v in pairs(l) do\r\n" +
-                "  print(\"name:\"..k..\", size:\"..v)\r\n" +
-                "end\r\n";
-
-            SendLines(listFiles);
         }
 
         private void LoadFromESPButton_Click(object sender, EventArgs e)
@@ -207,7 +213,38 @@ namespace LearnSerialPort
                 "file.close()\r\n" +
                 "print(txt)\r\n";
 
+            //IsLoadingLua = true;
+            //StartingLinePosition = output.Text.Length + printFileContent.Length; // Pretend as if we've inserted the command. That's where we will start capturing output of the opened file
+
             SendLines(printFileContent);
+
+        }
+
+        private void ClearOutputButton_Click(object sender, EventArgs e)
+        {
+            output.Clear();
+        }
+
+        private void DeleteButton_Click(object sender, EventArgs e)
+        {
+            SendLines("file.remove('" + LuaFilenameTextbox.Text + "')");
+        }
+
+        private void ListFilesButton_Click(object sender, EventArgs e)
+        {
+            string listFiles =
+                "l = file.list()\r\n" +
+                "for k,v in pairs(l) do\r\n" +
+                "  print(\"name:\"..k..\", size:\"..v)\r\n" +
+                "end\r\n";
+
+            SendLines(listFiles);
+        }
+
+        private void RunButton_Click(object sender, EventArgs e)
+        {
+            string doFile = string.Format("dofile(\"{0}\")\r\n", LuaFilenameTextbox.Text);
+            SendLines(doFile);
         }
     }
 }

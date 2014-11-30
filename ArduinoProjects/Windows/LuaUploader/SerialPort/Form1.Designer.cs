@@ -1,4 +1,4 @@
-﻿namespace LearnSerialPort
+﻿namespace LuaUploader
 {
     partial class Form1
     {
@@ -52,13 +52,15 @@
             this.RestartButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.LoadFromESPButton = new System.Windows.Forms.Button();
             this.RunAfterSaving = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.LoadFromESPButton = new System.Windows.Forms.Button();
+            this.ClearOutputButton = new System.Windows.Forms.Button();
+            this.DeleteButton = new System.Windows.Forms.Button();
+            this.ListFilesButton = new System.Windows.Forms.Button();
+            this.RunButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -72,11 +74,11 @@
             this.output.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.output.Location = new System.Drawing.Point(6, 19);
+            this.output.Location = new System.Drawing.Point(6, 48);
             this.output.Multiline = true;
             this.output.Name = "output";
             this.output.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.output.Size = new System.Drawing.Size(388, 620);
+            this.output.Size = new System.Drawing.Size(388, 591);
             this.output.TabIndex = 1;
             // 
             // label1
@@ -234,7 +236,7 @@
             this.SaveOnESPButton.Name = "SaveOnESPButton";
             this.SaveOnESPButton.Size = new System.Drawing.Size(100, 23);
             this.SaveOnESPButton.TabIndex = 25;
-            this.SaveOnESPButton.Text = "Save on ESP";
+            this.SaveOnESPButton.Text = "Save to ESP";
             this.SaveOnESPButton.UseVisualStyleBackColor = true;
             this.SaveOnESPButton.Click += new System.EventHandler(this.SaveOnESPButton_Click);
             // 
@@ -282,7 +284,7 @@
             this.RestartButton.Name = "RestartButton";
             this.RestartButton.Size = new System.Drawing.Size(100, 23);
             this.RestartButton.TabIndex = 14;
-            this.RestartButton.Text = "Restart";
+            this.RestartButton.Text = "Restart ESP";
             this.RestartButton.UseVisualStyleBackColor = true;
             this.RestartButton.Click += new System.EventHandler(this.RestartButton_Click);
             // 
@@ -302,6 +304,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.RunButton);
+            this.tabPage1.Controls.Add(this.DeleteButton);
             this.tabPage1.Controls.Add(this.LoadFromESPButton);
             this.tabPage1.Controls.Add(this.RunAfterSaving);
             this.tabPage1.Controls.Add(this.label8);
@@ -315,6 +319,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Editor";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // LoadFromESPButton
+            // 
+            this.LoadFromESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LoadFromESPButton.Location = new System.Drawing.Point(480, 6);
+            this.LoadFromESPButton.Name = "LoadFromESPButton";
+            this.LoadFromESPButton.Size = new System.Drawing.Size(100, 23);
+            this.LoadFromESPButton.TabIndex = 29;
+            this.LoadFromESPButton.Text = "Load from ESP";
+            this.LoadFromESPButton.UseVisualStyleBackColor = true;
+            this.LoadFromESPButton.Click += new System.EventHandler(this.LoadFromESPButton_Click);
             // 
             // RunAfterSaving
             // 
@@ -330,8 +345,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.label4);
-            this.tabPage2.Controls.Add(this.label2);
             this.tabPage2.Controls.Add(this.CommandTextbox);
             this.tabPage2.Controls.Add(this.ExecuteButton);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -341,25 +354,6 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Immediate";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(151, 11);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(45, 13);
-            this.label4.TabIndex = 23;
-            this.label4.Text = "Macros:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(202, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 13);
-            this.label2.TabIndex = 22;
-            this.label2.Text = "File List";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // tabPage3
             // 
@@ -378,6 +372,8 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.ListFilesButton);
+            this.groupBox2.Controls.Add(this.ClearOutputButton);
             this.groupBox2.Controls.Add(this.output);
             this.groupBox2.Location = new System.Drawing.Point(727, 69);
             this.groupBox2.Name = "groupBox2";
@@ -386,16 +382,48 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
             // 
-            // LoadFromESPButton
+            // ClearOutputButton
             // 
-            this.LoadFromESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadFromESPButton.Location = new System.Drawing.Point(336, 6);
-            this.LoadFromESPButton.Name = "LoadFromESPButton";
-            this.LoadFromESPButton.Size = new System.Drawing.Size(100, 23);
-            this.LoadFromESPButton.TabIndex = 29;
-            this.LoadFromESPButton.Text = "Load from ESP";
-            this.LoadFromESPButton.UseVisualStyleBackColor = true;
-            this.LoadFromESPButton.Click += new System.EventHandler(this.LoadFromESPButton_Click);
+            this.ClearOutputButton.Location = new System.Drawing.Point(6, 19);
+            this.ClearOutputButton.Name = "ClearOutputButton";
+            this.ClearOutputButton.Size = new System.Drawing.Size(100, 23);
+            this.ClearOutputButton.TabIndex = 24;
+            this.ClearOutputButton.Text = "Clear";
+            this.ClearOutputButton.UseVisualStyleBackColor = true;
+            this.ClearOutputButton.Click += new System.EventHandler(this.ClearOutputButton_Click);
+            // 
+            // DeleteButton
+            // 
+            this.DeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.DeleteButton.Location = new System.Drawing.Point(586, 6);
+            this.DeleteButton.Name = "DeleteButton";
+            this.DeleteButton.Size = new System.Drawing.Size(100, 23);
+            this.DeleteButton.TabIndex = 30;
+            this.DeleteButton.Text = "Delete";
+            this.DeleteButton.UseVisualStyleBackColor = true;
+            this.DeleteButton.Click += new System.EventHandler(this.DeleteButton_Click);
+            // 
+            // ListFilesButton
+            // 
+            this.ListFilesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ListFilesButton.Location = new System.Drawing.Point(294, 19);
+            this.ListFilesButton.Name = "ListFilesButton";
+            this.ListFilesButton.Size = new System.Drawing.Size(100, 23);
+            this.ListFilesButton.TabIndex = 31;
+            this.ListFilesButton.Text = "List Files";
+            this.ListFilesButton.UseVisualStyleBackColor = true;
+            this.ListFilesButton.Click += new System.EventHandler(this.ListFilesButton_Click);
+            // 
+            // RunButton
+            // 
+            this.RunButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.RunButton.Location = new System.Drawing.Point(336, 6);
+            this.RunButton.Name = "RunButton";
+            this.RunButton.Size = new System.Drawing.Size(100, 23);
+            this.RunButton.TabIndex = 31;
+            this.RunButton.Text = "Run";
+            this.RunButton.UseVisualStyleBackColor = true;
+            this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
             // 
             // Form1
             // 
@@ -453,9 +481,11 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button RestartButton;
         private System.Windows.Forms.CheckBox RunAfterSaving;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button LoadFromESPButton;
+        private System.Windows.Forms.Button ClearOutputButton;
+        private System.Windows.Forms.Button DeleteButton;
+        private System.Windows.Forms.Button ListFilesButton;
+        private System.Windows.Forms.Button RunButton;
     }
 }
 
