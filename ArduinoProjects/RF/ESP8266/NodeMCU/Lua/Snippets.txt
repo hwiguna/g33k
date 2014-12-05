@@ -3,6 +3,12 @@ node.restart()
 print(wifi.sta.getip()) -- Print IP Address
 print(node.heap()) 		-- Print Available Memory
 
+print(wifi.sta.getip())
+wifi.setmode(wifi.STATION)
+wifi.sta.config ( "WIFI_SSID" , "PASSWORD" )  
+print(wifi.sta.getip())
+
+
 -- File List --
 l = file.list();
 for k,v in pairs(l) do

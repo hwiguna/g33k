@@ -22,8 +22,8 @@ srv:listen(80,function(conn)
 	if (command == "set") then
 		sentValue = string.sub(payload, 12,12) -- Get the 12th character
 		print("sent value=" .. sentValue)
-		if (sentValue=="0") then
-		  ledValue = gpio.LOW
+		if (sentValue=="1") then
+		  ledValue = gpio.LOW -- ledPin is connected to the LED cathode
 		else
 		  ledValue = gpio.HIGH
 		end

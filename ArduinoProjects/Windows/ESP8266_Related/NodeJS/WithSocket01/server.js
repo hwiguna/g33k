@@ -3,6 +3,9 @@ var http = require('http');
 var httpServer = http.Server(app);
 var io = require('socket.io')(httpServer);
 
+var ESP1Address = '192.168.254.106';
+var ESP2Address = '192.168.254.110';
+
 app.get('/', function (req, res) {
     //res.send('<h1>hello world</h>');
     res.sendFile(__dirname + '/index.html');
@@ -15,12 +18,14 @@ app.get('/api/1', function (req, res) {
     res.send('<h1>API hit</h>');
     //res.sendFile(__dirname + '/index.html');
     io.emit('chat message', 'API says released');
+	SetDataOnESP('0', '192.168.254.110');
 });
 
 app.get('/api/0', function (req, res) {
     res.send('<h1>API hit</h>');
     //res.sendFile(__dirname + '/index.html');
     io.emit('chat message', 'API says PRESSED');
+	SetDataOnESP('1', '192.168.254.110');
 });
 
 io.on('connection', function (socket) {
@@ -36,8 +41,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('led message', function (ledState) {
-        console.log('node js got the led message click. ledstate=' + ledState);
-        SetDataOnESP(ledState);
+        console.log('node js got the led message click. ledstate=' + ledState.ip);
+        SetDataOnESP(ledState.led, ledState.ip);
     });
 });
 
@@ -52,10 +57,10 @@ function blinkNow() {
     io.emit('chat message', 'beep');
 }
 
-function SetDataOnESP(ledState) {
+function SetDataOnESP(ledState, deviceIP) {
     console.log('server.js got the led message click');
     var options = {
-        host: '192.168.254.110',
+        host: deviceIP,
         port: 80,
         path: '/set?b=' + ledState,
         method: 'GET',

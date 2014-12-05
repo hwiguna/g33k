@@ -6,14 +6,24 @@ $(function () {
         $('#m').val('');
     });
 
-    $('#ledOnBtn').click(function (event) {
+    $('#led1OnBtn').click(function (event) {
         console.log('ledBtn clicked');
-        socket.emit('led message', '1');
+        socket.emit('led message', {led:'1', ip:'192.168.254.106'});
     });
 
-    $('#ledOffBtn').click(function (event) {
+    $('#led1OffBtn').click(function (event) {
         console.log('ledBtn clicked');
-        socket.emit('led message', '0');
+        socket.emit('led message', {led:'0', ip:'192.168.254.106'});
+    });
+	
+    $('#led2OnBtn').click(function (event) {
+        console.log('ledBtn clicked');
+        socket.emit('led message', {led:'1', ip:'192.168.254.110'});
+    });
+
+    $('#led2OffBtn').click(function (event) {
+        console.log('ledBtn clicked');
+        socket.emit('led message', {led:'0', ip:'192.168.254.110'});
     });
 
     socket.on('chat message', function (msg) {
