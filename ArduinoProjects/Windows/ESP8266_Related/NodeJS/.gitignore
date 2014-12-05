@@ -1,0 +1,2 @@
+# Let's not sync node_modules
+node_modules/
