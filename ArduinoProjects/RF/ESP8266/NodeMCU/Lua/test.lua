@@ -8,11 +8,6 @@ wifi.setmode(wifi.STATION)
 wifi.sta.config ( "WIFI_SSID" , "PASSWORD" )  
 print(wifi.sta.getip())
 
--- I/O --
-led=9
-gpio.mode(led,gpio.OUTPUT)
-gpio.write(led,gpio.LOW)
-gpio.write(led,gpio.HIGH)
 
 -- File List --
 l = file.list();

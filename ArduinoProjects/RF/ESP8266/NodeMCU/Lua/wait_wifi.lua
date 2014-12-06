@@ -1,4 +1,4 @@
--- http://www.esp8266.com/viewtopic.php?f=18&t=628
+-- from http://www.esp8266.com/viewtopic.php?f=18&t=628
 function wait_wifi()
   count = count + 1
   wifi_ip = wifi.sta.getip()

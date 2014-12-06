@@ -12,6 +12,17 @@ using System.IO;
 
 namespace LuaUploader
 {
+    /// <summary>
+    /// Lua Uploader by Hari Wiguna, 2014
+    /// 
+    /// You can find me at:
+    ///     YouTube: https://www.youtube.com/user/hwiguna/videos?view_as=public
+    ///     Hackaday.io: http://hackaday.io/projects/hacker/9819
+    ///     My blog: http://g33k.blogspot.com/
+    ///     Google+: https://plus.google.com/u/0/+HariWiguna/posts
+    ///     
+    /// "Refresh" icon courtesy of "PC" at iconFinder: https://www.iconfinder.com/icons/59198/refresh_reload_repeat_reset_icon#size=32
+    /// </summary>
     public partial class Form1 : Form
     {
         SerialPort serialPort;
@@ -27,7 +38,8 @@ namespace LuaUploader
         {
             RestoreUserSettings();
 
-            serialPort = new SerialPort(PortTextbox.Text, int.Parse(BaudRateBox.Text));
+            RefreshPortList();
+            serialPort = new SerialPort(PortComboBox.Text, int.Parse(BaudRateBox.Text));
             serialPort.NewLine = "\r\n"; // CR followed by LF
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
             serialPort.DataReceived += (s,ea) => output.Invoke(new System.Action(() => serialPort_DataReceived(s,ea)));
@@ -36,7 +48,7 @@ namespace LuaUploader
         private void RestoreUserSettings()
         {
             //-- Restore User Settings --
-            PortTextbox.Text = Properties.Settings.Default.comPort;
+            PortComboBox.Text = Properties.Settings.Default.comPort;
             FilePathTextbox.Text = Properties.Settings.Default.filePath;
             BaudRateBox.Text = Properties.Settings.Default.baudRate;
             LineDelayTextbox.Text = Properties.Settings.Default.lineDelay;
@@ -84,7 +96,7 @@ namespace LuaUploader
         {
             //-- Save User Settings --
             Properties.Settings.Default.filePath = FilePathTextbox.Text;
-            Properties.Settings.Default.comPort = PortTextbox.Text;
+            Properties.Settings.Default.comPort = PortComboBox.Text;
             Properties.Settings.Default.baudRate = BaudRateBox.Text;
             Properties.Settings.Default.lineDelay = LineDelayTextbox.Text;
             Properties.Settings.Default.LuaFilename = LuaFilenameTextbox.Text;
@@ -151,7 +163,7 @@ namespace LuaUploader
         {
             if (serialPort.IsOpen) serialPort.Close();
             //-- Keep COM port up-to-date --
-            serialPort.PortName = PortTextbox.Text;
+            serialPort.PortName = PortComboBox.Text;
             serialPort.BaudRate = int.Parse(BaudRateBox.Text);
             serialPort.Open();
         }
@@ -302,6 +314,17 @@ namespace LuaUploader
         private void ExecuteSelectionButton_Click(object sender, EventArgs e)
         {
             SendLines(LuaCodeTextbox.SelectedText);
+        }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            RefreshPortList();
+        }
+
+        private void RefreshPortList()
+        {
+            string[] portNames = SerialPort.GetPortNames();
+            PortComboBox.DataSource = portNames;
         }
 
     }

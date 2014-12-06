@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.output = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -37,7 +38,6 @@
             this.CommandTextbox = new System.Windows.Forms.TextBox();
             this.ExecuteButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.PortTextbox = new System.Windows.Forms.TextBox();
             this.BrowseButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.BaudRateBox = new System.Windows.Forms.ComboBox();
@@ -49,6 +49,8 @@
             this.LuaFilenameTextbox = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.PortComboBox = new System.Windows.Forms.ComboBox();
+            this.RefreshButton = new System.Windows.Forms.PictureBox();
             this.RestartButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -65,7 +67,9 @@
             this.ListFilesButton = new System.Windows.Forms.Button();
             this.ClearOutputButton = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RefreshButton)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -150,14 +154,6 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "Port";
             // 
-            // PortTextbox
-            // 
-            this.PortTextbox.Location = new System.Drawing.Point(38, 18);
-            this.PortTextbox.Name = "PortTextbox";
-            this.PortTextbox.Size = new System.Drawing.Size(56, 20);
-            this.PortTextbox.TabIndex = 15;
-            this.PortTextbox.Text = "COM1";
-            // 
             // BrowseButton
             // 
             this.BrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -172,7 +168,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(121, 21);
+            this.label5.Location = new System.Drawing.Point(141, 21);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(31, 13);
             this.label5.TabIndex = 19;
@@ -189,7 +185,7 @@
             "38400",
             "57600",
             "115200"});
-            this.BaudRateBox.Location = new System.Drawing.Point(158, 17);
+            this.BaudRateBox.Location = new System.Drawing.Point(178, 17);
             this.BaudRateBox.Name = "BaudRateBox";
             this.BaudRateBox.Size = new System.Drawing.Size(70, 21);
             this.BaudRateBox.TabIndex = 20;
@@ -198,7 +194,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(256, 21);
+            this.label6.Location = new System.Drawing.Point(276, 21);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(57, 13);
             this.label6.TabIndex = 21;
@@ -206,7 +202,7 @@
             // 
             // LineDelayTextbox
             // 
-            this.LineDelayTextbox.Location = new System.Drawing.Point(319, 18);
+            this.LineDelayTextbox.Location = new System.Drawing.Point(339, 18);
             this.LineDelayTextbox.Name = "LineDelayTextbox";
             this.LineDelayTextbox.Size = new System.Drawing.Size(56, 20);
             this.LineDelayTextbox.TabIndex = 22;
@@ -215,7 +211,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(381, 21);
+            this.label7.Location = new System.Drawing.Point(401, 21);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(20, 13);
             this.label7.TabIndex = 23;
@@ -228,11 +224,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LuaCodeTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LuaCodeTextbox.HideSelection = false;
-            this.LuaCodeTextbox.Location = new System.Drawing.Point(9, 58);
+            this.LuaCodeTextbox.Location = new System.Drawing.Point(9, 61);
             this.LuaCodeTextbox.Multiline = true;
             this.LuaCodeTextbox.Name = "LuaCodeTextbox";
             this.LuaCodeTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.LuaCodeTextbox.Size = new System.Drawing.Size(677, 555);
+            this.LuaCodeTextbox.Size = new System.Drawing.Size(677, 552);
             this.LuaCodeTextbox.TabIndex = 24;
             this.LuaCodeTextbox.Text = resources.GetString("LuaCodeTextbox.Text");
             this.LuaCodeTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LuaCodeTextbox_keyDown);
@@ -271,9 +267,10 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.PortComboBox);
+            this.groupBox1.Controls.Add(this.RefreshButton);
             this.groupBox1.Controls.Add(this.RestartButton);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.PortTextbox);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.BaudRateBox);
             this.groupBox1.Controls.Add(this.LineDelayTextbox);
@@ -286,9 +283,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Communication";
             // 
+            // PortComboBox
+            // 
+            this.PortComboBox.FormattingEnabled = true;
+            this.PortComboBox.Location = new System.Drawing.Point(33, 17);
+            this.PortComboBox.Name = "PortComboBox";
+            this.PortComboBox.Size = new System.Drawing.Size(60, 21);
+            this.PortComboBox.TabIndex = 26;
+            this.PortComboBox.Text = "COM1";
+            // 
+            // RefreshButton
+            // 
+            this.RefreshButton.Image = global::LuaUploader.Properties.Resources._1417911755_refresh;
+            this.RefreshButton.Location = new System.Drawing.Point(96, 20);
+            this.RefreshButton.Name = "RefreshButton";
+            this.RefreshButton.Size = new System.Drawing.Size(16, 16);
+            this.RefreshButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.RefreshButton.TabIndex = 25;
+            this.RefreshButton.TabStop = false;
+            this.toolTip1.SetToolTip(this.RefreshButton, "Refresh COM Port List");
+            this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
+            // 
             // RestartButton
             // 
-            this.RestartButton.Location = new System.Drawing.Point(432, 15);
+            this.RestartButton.Location = new System.Drawing.Point(452, 15);
             this.RestartButton.Name = "RestartButton";
             this.RestartButton.Size = new System.Drawing.Size(100, 23);
             this.RestartButton.TabIndex = 14;
@@ -334,7 +352,7 @@
             // ExecuteSelectionButton
             // 
             this.ExecuteSelectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExecuteSelectionButton.Location = new System.Drawing.Point(280, 31);
+            this.ExecuteSelectionButton.Location = new System.Drawing.Point(280, 32);
             this.ExecuteSelectionButton.Name = "ExecuteSelectionButton";
             this.ExecuteSelectionButton.Size = new System.Drawing.Size(166, 23);
             this.ExecuteSelectionButton.TabIndex = 34;
@@ -345,7 +363,7 @@
             // SaveToDiskButton
             // 
             this.SaveToDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveToDiskButton.Location = new System.Drawing.Point(586, 31);
+            this.SaveToDiskButton.Location = new System.Drawing.Point(586, 6);
             this.SaveToDiskButton.Name = "SaveToDiskButton";
             this.SaveToDiskButton.Size = new System.Drawing.Size(100, 23);
             this.SaveToDiskButton.TabIndex = 33;
@@ -356,7 +374,7 @@
             // LoadFromDiskButton
             // 
             this.LoadFromDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadFromDiskButton.Location = new System.Drawing.Point(586, 6);
+            this.LoadFromDiskButton.Location = new System.Drawing.Point(586, 32);
             this.LoadFromDiskButton.Name = "LoadFromDiskButton";
             this.LoadFromDiskButton.Size = new System.Drawing.Size(100, 23);
             this.LoadFromDiskButton.TabIndex = 32;
@@ -389,11 +407,12 @@
             // LoadFromESPButton
             // 
             this.LoadFromESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadFromESPButton.Location = new System.Drawing.Point(480, 6);
+            this.LoadFromESPButton.Location = new System.Drawing.Point(174, 32);
             this.LoadFromESPButton.Name = "LoadFromESPButton";
             this.LoadFromESPButton.Size = new System.Drawing.Size(100, 23);
             this.LoadFromESPButton.TabIndex = 29;
             this.LoadFromESPButton.Text = "Load from ESP";
+            this.toolTip1.SetToolTip(this.LoadFromESPButton, "(for now this prints in output window instead of the editor window)");
             this.LoadFromESPButton.UseVisualStyleBackColor = true;
             this.LoadFromESPButton.Click += new System.EventHandler(this.LoadFromESPButton_Click);
             // 
@@ -402,11 +421,11 @@
             this.RunAfterSaving.AutoSize = true;
             this.RunAfterSaving.Checked = true;
             this.RunAfterSaving.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.RunAfterSaving.Location = new System.Drawing.Point(64, 34);
+            this.RunAfterSaving.Location = new System.Drawing.Point(9, 36);
             this.RunAfterSaving.Name = "RunAfterSaving";
-            this.RunAfterSaving.Size = new System.Drawing.Size(104, 17);
+            this.RunAfterSaving.Size = new System.Drawing.Size(152, 17);
             this.RunAfterSaving.TabIndex = 28;
-            this.RunAfterSaving.Text = "Run after saving";
+            this.RunAfterSaving.Text = "Auto-run after save to ESP";
             this.RunAfterSaving.UseVisualStyleBackColor = true;
             // 
             // tabPage2
@@ -478,11 +497,12 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "Lua Uploader - Hari Wiguna 2014";
+            this.Text = "Lua Uploader v 1.0.2 - Hari Wiguna 2014";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RefreshButton)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -506,7 +526,6 @@
         private System.Windows.Forms.TextBox CommandTextbox;
         private System.Windows.Forms.Button ExecuteButton;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox PortTextbox;
         private System.Windows.Forms.Button BrowseButton;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox BaudRateBox;
@@ -534,6 +553,9 @@
         private System.Windows.Forms.Button SaveToDiskButton;
         private System.Windows.Forms.Button LoadFromDiskButton;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.PictureBox RefreshButton;
+        private System.Windows.Forms.ComboBox PortComboBox;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
