@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace LuaUploader
 {
@@ -129,8 +130,15 @@ namespace LuaUploader
         private void UploadButton_Click(object sender, EventArgs e)
         {
             //Open Text file
-            string[] lines = System.IO.File.ReadAllLines(FilePathTextbox.Text);
-            SendLines(lines);
+            string origFile = System.IO.File.ReadAllText(FilePathTextbox.Text);
+
+            string luaCode = string.Format(
+                "file.remove(\"{0}\")\r\n" +
+                "file.open(\"{0}\",\"w\")\r\n" +
+                "{1}" +
+                "file.close()\r\n", LuaFilenameTextbox.Text, WrapInWriteLine(origFile));
+            
+            SendLines(luaCode);
         }
 
         private void ExecuteButton_Click(object sender, EventArgs e)
@@ -195,8 +203,26 @@ namespace LuaUploader
 
         private void LuaCodeTextbox_keyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control & e.KeyCode == Keys.A)
-                LuaCodeTextbox.SelectAll();
+            //if (e.KeyCode == Keys.F5)
+            //{
+            //    SendLines(LuaCodeTextbox.SelectedText);
+            //    e.Handled = true;
+            //}
+
+            if (e.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.A:
+                        LuaCodeTextbox.SelectAll();
+                        e.Handled = true;
+                        break;
+                    case Keys.S:
+                        SaveToDisk();
+                        e.Handled = true;
+                        break;
+                }
+            }
         }
 
         private void LoadFromESPButton_Click(object sender, EventArgs e)
@@ -246,5 +272,37 @@ namespace LuaUploader
             string doFile = string.Format("dofile(\"{0}\")\r\n", LuaFilenameTextbox.Text);
             SendLines(doFile);
         }
+
+        private void LoadFromDiskButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = openFileDialog1.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                LuaCodeTextbox.Text = System.IO.File.ReadAllText(openFileDialog1.FileName);
+                LuaFilenameTextbox.Text = Path.GetFileName(openFileDialog1.FileName);
+            }
+        }
+
+        private void SaveToDiskButton_Click(object sender, EventArgs e)
+        {
+            SaveToDisk();
+        }
+
+        private void SaveToDisk()
+        {
+            saveFileDialog1.Filter = "LUA|*.lua|Text File|*.txt";
+            DialogResult result = saveFileDialog1.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                string fileContent = LuaCodeTextbox.Text;
+                System.IO.File.WriteAllText(saveFileDialog1.FileName, fileContent);
+            }
+        }
+
+        private void ExecuteSelectionButton_Click(object sender, EventArgs e)
+        {
+            SendLines(LuaCodeTextbox.SelectedText);
+        }
+
     }
 }

@@ -52,15 +52,19 @@
             this.RestartButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ExecuteSelectionButton = new System.Windows.Forms.Button();
+            this.SaveToDiskButton = new System.Windows.Forms.Button();
+            this.LoadFromDiskButton = new System.Windows.Forms.Button();
+            this.RunButton = new System.Windows.Forms.Button();
+            this.DeleteButton = new System.Windows.Forms.Button();
             this.LoadFromESPButton = new System.Windows.Forms.Button();
             this.RunAfterSaving = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.ClearOutputButton = new System.Windows.Forms.Button();
-            this.DeleteButton = new System.Windows.Forms.Button();
             this.ListFilesButton = new System.Windows.Forms.Button();
-            this.RunButton = new System.Windows.Forms.Button();
+            this.ClearOutputButton = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -74,6 +78,7 @@
             this.output.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.output.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.output.Location = new System.Drawing.Point(6, 48);
             this.output.Multiline = true;
             this.output.Name = "output";
@@ -118,6 +123,7 @@
             this.CommandTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.CommandTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CommandTextbox.Location = new System.Drawing.Point(6, 35);
             this.CommandTextbox.Multiline = true;
             this.CommandTextbox.Name = "CommandTextbox";
@@ -220,6 +226,8 @@
             this.LuaCodeTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.LuaCodeTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LuaCodeTextbox.HideSelection = false;
             this.LuaCodeTextbox.Location = new System.Drawing.Point(9, 58);
             this.LuaCodeTextbox.Multiline = true;
             this.LuaCodeTextbox.Name = "LuaCodeTextbox";
@@ -232,7 +240,7 @@
             // SaveOnESPButton
             // 
             this.SaveOnESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveOnESPButton.Location = new System.Drawing.Point(230, 6);
+            this.SaveOnESPButton.Location = new System.Drawing.Point(174, 6);
             this.SaveOnESPButton.Name = "SaveOnESPButton";
             this.SaveOnESPButton.Size = new System.Drawing.Size(100, 23);
             this.SaveOnESPButton.TabIndex = 25;
@@ -246,7 +254,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LuaFilenameTextbox.Location = new System.Drawing.Point(64, 8);
             this.LuaFilenameTextbox.Name = "LuaFilenameTextbox";
-            this.LuaFilenameTextbox.Size = new System.Drawing.Size(160, 20);
+            this.LuaFilenameTextbox.Size = new System.Drawing.Size(104, 20);
             this.LuaFilenameTextbox.TabIndex = 26;
             this.LuaFilenameTextbox.Text = "door.lua";
             // 
@@ -304,6 +312,9 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.ExecuteSelectionButton);
+            this.tabPage1.Controls.Add(this.SaveToDiskButton);
+            this.tabPage1.Controls.Add(this.LoadFromDiskButton);
             this.tabPage1.Controls.Add(this.RunButton);
             this.tabPage1.Controls.Add(this.DeleteButton);
             this.tabPage1.Controls.Add(this.LoadFromESPButton);
@@ -319,6 +330,61 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Editor";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // ExecuteSelectionButton
+            // 
+            this.ExecuteSelectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExecuteSelectionButton.Location = new System.Drawing.Point(280, 31);
+            this.ExecuteSelectionButton.Name = "ExecuteSelectionButton";
+            this.ExecuteSelectionButton.Size = new System.Drawing.Size(166, 23);
+            this.ExecuteSelectionButton.TabIndex = 34;
+            this.ExecuteSelectionButton.Text = "E&xecute Selection";
+            this.ExecuteSelectionButton.UseVisualStyleBackColor = true;
+            this.ExecuteSelectionButton.Click += new System.EventHandler(this.ExecuteSelectionButton_Click);
+            // 
+            // SaveToDiskButton
+            // 
+            this.SaveToDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveToDiskButton.Location = new System.Drawing.Point(586, 31);
+            this.SaveToDiskButton.Name = "SaveToDiskButton";
+            this.SaveToDiskButton.Size = new System.Drawing.Size(100, 23);
+            this.SaveToDiskButton.TabIndex = 33;
+            this.SaveToDiskButton.Text = "Save to Disk";
+            this.SaveToDiskButton.UseVisualStyleBackColor = true;
+            this.SaveToDiskButton.Click += new System.EventHandler(this.SaveToDiskButton_Click);
+            // 
+            // LoadFromDiskButton
+            // 
+            this.LoadFromDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LoadFromDiskButton.Location = new System.Drawing.Point(586, 6);
+            this.LoadFromDiskButton.Name = "LoadFromDiskButton";
+            this.LoadFromDiskButton.Size = new System.Drawing.Size(100, 23);
+            this.LoadFromDiskButton.TabIndex = 32;
+            this.LoadFromDiskButton.Text = "Load from Disk";
+            this.LoadFromDiskButton.UseVisualStyleBackColor = true;
+            this.LoadFromDiskButton.Click += new System.EventHandler(this.LoadFromDiskButton_Click);
+            // 
+            // RunButton
+            // 
+            this.RunButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.RunButton.Location = new System.Drawing.Point(280, 6);
+            this.RunButton.Name = "RunButton";
+            this.RunButton.Size = new System.Drawing.Size(80, 23);
+            this.RunButton.TabIndex = 31;
+            this.RunButton.Text = "Run";
+            this.RunButton.UseVisualStyleBackColor = true;
+            this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
+            // 
+            // DeleteButton
+            // 
+            this.DeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.DeleteButton.Location = new System.Drawing.Point(366, 6);
+            this.DeleteButton.Name = "DeleteButton";
+            this.DeleteButton.Size = new System.Drawing.Size(80, 23);
+            this.DeleteButton.TabIndex = 30;
+            this.DeleteButton.Text = "Delete";
+            this.DeleteButton.UseVisualStyleBackColor = true;
+            this.DeleteButton.Click += new System.EventHandler(this.DeleteButton_Click);
             // 
             // LoadFromESPButton
             // 
@@ -336,7 +402,7 @@
             this.RunAfterSaving.AutoSize = true;
             this.RunAfterSaving.Checked = true;
             this.RunAfterSaving.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.RunAfterSaving.Location = new System.Drawing.Point(64, 35);
+            this.RunAfterSaving.Location = new System.Drawing.Point(64, 34);
             this.RunAfterSaving.Name = "RunAfterSaving";
             this.RunAfterSaving.Size = new System.Drawing.Size(104, 17);
             this.RunAfterSaving.TabIndex = 28;
@@ -382,27 +448,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
             // 
-            // ClearOutputButton
-            // 
-            this.ClearOutputButton.Location = new System.Drawing.Point(6, 19);
-            this.ClearOutputButton.Name = "ClearOutputButton";
-            this.ClearOutputButton.Size = new System.Drawing.Size(100, 23);
-            this.ClearOutputButton.TabIndex = 24;
-            this.ClearOutputButton.Text = "Clear";
-            this.ClearOutputButton.UseVisualStyleBackColor = true;
-            this.ClearOutputButton.Click += new System.EventHandler(this.ClearOutputButton_Click);
-            // 
-            // DeleteButton
-            // 
-            this.DeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DeleteButton.Location = new System.Drawing.Point(586, 6);
-            this.DeleteButton.Name = "DeleteButton";
-            this.DeleteButton.Size = new System.Drawing.Size(100, 23);
-            this.DeleteButton.TabIndex = 30;
-            this.DeleteButton.Text = "Delete";
-            this.DeleteButton.UseVisualStyleBackColor = true;
-            this.DeleteButton.Click += new System.EventHandler(this.DeleteButton_Click);
-            // 
             // ListFilesButton
             // 
             this.ListFilesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -414,16 +459,15 @@
             this.ListFilesButton.UseVisualStyleBackColor = true;
             this.ListFilesButton.Click += new System.EventHandler(this.ListFilesButton_Click);
             // 
-            // RunButton
+            // ClearOutputButton
             // 
-            this.RunButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.RunButton.Location = new System.Drawing.Point(336, 6);
-            this.RunButton.Name = "RunButton";
-            this.RunButton.Size = new System.Drawing.Size(100, 23);
-            this.RunButton.TabIndex = 31;
-            this.RunButton.Text = "Run";
-            this.RunButton.UseVisualStyleBackColor = true;
-            this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
+            this.ClearOutputButton.Location = new System.Drawing.Point(6, 19);
+            this.ClearOutputButton.Name = "ClearOutputButton";
+            this.ClearOutputButton.Size = new System.Drawing.Size(100, 23);
+            this.ClearOutputButton.TabIndex = 24;
+            this.ClearOutputButton.Text = "Clear";
+            this.ClearOutputButton.UseVisualStyleBackColor = true;
+            this.ClearOutputButton.Click += new System.EventHandler(this.ClearOutputButton_Click);
             // 
             // Form1
             // 
@@ -486,6 +530,10 @@
         private System.Windows.Forms.Button DeleteButton;
         private System.Windows.Forms.Button ListFilesButton;
         private System.Windows.Forms.Button RunButton;
+        private System.Windows.Forms.Button ExecuteSelectionButton;
+        private System.Windows.Forms.Button SaveToDiskButton;
+        private System.Windows.Forms.Button LoadFromDiskButton;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 
