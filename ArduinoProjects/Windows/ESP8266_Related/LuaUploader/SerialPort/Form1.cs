@@ -36,9 +36,9 @@ namespace LuaUploader
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            RefreshPortList();
             RestoreUserSettings();
 
-            RefreshPortList();
             serialPort = new SerialPort(PortComboBox.Text, int.Parse(BaudRateBox.Text));
             serialPort.NewLine = "\r\n"; // CR followed by LF
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
@@ -325,6 +325,7 @@ namespace LuaUploader
         {
             string[] portNames = SerialPort.GetPortNames();
             PortComboBox.DataSource = portNames;
+            PortComboBox.SelectedIndex = portNames.Count() - 1;
         }
 
     }
