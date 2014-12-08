@@ -64,3 +64,33 @@ RECEIVED:  GET /update.html?d=1
 wrong syntax
 
 ERROR
+
+
+--------------------------
+
+GET / HTTP/1.1
+Host: thawing-depths-8215.herokuapp.com
+Connection: keep-alive
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8
+If-None-Match: W/"2c-70d92767"
+
+HTTP/1.1 200 OK
+Server: Cowboy
+Connection: keep-alive
+X-Powered-By: Express
+Content-Type: text/html; charset=utf-8
+Content-Length: 46
+Etag: W/"2e-e18d204"
+Date: Sun, 07 Dec 2014 01:05:28 GMT
+Via: 1.1 vegur
+
+Simon says: | (... ......)|<p>(...........)<p>GET /favicon.ico HTTP/1.1
+Host: thawing-depths-8215.herokuapp.com
+Connection: keep-alive
+Accept: */*
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8

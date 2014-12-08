@@ -20,6 +20,27 @@ gpio.mode(led,gpio.OUTPUT)
 gpio.write(led,gpio.LOW)
 gpio.write(led,gpio.HIGH)
 
+-- LUA Web Client --
+conn = net.createConnection( net.TCP, false)
+conn:on("receive", function(c, payload) print(payload) end)
+conn:connect(80,"115.239.210.27")
+conn:send("GET / HTTP/1.1\r\n\r\n")
+
+-- LUA Web Client --
+conn = net.createConnection( net.TCP, false)
+conn:on("receive", function(c, payload) print(payload) end)
+conn:connect(80,"www.baidu.com")
+conn:send("GET / HTTP/1.1\r\n\r\n")
+
+-- LUA Web Client with DNS lookup --
+address = 'unknown'
+conn = net.createConnection( net.TCP, 0)
+conn:on("receive", function(c, payload) print(payload) end)
+conn.dns(conn, "thawing-depths-8215.herokuapp.com", function(conn, ip) print(ip) address=ip end)
+print(address)
+conn:connect(80,address)
+conn:send("GET / HTTP/1.1\r\nHost: thawing-depths-8215.herokuapp.com\r\n\r\n")
+
 -- File List --
 l = file.list();
 for k,v in pairs(l) do
