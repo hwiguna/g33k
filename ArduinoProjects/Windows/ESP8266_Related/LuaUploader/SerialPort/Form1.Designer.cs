@@ -497,7 +497,7 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "Lua Uploader v 1.0.2 - Hari Wiguna 2014";
+            this.Text = "Lua Uploader v 1.0.2.1 - Hari Wiguna 2014";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);

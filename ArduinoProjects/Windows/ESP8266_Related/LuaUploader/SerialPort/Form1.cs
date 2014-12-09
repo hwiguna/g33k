@@ -143,12 +143,13 @@ namespace LuaUploader
         {
             //Open Text file
             string origFile = System.IO.File.ReadAllText(FilePathTextbox.Text);
+            string targetFileName = Path.GetFileName(FilePathTextbox.Text);
 
             string luaCode = string.Format(
                 "file.remove(\"{0}\")\r\n" +
                 "file.open(\"{0}\",\"w\")\r\n" +
                 "{1}" +
-                "file.close()\r\n", LuaFilenameTextbox.Text, WrapInWriteLine(origFile));
+                "file.close()\r\n", targetFileName, WrapInWriteLine(origFile));
             
             SendLines(luaCode);
         }
