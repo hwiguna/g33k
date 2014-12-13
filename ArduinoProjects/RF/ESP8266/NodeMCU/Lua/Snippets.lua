@@ -1,5 +1,13 @@
 -- Two dashes starts a comment
 
+-- from Jankop
+-- http://www.esp8266.com/viewtopic.php?f=24&t=826&p=4718#p4686
+tmr.alarm(1,1000, 1, function() if wifi.sta.getip()==nil then print(" Wait to IP address!") else print("New IP address is "..wifi.sta.getip()) tmr.stop(1) end end)
+
+s = "123"
+print(string.sub(s,2,2))
+print(digits[tonumber(string.sub(s,2,2))])
+
 a = 1
 b = 2
 c = a + b
@@ -309,3 +317,102 @@ end
 //	  $.getJSON("192.168.254.100:8080", function(data) {
 //	    alert(data);
 //	  });
+
+
+-- Saving data --
+a = 7
+b = 8
+
+fname = "data.lua"
+file.open(fname,"w")
+file.writeline("a="..a)
+file.writeline("b="..b)
+file.close()
+
+file.open(fname,"r")
+repeat
+ line=file.readline()
+ pcall(loadstring(line))
+until (line == nil)
+file.close()
+
+print(a)
+print(b)
+
+
+
+
+
+-- Writing data to a file --
+function Saver(fname)
+ file.open(fname,"w")
+ file.writeline("a="..a)
+ file.writeline("b="..b)
+ file.writeline("c=\""..c.."\"")
+ file.close()
+end
+
+
+-- Sample Program --
+a=7
+b=8
+c="Hello"
+Saver("data.lua")
+
+node.restart()
+
+print(a)
+print(b)
+print(c)
+
+
+-- Reading data from a file --
+function Loadr(fname)
+ file.open(fname,"r")
+ repeat
+  line = file.readline()
+  if line ~= nil then pcall(loadstring(line)) end
+ until line == nil
+ file.close()
+end
+
+Loadr("data.lua")
+print(a)
+print(b)
+print(c)
+
+--------------------------------------
+-- Sample variables --
+a=7
+b=8
+c="Hello"
+
+-- Write data to a file --
+file.open("data.lua","w")
+file.writeline("a="..a)
+file.writeline("b="..b)
+file.writeline("c=\""..c.."\"")
+file.close()
+
+-- Restart --
+node.restart()
+
+-- All gone! --
+print(a)
+print(b)
+print(c)
+
+-- Read data from a file --
+-- pcall(loadstring(x)) executes the string as if we typed it! -- 
+file.open("data.lua","r")
+repeat
+ line = file.readline()
+ if line ~= nil then pcall(loadstring(line)) end
+until line == nil
+file.close()
+
+-- We're back! --
+Loadr("data.lua")
+print(a)
+print(b)
+print(c)
