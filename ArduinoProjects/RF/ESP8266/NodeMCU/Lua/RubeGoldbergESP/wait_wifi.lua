@@ -10,7 +10,7 @@ function wait_wifi()
   else
     wifi_connected = true
     print("Got IP "..wifi_ip.."\n")
-    dofile("x10_v02.lua")
+    dofile("rube.lua")
   end
 end
 
