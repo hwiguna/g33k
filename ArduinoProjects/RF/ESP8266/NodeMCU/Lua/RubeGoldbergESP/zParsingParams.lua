@@ -51,6 +51,8 @@ for i=1,6 do
  end
 end
 
+
+
 --- Simpler version? ---
 function parsePayload(payload)
  digitEnd=string.find(payload, ",")
@@ -60,7 +62,6 @@ function parsePayload(payload)
  end
  return payload
 end
-
 
 -- I/O --
 led=9

@@ -1,8 +1,9 @@
 -- from http://www.esp8266.com/viewtopic.php?f=18&t=628
 function wait_wifi()
   count = count + 1
+  print("Waiting for WiFi .." .. count)
   wifi_ip = wifi.sta.getip()
-  if wifi_ip == "0.0.0.0" and count < 20 then
+  if wifi_ip == nil and count < 20 then
     tmr.alarm(0, 1000,0,wait_wifi)
   elseif count >= 20 then
     wifi_connected = false
