@@ -9,9 +9,13 @@ function parsePayload(payload)
 end
 
 -- I/O --
+io0=3
+gpio.mode(io0,gpio.INPUT)
+
+
 led=4
 gpio.mode(led,gpio.OUTPUT)
-gpio.write(led,gpio.HIGH)
+gpio.write(led,gpio.LOW)
 
 -- LUA Webserver --
 srv=net.createServer(net.TCP)
@@ -22,13 +26,13 @@ srv:listen(80,function(conn)
 			gpio.write(led,gpio.LOW) -- Turn on LED upon valid request (ignore favicon)
 			if string.sub(payload,6,6)~=" " then
 				ips = string.sub(payload, 6, string.find(payload," ",6)-1)
-				print("ips=" .. ips)
+				--print("ips=" .. ips)
 				payload = parsePayload( ips )
 
 				if nextGuy ~= nil then
 					-- LUA Web Client --
 					client = net.createConnection( net.TCP, false)
-					client:on("receive", function(c, payload) print("REPLIED: " .. payload) end)
+					client:on("receive", function(c, payload) r=1 end)
 					client:connect(80,nextGuy)
 					client:send("GET /" .. payload .. " HTTP/1.1\r\n\r\n")
 					reply = "Sent " .. payload .. " to " .. nextGuy
@@ -56,5 +60,5 @@ srv:listen(80,function(conn)
 	end)
 end)
 
-print(wifi.sta.getip() .. " READY!")
-
+--print(wifi.sta.getip() .. " READY!")
+gpio.write(led,gpio.HIGH)
