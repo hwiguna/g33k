@@ -49,28 +49,28 @@ srv=net.createServer(net.TCP)
 
 srv:listen(80,function(conn)
 
-  conn:on("receive",function(conn,payload)
-    print(payload)
-    bitz="?"
-    if string.len(payload)>=6 then
-     if string.sub(payload,6,8) == "dig" then
-      index = tonumber(string.sub(payload,9,9))
-      bitz = tostring(digits[index+1])
-      shiftOut(dataPin, clockPin, latchPin, bitz)
-     end 
-    end
+ conn:on("receive",function(conn,payload)
+  print(payload)
+  bitz="?"
+  if string.len(payload)>=6 then
+   if string.sub(payload,6,8) == "dig" then
+    index = tonumber(string.sub(payload,9,9))
+    bitz = tostring(digits[index+1])
+    shiftOut(dataPin, clockPin, latchPin, bitz)
+   end 
+  end
 
-    reply = "Sent to Shift Register: " .. bitz 
-    payloadLen = string.len(reply)
-    conn:send("HTTP/1.1 200 OK\r\n")
-    conn:send("Content-Length:" .. tostring(payloadLen) .. "\r\n")
-    conn:send("Connection:close\r\n\r\n")
-    conn:send(reply)
-  end)
+  reply = "Sent to Shift Register: " .. bitz 
+  payloadLen = string.len(reply)
+  conn:send("HTTP/1.1 200 OK\r\n")
+  conn:send("Content-Length:" .. tostring(payloadLen) .. "\r\n")
+  conn:send("Connection:close\r\n\r\n")
+  conn:send(reply)
+ end)
 
-  conn:on("sent",function(conn)
-    conn:close()
-  end)
+ conn:on("sent",function(conn)
+  conn:close()
+ end)
 end)
 
 print(wifi.sta.getip())
