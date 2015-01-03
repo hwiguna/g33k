@@ -1,0 +1,7 @@
+Worldwide ESP
+Flipping over the transmitter turns it on and sends signal to receiver over WiFi.
+
+Disclaimer:
+Although final version would involve a server, to test concept we'll have the ESPs talk to each other.
+
+
