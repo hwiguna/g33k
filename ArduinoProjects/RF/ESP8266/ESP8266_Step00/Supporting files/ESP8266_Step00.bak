@@ -1,0 +1,254 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+EELAYER 27 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date "7 jan 2015"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L CONN_4X2 ESP-01
+U 1 1 54AC881C
+P 5050 3600
+F 0 "ESP-01" H 5050 3850 50  0000 C CNN
+F 1 "CONN_4X2" V 5050 3600 40  0000 C CNN
+F 2 "" H 5050 3600 60  0000 C CNN
+F 3 "" H 5050 3600 60  0000 C CNN
+	1    5050 3600
+	0    -1   -1   0   
+$EndComp
+Text Label 4750 4450 1    60   ~ 0
+TX
+Text Label 5000 4450 1    60   ~ 0
+CH_PD
+Text Label 5200 4450 1    60   ~ 0
+~RST
+Text Label 5400 4450 1    60   ~ 0
+VCC
+$Comp
+L GND #PWR2
+U 1 1 54AC89AA
+P 4500 3600
+F 0 "#PWR2" H 4500 3600 30  0001 C CNN
+F 1 "GND" H 4500 3530 30  0001 C CNN
+F 2 "" H 4500 3600 60  0000 C CNN
+F 3 "" H 4500 3600 60  0000 C CNN
+	1    4500 3600
+	1    0    0    -1  
+$EndComp
+Text Label 4800 2950 1    60   ~ 0
+GND
+Text Label 5000 2950 1    60   ~ 0
+GPIO 02
+Text Label 5200 2950 1    60   ~ 0
+GPIO 00
+Text Label 5400 2950 1    60   ~ 0
+RX
+$Comp
+L GND #PWR4
+U 1 1 54AC8A8A
+P 6000 3600
+F 0 "#PWR4" H 6000 3600 30  0001 C CNN
+F 1 "GND" H 6000 3530 30  0001 C CNN
+F 2 "" H 6000 3600 60  0000 C CNN
+F 3 "" H 6000 3600 60  0000 C CNN
+	1    6000 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R4
+U 1 1 54AC8AA8
+P 6000 3200
+F 0 "R4" V 6080 3200 40  0000 C CNN
+F 1 "1K8" V 6007 3201 40  0000 C CNN
+F 2 "~" V 5930 3200 30  0000 C CNN
+F 3 "~" H 6000 3200 30  0000 C CNN
+	1    6000 3200
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R3
+U 1 1 54AC8AB5
+P 6000 2700
+F 0 "R3" V 6080 2700 40  0000 C CNN
+F 1 "1K" V 6007 2701 40  0000 C CNN
+F 2 "~" V 5930 2700 30  0000 C CNN
+F 3 "~" H 6000 2700 30  0000 C CNN
+	1    6000 2700
+	1    0    0    -1  
+$EndComp
+Text Label 6350 2400 0    60   ~ 0
+ESP RX / FTDI TX
+Text Label 6350 2750 0    60   ~ 0
+ESP TX / FTDI RX
+$Comp
+L GND #PWR5
+U 1 1 54AC8B80
+P 6400 3600
+F 0 "#PWR5" H 6400 3600 30  0001 C CNN
+F 1 "GND" H 6400 3530 30  0001 C CNN
+F 2 "" H 6400 3600 60  0000 C CNN
+F 3 "" H 6400 3600 60  0000 C CNN
+	1    6400 3600
+	1    0    0    -1  
+$EndComp
+Text Label 7000 3050 0    60   ~ 0
+GND
+Wire Wire Line
+	5350 2950 6000 2950
+Wire Wire Line
+	6000 3450 6000 3600
+Wire Wire Line
+	4500 2950 4800 2950
+Wire Wire Line
+	4500 3600 4500 2950
+Wire Wire Line
+	5350 3200 5350 2950
+Wire Wire Line
+	5200 3200 5350 3200
+Wire Wire Line
+	5200 2600 5200 3100
+Wire Wire Line
+	5200 3100 5100 3100
+Wire Wire Line
+	5100 3100 5100 3200
+Wire Wire Line
+	4800 2950 4800 3100
+Wire Wire Line
+	4800 3100 4900 3100
+Wire Wire Line
+	4900 3100 4900 3200
+Wire Wire Line
+	5000 2600 5000 3200
+Wire Wire Line
+	5200 4750 5200 4150
+Wire Wire Line
+	5200 4150 5100 4150
+Wire Wire Line
+	5100 4150 5100 4000
+Wire Wire Line
+	5000 4750 5000 4000
+Wire Wire Line
+	4900 4000 4800 4000
+Wire Wire Line
+	5400 4000 5200 4000
+Wire Wire Line
+	6000 2450 7250 2450
+Wire Wire Line
+	4800 4950 6200 4950
+Wire Wire Line
+	7250 2800 6200 2800
+Connection ~ 6200 2800
+Wire Wire Line
+	6200 2800 6200 4950
+Wire Wire Line
+	6400 3100 7250 3100
+Wire Wire Line
+	6400 3100 6400 3600
+Wire Wire Line
+	4800 4000 4800 4950
+Wire Wire Line
+	5400 4750 5400 4000
+Connection ~ 5200 4750
+Connection ~ 5400 4750
+$Comp
+L +3.3V #PWR1
+U 1 1 54AC8E25
+P 4500 2000
+F 0 "#PWR1" H 4500 1960 30  0001 C CNN
+F 1 "+3.3V" H 4500 2110 30  0000 C CNN
+F 2 "" H 4500 2000 60  0000 C CNN
+F 3 "" H 4500 2000 60  0000 C CNN
+	1    4500 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 54AC8E2B
+P 5000 2350
+F 0 "R1" V 5080 2350 40  0000 C CNN
+F 1 "1K" V 5007 2351 40  0000 C CNN
+F 2 "~" V 4930 2350 30  0000 C CNN
+F 3 "~" H 5000 2350 30  0000 C CNN
+	1    5000 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R2
+U 1 1 54AC8E31
+P 5200 2350
+F 0 "R2" V 5280 2350 40  0000 C CNN
+F 1 "1K" V 5207 2351 40  0000 C CNN
+F 2 "~" V 5130 2350 30  0000 C CNN
+F 3 "~" H 5200 2350 30  0000 C CNN
+	1    5200 2350
+	1    0    0    -1  
+$EndComp
+Connection ~ 5000 2100
+Text Label 5500 2000 0    60   ~ 0
+Connect GPIO 00 to ground to flash the firmware
+Wire Notes Line
+	5200 2600 5550 2600
+Wire Notes Line
+	5550 2600 5550 2000
+Text Label 6600 3250 0    60   ~ 0
+(Don't forget common GND between ESP-01 and FTDI)
+Connection ~ 5000 4750
+Wire Wire Line
+	4500 2100 4500 2000
+Connection ~ 4500 2100
+Wire Wire Line
+	4500 2100 5200 2100
+Wire Wire Line
+	5000 4750 5700 4750
+Wire Wire Line
+	5700 4750 5700 4550
+$Comp
+L +3.3V #PWR3
+U 1 1 54AC90DE
+P 5700 4550
+F 0 "#PWR3" H 5700 4510 30  0001 C CNN
+F 1 "+3.3V" H 5700 4660 30  0000 C CNN
+F 2 "" H 5700 4550 60  0000 C CNN
+F 3 "" H 5700 4550 60  0000 C CNN
+	1    5700 4550
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

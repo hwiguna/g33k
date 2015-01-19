@@ -1,0 +1,17 @@
+Cmp-Mod V01 Created by CvPcb (2013-07-07 BZR 4022)-stable date = 1/4/2015 12:19:23 AM
+
+BeginCmp
+TimeStamp = /54A8DA5C;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = LED-3MM;
+EndCmp
+
+BeginCmp
+TimeStamp = /54A8DA4D;
+Reference = R1;
+ValeurCmp = R;
+IdModule  = R3;
+EndCmp
+
+EndListe
