@@ -67,19 +67,25 @@ file.close()
 print(txt)
 
 
+
+print(node.heap()) 	-- Print Available Memory
+
+-- One time ESP Setup --
+wifi.setmode(wifi.STATION)
+wifi.sta.config ( "WIFI_SSID" , "PASSWORD" )  
+print(wifi.sta.getip())
+
 -- Blink using timer alarm --
-dly = 200 -- milliseconds
-ledPin = 9
+timerId = 0 -- we have seven timers! 0..6
+dly = 500 -- milliseconds
+ledPin = 4 -- 4=GPIO2 https://github.com/nodemcu/nodemcu-firmware/wiki/nodemcu_api_en#gpio-new-table--build-20141219-and-later
 gpio.mode(ledPin,gpio.OUTPUT)
-ledState = 0 -- gpio.HIGH=1, gpio.LOW=0
-tmr.stop() -- There's only one timer, so make sure it's stopped before we start this one.
-tmr.alarm( dly, 1, function() 
+ledState = 0
+tmr.stop(timerId)
+tmr.alarm( timerId, dly, 1, function() 
   ledState = 1 - ledState;
   gpio.write(ledPin, ledState)
 end)
-
-
-
 
 
 

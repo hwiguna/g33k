@@ -121,21 +121,20 @@
     <value>17, 17</value>
   </metadata>
   <data name="LuaCodeTextbox.Text" xml:space="preserve">
-    <value>-- Blink using timer alarm --
-dly = 1000 -- miliseconds
-isOn = false
+    <value>-- One time ESP Setup --
+wifi.setmode(wifi.STATION)
+wifi.sta.config ( "WIFI_SSID" , "PASSWORD" )  
+print(wifi.sta.getip())
 
-led = 9 -- 8=GPIO 00, 9=GPIO 02
-gpio.mode(led,gpio.OUTPUT)
-
-tmr.stop() -- There's only one timer, so make sure it's stopped before we start this one.
-tmr.alarm( dly, 1, function() 
-  isOn = not isOn
-  if isOn then
-    gpio.write(led,gpio.HIGH)
-  else
-    gpio.write(led,gpio.LOW)
-  end
+-- Blink using timer alarm --
+timerId = 0 -- we have seven timers! 0..6
+dly = 500 -- milliseconds
+ledPin = 4 -- 4=GPIO2 https://github.com/nodemcu/nodemcu-firmware/wiki/nodemcu_api_en#gpio-new-table--build-20141219-and-later
+gpio.mode(ledPin,gpio.OUTPUT)
+ledState = 0
+tmr.alarm( timerId, dly, 1, function() 
+  ledState = 1 - ledState;
+  gpio.write(ledPin, ledState)
 end)</value>
   </data>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -144,7 +143,7 @@ end)</value>
   <metadata name="saveFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>157, 17</value>
   </metadata>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>293, 17</value>
+  <metadata name="timer1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>390, 17</value>
   </metadata>
 </root>

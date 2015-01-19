@@ -28,6 +28,7 @@ namespace LuaUploader
         SerialPort serialPort;
         //int StartingLinePosition;
         //bool IsLoadingLua = false;
+        DateTime lastSerialActivity = DateTime.MinValue;
 
         public Form1()
         {
@@ -38,6 +39,9 @@ namespace LuaUploader
         {
             RefreshPortList();
             RestoreUserSettings();
+
+            timer1.Stop();
+            timer1.Interval = 200;
 
             serialPort = new SerialPort(PortComboBox.Text, int.Parse(BaudRateBox.Text));
             serialPort.NewLine = "\r\n"; // CR followed by LF
@@ -81,6 +85,7 @@ namespace LuaUploader
             //    LuaCodeTextbox.Text = Clipboard.GetText();
             //    IsLoadingLua = false;
             //}
+            lastSerialActivity = DateTime.Now;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -257,6 +262,7 @@ namespace LuaUploader
 
             SendLines(printFileContent);
 
+            timer1.Start();
         }
 
         private void ClearOutputButton_Click(object sender, EventArgs e)
@@ -329,5 +335,33 @@ namespace LuaUploader
             PortComboBox.SelectedIndex = portNames.Count() - 1;
         }
 
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //Console.WriteLine("TICK");
+            if (DateTime.Now.Subtract( lastSerialActivity ).TotalMilliseconds > 500)
+            {
+                //Console.WriteLine("Haven't received any chars from ESP for a while.  He must be done sending the lua listing...");
+                timer1.Stop();
+                CopyOutputToCode();
+            }
+        }
+
+        private void CopyOutputToCode()
+        {
+            // Thanks to Eskici for the code to find the lua code sent back by the ESP!
+            string splitter = "> print(txt)\r\n";
+
+            // making sure that the output contains the splitter
+            if (output.Text.Contains(splitter))
+            {
+                // split the output string and get the latest loaded code
+                string spl_code = output.Text.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToList<string>().Last<string>().Trim();
+
+                // make sure the code ends with ">" and remove it, other wise something gone wrong, just return empty.
+                if (spl_code.EndsWith(">"))
+                    LuaCodeTextbox.Text = spl_code.Substring(0, spl_code.Length - 1).Trim();
+            }
+        }
     }
 }

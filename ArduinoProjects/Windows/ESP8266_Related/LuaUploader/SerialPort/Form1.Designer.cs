@@ -68,6 +68,7 @@
             this.ClearOutputButton = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RefreshButton)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -252,7 +253,7 @@
             this.LuaFilenameTextbox.Name = "LuaFilenameTextbox";
             this.LuaFilenameTextbox.Size = new System.Drawing.Size(104, 20);
             this.LuaFilenameTextbox.TabIndex = 26;
-            this.LuaFilenameTextbox.Text = "door.lua";
+            this.LuaFilenameTextbox.Text = "snippets.lua";
             // 
             // label8
             // 
@@ -488,6 +489,10 @@
             this.ClearOutputButton.UseVisualStyleBackColor = true;
             this.ClearOutputButton.Click += new System.EventHandler(this.ClearOutputButton_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -497,7 +502,7 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "Lua Uploader v 1.0.2.1 - Hari Wiguna 2014";
+            this.Text = "Lua Uploader v 1.0.2.2 - Hari Wiguna 2014";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
@@ -556,6 +561,7 @@
         private System.Windows.Forms.PictureBox RefreshButton;
         private System.Windows.Forms.ComboBox PortComboBox;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
