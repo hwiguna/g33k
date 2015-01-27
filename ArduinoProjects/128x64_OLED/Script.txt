@@ -1,0 +1,42 @@
+- The one I bought.
+- Watch for:
+- I2C vs SPI
+- multi-color
+- 128x64 vs 128x32
+- Low quality: - Crooked assembly
+
+- AdaFruit is more expensive, but they build fantastic products.
+- Shares everything including the library that we'll be using for this Chinese
+- Please support them!
+
+Download Adafruit_GFX and Adafruit_SSD1306
+SSD1306
+
+Run the Adafruit demo
+
+Trim code to just draw a line
+
+Go to paper, explain the trig to draw a circle
+- Radians vs Degrees
+- Sin, Cos
+- 128x64 center
+- Radius
+
+Draw a 4 point circle (square), mention array
+
+Draw a chord
+
+Loop radius
+
+Implement rotation
+
+Loop chord the other way
+
+
+Fun
+Hope you learn something new
+Go make your own patterns
+leave questions in comments
+Thumbs up and subscribe
+
+
