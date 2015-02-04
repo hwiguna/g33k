@@ -154,3 +154,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+ArduinoProjects/RF/ESP8266/_LuaUploader.exe.lnk
