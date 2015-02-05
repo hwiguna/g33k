@@ -1,0 +1,30 @@
+HariFun #102 - Scope Club 2 - Direct (FAST) Arduino Port manipulation explained
+
+PORTD
+D0..D7
+7654 3210
+7654 32xx -- NEVER set lowest bit as output or you cant receive data
+
+PORTB
+D8..D13
+XXDC BA98 -- High two bits are occupied by the crystal
+
+PORTC
+A0..A5
+xx54 3210 -- High two bits are only available on Arduino Mini
+
+So, I chose to use the low six bits of PORTB and PORTC.
+To set the port directions (PinMode) of the low six bits as output
+and not touch the high two bits, we use a bit OR.
+
+DDRB = DDRB | B00111111; // Set bottom 6 bits as outout while leaving the top two alone
+DDRC = DDRC | B00111111; // Set bottom 6 bits as outout while leaving the top two alone
+
+To set the value of the port without affecting the high two bits, we first clear all bits except those:
+PORTB = PORTB & B11000000;
+
+Then we clear the two bits of the source value (just in case)
+val = val & B00111111;
+
+Finally, we combine those two operations:
+PORTB = (PORTB & B11000000) | (val & B00111111);
