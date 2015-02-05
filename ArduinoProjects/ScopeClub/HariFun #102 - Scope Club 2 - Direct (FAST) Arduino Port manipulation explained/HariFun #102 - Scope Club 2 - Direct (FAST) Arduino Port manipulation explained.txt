@@ -1,16 +1,16 @@
 HariFun #102 - Scope Club 2 - Direct (FAST) Arduino Port manipulation explained
 
 PORTD
-D0..D7
+D7..D0
 7654 3210
 7654 32xx -- NEVER set lowest bit as output or you cant receive data
 
 PORTB
-D8..D13
+D13..D8 -- D8 = least significant bit of PORTB
 XXDC BA98 -- High two bits are occupied by the crystal
 
 PORTC
-A0..A5
+A5..A0 -- A0 = least significant bit of PORTC
 xx54 3210 -- High two bits are only available on Arduino Mini
 
 So, I chose to use the low six bits of PORTB and PORTC.
