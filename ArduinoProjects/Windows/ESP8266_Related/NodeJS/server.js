@@ -4,7 +4,7 @@ var fs = require('fs');
 var url = require('url');
 
 //-- Global variables --
-var serverIP = '192.168.254.100';
+var serverIP = '192.168.254.202'; //'192.168.254.100';
 var apiPort = 8080;
 
 //-- HTMServer --
