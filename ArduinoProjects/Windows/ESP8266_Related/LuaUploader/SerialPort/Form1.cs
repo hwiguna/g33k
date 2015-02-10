@@ -208,7 +208,10 @@ namespace LuaUploader
 
             foreach (var line in luaCode.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                stringBuilder.AppendLine("file.writeline([[" + line + "]])");
+                // Thanks to user myplacedk for finding this bug and suggesting the solution - Hari.
+                string escapeSlashes = line.Replace(@"\", @"\\");               // Replace \ with \\
+                string escapeSingleQuotes = escapeSlashes.Replace("'", @"\'");  // Replace ' with \'
+                stringBuilder.AppendLine("file.writeline('" + escapeSingleQuotes + "')");
             }
 
             return stringBuilder.ToString();
