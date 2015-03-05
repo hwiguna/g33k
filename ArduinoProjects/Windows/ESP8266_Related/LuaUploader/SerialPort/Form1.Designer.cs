@@ -229,15 +229,14 @@
             this.LuaCodeTextbox.Multiline = true;
             this.LuaCodeTextbox.Name = "LuaCodeTextbox";
             this.LuaCodeTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.LuaCodeTextbox.Size = new System.Drawing.Size(677, 552);
+            this.LuaCodeTextbox.Size = new System.Drawing.Size(551, 552);
             this.LuaCodeTextbox.TabIndex = 24;
             this.LuaCodeTextbox.Text = resources.GetString("LuaCodeTextbox.Text");
             this.LuaCodeTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LuaCodeTextbox_keyDown);
             // 
             // SaveOnESPButton
             // 
-            this.SaveOnESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveOnESPButton.Location = new System.Drawing.Point(174, 6);
+            this.SaveOnESPButton.Location = new System.Drawing.Point(168, 6);
             this.SaveOnESPButton.Name = "SaveOnESPButton";
             this.SaveOnESPButton.Size = new System.Drawing.Size(100, 23);
             this.SaveOnESPButton.TabIndex = 25;
@@ -247,11 +246,9 @@
             // 
             // LuaFilenameTextbox
             // 
-            this.LuaFilenameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.LuaFilenameTextbox.Location = new System.Drawing.Point(64, 8);
             this.LuaFilenameTextbox.Name = "LuaFilenameTextbox";
-            this.LuaFilenameTextbox.Size = new System.Drawing.Size(104, 20);
+            this.LuaFilenameTextbox.Size = new System.Drawing.Size(91, 20);
             this.LuaFilenameTextbox.TabIndex = 26;
             this.LuaFilenameTextbox.Text = "snippets.lua";
             // 
@@ -279,7 +276,7 @@
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Location = new System.Drawing.Point(13, 13);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1114, 49);
+            this.groupBox1.Size = new System.Drawing.Size(980, 49);
             this.groupBox1.TabIndex = 28;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Communication";
@@ -326,7 +323,7 @@
             this.tabControl1.Location = new System.Drawing.Point(13, 69);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(700, 645);
+            this.tabControl1.Size = new System.Drawing.Size(574, 645);
             this.tabControl1.TabIndex = 29;
             // 
             // tabPage1
@@ -345,15 +342,14 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(692, 619);
+            this.tabPage1.Size = new System.Drawing.Size(566, 619);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Editor";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // ExecuteSelectionButton
             // 
-            this.ExecuteSelectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExecuteSelectionButton.Location = new System.Drawing.Point(280, 32);
+            this.ExecuteSelectionButton.Location = new System.Drawing.Point(274, 32);
             this.ExecuteSelectionButton.Name = "ExecuteSelectionButton";
             this.ExecuteSelectionButton.Size = new System.Drawing.Size(166, 23);
             this.ExecuteSelectionButton.TabIndex = 34;
@@ -363,8 +359,7 @@
             // 
             // SaveToDiskButton
             // 
-            this.SaveToDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveToDiskButton.Location = new System.Drawing.Point(586, 6);
+            this.SaveToDiskButton.Location = new System.Drawing.Point(460, 6);
             this.SaveToDiskButton.Name = "SaveToDiskButton";
             this.SaveToDiskButton.Size = new System.Drawing.Size(100, 23);
             this.SaveToDiskButton.TabIndex = 33;
@@ -374,8 +369,7 @@
             // 
             // LoadFromDiskButton
             // 
-            this.LoadFromDiskButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadFromDiskButton.Location = new System.Drawing.Point(586, 32);
+            this.LoadFromDiskButton.Location = new System.Drawing.Point(460, 32);
             this.LoadFromDiskButton.Name = "LoadFromDiskButton";
             this.LoadFromDiskButton.Size = new System.Drawing.Size(100, 23);
             this.LoadFromDiskButton.TabIndex = 32;
@@ -385,8 +379,7 @@
             // 
             // RunButton
             // 
-            this.RunButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.RunButton.Location = new System.Drawing.Point(280, 6);
+            this.RunButton.Location = new System.Drawing.Point(274, 6);
             this.RunButton.Name = "RunButton";
             this.RunButton.Size = new System.Drawing.Size(80, 23);
             this.RunButton.TabIndex = 31;
@@ -396,8 +389,7 @@
             // 
             // DeleteButton
             // 
-            this.DeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DeleteButton.Location = new System.Drawing.Point(366, 6);
+            this.DeleteButton.Location = new System.Drawing.Point(360, 6);
             this.DeleteButton.Name = "DeleteButton";
             this.DeleteButton.Size = new System.Drawing.Size(80, 23);
             this.DeleteButton.TabIndex = 30;
@@ -407,8 +399,7 @@
             // 
             // LoadFromESPButton
             // 
-            this.LoadFromESPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadFromESPButton.Location = new System.Drawing.Point(174, 32);
+            this.LoadFromESPButton.Location = new System.Drawing.Point(168, 32);
             this.LoadFromESPButton.Name = "LoadFromESPButton";
             this.LoadFromESPButton.Size = new System.Drawing.Size(100, 23);
             this.LoadFromESPButton.TabIndex = 29;
@@ -423,6 +414,7 @@
             this.RunAfterSaving.Checked = true;
             this.RunAfterSaving.CheckState = System.Windows.Forms.CheckState.Checked;
             this.RunAfterSaving.Location = new System.Drawing.Point(9, 36);
+            this.RunAfterSaving.MinimumSize = new System.Drawing.Size(150, 0);
             this.RunAfterSaving.Name = "RunAfterSaving";
             this.RunAfterSaving.Size = new System.Drawing.Size(152, 17);
             this.RunAfterSaving.TabIndex = 28;
@@ -461,7 +453,7 @@
             this.groupBox2.Controls.Add(this.ListFilesButton);
             this.groupBox2.Controls.Add(this.ClearOutputButton);
             this.groupBox2.Controls.Add(this.output);
-            this.groupBox2.Location = new System.Drawing.Point(727, 69);
+            this.groupBox2.Location = new System.Drawing.Point(593, 69);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(400, 645);
             this.groupBox2.TabIndex = 30;
@@ -497,12 +489,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1139, 726);
+            this.ClientSize = new System.Drawing.Size(1005, 726);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "Lua Uploader v 1.0.2.3 - Hari Wiguna 2014";
+            this.Text = "Lua Uploader v 1.0.2.4 - Hari Wiguna 2014";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
