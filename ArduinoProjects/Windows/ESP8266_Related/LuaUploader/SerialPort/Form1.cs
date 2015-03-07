@@ -366,5 +366,6 @@ namespace LuaUploader
                     LuaCodeTextbox.Text = spl_code.Substring(0, spl_code.Length - 1).Trim();
             }
         }
+
     }
 }

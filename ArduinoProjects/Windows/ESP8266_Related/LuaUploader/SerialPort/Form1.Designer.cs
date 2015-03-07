@@ -69,6 +69,8 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RefreshButton)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -76,6 +78,11 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // output
@@ -88,7 +95,7 @@
             this.output.Multiline = true;
             this.output.Name = "output";
             this.output.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.output.Size = new System.Drawing.Size(388, 591);
+            this.output.Size = new System.Drawing.Size(380, 581);
             this.output.TabIndex = 1;
             // 
             // label1
@@ -120,7 +127,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FilePathTextbox.Location = new System.Drawing.Point(55, 8);
             this.FilePathTextbox.Name = "FilePathTextbox";
-            this.FilePathTextbox.Size = new System.Drawing.Size(538, 20);
+            this.FilePathTextbox.Size = new System.Drawing.Size(537, 20);
             this.FilePathTextbox.TabIndex = 10;
             // 
             // CommandTextbox
@@ -132,7 +139,7 @@
             this.CommandTextbox.Location = new System.Drawing.Point(6, 35);
             this.CommandTextbox.Multiline = true;
             this.CommandTextbox.Name = "CommandTextbox";
-            this.CommandTextbox.Size = new System.Drawing.Size(680, 578);
+            this.CommandTextbox.Size = new System.Drawing.Size(586, 573);
             this.CommandTextbox.TabIndex = 13;
             this.CommandTextbox.Text = "dofile(\"door.lua\")";
             // 
@@ -158,7 +165,7 @@
             // BrowseButton
             // 
             this.BrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BrowseButton.Location = new System.Drawing.Point(599, 6);
+            this.BrowseButton.Location = new System.Drawing.Point(636, 6);
             this.BrowseButton.Name = "BrowseButton";
             this.BrowseButton.Size = new System.Drawing.Size(90, 23);
             this.BrowseButton.TabIndex = 16;
@@ -229,7 +236,7 @@
             this.LuaCodeTextbox.Multiline = true;
             this.LuaCodeTextbox.Name = "LuaCodeTextbox";
             this.LuaCodeTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.LuaCodeTextbox.Size = new System.Drawing.Size(551, 552);
+            this.LuaCodeTextbox.Size = new System.Drawing.Size(545, 547);
             this.LuaCodeTextbox.TabIndex = 24;
             this.LuaCodeTextbox.Text = resources.GetString("LuaCodeTextbox.Text");
             this.LuaCodeTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LuaCodeTextbox_keyDown);
@@ -320,10 +327,10 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Location = new System.Drawing.Point(13, 69);
+            this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(574, 645);
+            this.tabControl1.Size = new System.Drawing.Size(573, 640);
             this.tabControl1.TabIndex = 29;
             // 
             // tabPage1
@@ -342,7 +349,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(566, 619);
+            this.tabPage1.Size = new System.Drawing.Size(565, 614);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Editor";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -359,7 +366,7 @@
             // 
             // SaveToDiskButton
             // 
-            this.SaveToDiskButton.Location = new System.Drawing.Point(460, 6);
+            this.SaveToDiskButton.Location = new System.Drawing.Point(457, 6);
             this.SaveToDiskButton.Name = "SaveToDiskButton";
             this.SaveToDiskButton.Size = new System.Drawing.Size(100, 23);
             this.SaveToDiskButton.TabIndex = 33;
@@ -369,7 +376,7 @@
             // 
             // LoadFromDiskButton
             // 
-            this.LoadFromDiskButton.Location = new System.Drawing.Point(460, 32);
+            this.LoadFromDiskButton.Location = new System.Drawing.Point(457, 32);
             this.LoadFromDiskButton.Name = "LoadFromDiskButton";
             this.LoadFromDiskButton.Size = new System.Drawing.Size(100, 23);
             this.LoadFromDiskButton.TabIndex = 32;
@@ -428,7 +435,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(692, 619);
+            this.tabPage2.Size = new System.Drawing.Size(603, 614);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Immediate";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -441,21 +448,22 @@
             this.tabPage3.Controls.Add(this.BrowseButton);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(692, 619);
+            this.tabPage3.Size = new System.Drawing.Size(603, 614);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Upload";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.ListFilesButton);
             this.groupBox2.Controls.Add(this.ClearOutputButton);
             this.groupBox2.Controls.Add(this.output);
-            this.groupBox2.Location = new System.Drawing.Point(593, 69);
+            this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(400, 645);
+            this.groupBox2.Size = new System.Drawing.Size(392, 636);
             this.groupBox2.TabIndex = 30;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
@@ -463,7 +471,7 @@
             // ListFilesButton
             // 
             this.ListFilesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ListFilesButton.Location = new System.Drawing.Point(294, 19);
+            this.ListFilesButton.Location = new System.Drawing.Point(286, 19);
             this.ListFilesButton.Name = "ListFilesButton";
             this.ListFilesButton.Size = new System.Drawing.Size(100, 23);
             this.ListFilesButton.TabIndex = 31;
@@ -485,16 +493,44 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.splitContainer1);
+            this.panel1.Location = new System.Drawing.Point(12, 68);
+            this.panel1.MinimumSize = new System.Drawing.Size(981, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(981, 646);
+            this.panel1.TabIndex = 31;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.tabControl1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
+            this.splitContainer1.Size = new System.Drawing.Size(981, 646);
+            this.splitContainer1.SplitterDistance = 579;
+            this.splitContainer1.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1005, 726);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "Lua Uploader v 1.0.2.4 - Hari Wiguna 2014";
+            this.Text = "Lua Uploader v 1.0.2.4 - Hari Wiguna 2015";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
@@ -509,6 +545,11 @@
             this.tabPage3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -554,6 +595,8 @@
         private System.Windows.Forms.ComboBox PortComboBox;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.SplitContainer splitContainer1;
     }
 }
 
