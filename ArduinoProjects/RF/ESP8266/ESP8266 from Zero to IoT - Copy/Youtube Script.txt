@@ -1,0 +1,75 @@
+ESP8266 From Zero to IoT
+
+Summary
+1. Goal: ESP A -> Raspberry Pi -> ESP B
+2. Wiring the ESP
+3. Installing NodeMCU on the ESPs
+	- Firmware
+	- Firmware uploader
+	- LUA Uploader
+4. Installing NodeJS on the Raspberry Pi
+5. Code
+	- Button on ESP A -> Pi -> LED on ESP B WebServer
+
+Pi WebServer demos:
+PiWebServer0.js -- Hello world
+PiWebServer1.js -- Show favicon.ico request
+PiWebServer2.js -- ignore favicon.ico
+PiWebServer3.js -- Respond to requests
+
+ESP WebClient demo:
+
+
+NodeMCU Firmware
+https://github.com/nodemcu/nodemcu-firmware
+
+ESP8266 Simple Flasher
+https://drive.google.com/folderview?id=0B3dUKfqzZnlwRXBnV2NzUUNJUms&usp=sharing&tid=0B3dUKfqzZnlwRXhBTmlhaTROTmM
+
+LUA Uploader
+https://github.com/hwiguna/g33k/blob/master/ArduinoProjects/Windows/ESP8266_Related/LuaUploader_1.0.2.4.zip
+
+---
+
+Raspberry Pi Operating System images
+http://www.raspberrypi.org/downloads/
+
+PuTTY terminal program
+http://www.chiark.greenend.org.uk/~sgtatham/putty/
+
+NodeJS installation instructions
+http://weworkweplay.com/play/raspberry-pi-nodejs/
+
+wget http://node-arm.herokuapp.com/node_latest_armhf.deb 
+sudo dpkg -i node_latest_armhf.deb
+node -v
+
+emailJS
+npm install emailjs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
