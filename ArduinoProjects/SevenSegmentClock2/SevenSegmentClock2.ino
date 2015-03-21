@@ -28,9 +28,10 @@ int segmentPatterns[] = {B11111100, B01100000, B11011010, B11110010, B01100110, 
 
 int digitPatterns[numberOfDigits]; // Array elements are what digits are being displayed by the LEDs
 
-//-- Test Variables --
-int test = 0;
-int timeToIncrement = 100;
+//-- Clock Variables --
+int hour = 12;
+int minute = 34;
+int second = 56;
 
 void setup() {
   SetupPins();
@@ -38,12 +39,7 @@ void setup() {
 }
 
 void loop() {
-  if (timeToIncrement-- == 0)
-  {
-    test++;
-    SetupAllDigits();
-    timeToIncrement = 30;
-  }
+  SetupAllDigits();
   RefreshLEDs();
 }
 
@@ -58,10 +54,10 @@ void SetupPins()
 
 void SetupAllDigits()
 {
-  SetDigit(0, test % 10);
-  SetDigit(1, (test % 100) / 10);
-  SetDigit(2, (test % 1000) / 100);
-  SetDigit(3, test / 1000);
+  SetDigit(0, minute % 10);
+  SetDigit(1, minute / 10);
+  SetDigit(2, hour % 10);
+  SetDigit(3, hour / 10);
 }
 
 void SetDigit(int whichDigit, int whatToDisplay)
