@@ -1,5 +1,5 @@
 // Echo the request back
-// /set?b=1 --> b=1
+// /set?v=1 --> v=1
 
 // Node JS Server (running on the Raspberry Pi)
 var serverIP = '192.168.254.101';
@@ -14,10 +14,11 @@ var server = http.createServer(function (request, response) {
   console.log("Request: " + request.url);
   var theUrl = require('url').parse(request.url);
   var command = "(none)";
-  if (theUrl.href.indexOf("/set?b=") == 0) {
-    console.log("Request: " + request.url);
+
+  if (theUrl.href.indexOf("/set?v=") == 0) {
 	command = theUrl.query;
   }
+  
   console.log("Response: " + command);
   response.writeHead(200, {"Content-Type": "text/plain"});
   response.end(command);

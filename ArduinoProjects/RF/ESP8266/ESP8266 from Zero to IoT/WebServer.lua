@@ -1,3 +1,8 @@
+--== LUA WebServer ==--
+-- responds to:
+-- /set?v=1 to turn on led
+-- /set?v=0 to turn off led
+
 -- Configuration --
 serverPort = 80
 
@@ -19,27 +24,26 @@ srv:listen(serverPort,function(conn)
     print(payload)
 	
 	-- 123456789012
-	-- GET /set?b=1 HTTP/1.1 --
+	-- GET /set?v=1 HTTP/1.1 --
 	command = string.sub(payload, 6,8) -- Get characters 6,7, and 8
-	
-	if (command == "set") then
+
+	if command == "set" then
 		sentValue = string.sub(payload, 12,12) -- Get the 12th character
 		print("sent value=" .. sentValue)
-		if (sentValue=="1") then
-		  ledValue = gpio.LOW -- ledPin is connected to the LED cathode
-		else
-		  ledValue = gpio.HIGH
-		end
-		gpio.write(ledPin, ledValue)
-		
-		reply = "{ \"led\":\"" .. tostring(ledValue) .. "\" }"
-	else
+		gpio.write(ledPin, sentValue)
+		reply = "{ \"led\":\"" .. tostring(sentValue) .. "\" }"
+		status = "HTTP/1.1 200 OK\r\n"
+	elseif command == "get" then
 		switchValue = gpio.read( switchPin )
 		reply = "{ \"btn\":\"" .. tostring(switchValue) .. "\" }"
+		status = "HTTP/1.1 200 OK\r\n"
+	else
+		reply = "{ \"err\":\"" .. command .. "\" }"
+		status = "HTTP/1.1 404 Not Found\r\n"
 	end
 	
 	payloadLen = string.len(reply)
-    conn:send("HTTP/1.1 200 OK\r\n")
+    conn:send(status)
     conn:send("Content-Length:" .. tostring(payloadLen) .. "\r\n")
     conn:send("Connection:close\r\n\r\n")
     conn:send(reply)

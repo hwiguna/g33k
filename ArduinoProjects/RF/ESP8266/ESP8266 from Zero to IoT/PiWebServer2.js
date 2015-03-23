@@ -12,7 +12,10 @@ var server = http.createServer(function (request, response) {
   // This code runs when our WebServer receives a request from a WebClient/Browser
   console.log("Request: " + request.url);
   if (request.url == "/favicon.ico") {
-	  console.log("Response: (none)");
+	var respStr = "(not found)";	
+	console.log("Response: " + respStr);
+	response.writeHead(404, {"Content-Type": "text/plain"});
+	response.end(respStr);
   }
   else {
     var respStr = "Hello World, says NodeJS Server.";

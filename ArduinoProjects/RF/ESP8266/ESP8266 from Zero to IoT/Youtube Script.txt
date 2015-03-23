@@ -9,16 +9,10 @@ Summary
 	- LUA Uploader
 4. Installing NodeJS on the Raspberry Pi
 5. Code
-	- Button on ESP A -> Pi -> LED on ESP B WebServer
-
-Pi WebServer demos:
-PiWebServer0.js -- Hello world
-PiWebServer1.js -- Show favicon.ico request
-PiWebServer2.js -- ignore favicon.ico
-PiWebServer3.js -- Respond to requests
 
 ESP WebClient demo:
 
+=== LINKS ===
 
 NodeMCU Firmware
 https://github.com/nodemcu/nodemcu-firmware
@@ -29,7 +23,7 @@ https://drive.google.com/folderview?id=0B3dUKfqzZnlwRXBnV2NzUUNJUms&usp=sharing&
 LUA Uploader
 https://github.com/hwiguna/g33k/blob/master/ArduinoProjects/Windows/ESP8266_Related/LuaUploader_1.0.2.4.zip
 
----
+-----------------------------------------
 
 Raspberry Pi Operating System images
 http://www.raspberrypi.org/downloads/
@@ -44,12 +38,49 @@ wget http://node-arm.herokuapp.com/node_latest_armhf.deb
 sudo dpkg -i node_latest_armhf.deb
 node -v
 
+
+-- Cheatsheet --
+
 emailJS
 npm install emailjs
 
 
+------------------------------------------
 
+== LET'S CODE! ==
 
+Goal: Button on ESP A -> Pi -> LED on ESP B
+Why involve the Pi? Flexibility!
+
+1. Blinky on ESP
+
+2. Pushbutton on ESP
+
+3. Set LED from Web Browser
+	a. Chrome = WebBrowser
+	b. ESP = WebServer
+
+4. Pi WebServer demos:
+PiWebServer0.js -- Hello world
+PiWebServer1.js -- Show favicon.ico request
+PiWebServer2.js -- Respond to favicon.ico
+PiWebServer3.js -- Respond to requests
+PiWebServer4.js -- Pass requests from ESP A to ESP B
+PiWebServer5.js -- Send Email
+
+PiWebClient0.js -- Sends request to ESP
+
+Blinky.lua -- Guess what this does? :-)
+PushButton1.lua -- Press button, control led
+
+WebClient0.lua -- Send a request to WebServer
+WebClient1.lua -- When pushbutton chages, send value to WebServer
+
+WebServer.lua -- responds to set?v=x and get?v=x
+
+ESP A: WebClient1.lua -- When pushbutton chages, send value to WebServer
+Pi   : PiWebServer4.js -- Pass requests from ESP A to ESP B
+ESP B: WebServer.lua -- responds to set?v=x and get?v=x
 
 
 

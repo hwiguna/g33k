@@ -1,4 +1,4 @@
-// Send email when request is received
+// Pass request from first ESP to second ESP
 
 // Node JS Server (running on the Raspberry Pi)
 var serverIP = '192.168.254.101';
@@ -12,17 +12,18 @@ var server = http.createServer(function (request, response) {
   // This code runs when our WebServer receives a request from a WebClient/Browser
   console.log("Request: " + request.url);
   var theUrl = require('url').parse(request.url);
-  if (theUrl.href.indexOf("/set?b=") == 0) {
+  if (theUrl.href.indexOf("/set?v=") == 0) {
     console.log("Request: " + request.url);
-	var ledValue = theUrl.query;
-    console.log("Response: " + ledValue);
+  
+	var pair = theUrl.query;
+    console.log("Response: " + pair);
     response.writeHead(200, {"Content-Type": "text/plain"});
-	response.end(ledValue);
+	response.end(pair);
   
 	// -- Send request to second ESP --
 	var options = {
 	  host: '192.168.254.106',
-	  path: '/set?' + ledValue
+	  path: '/set?' + pair
 	}
 	callback = function(response) {
 	  var str = '';
