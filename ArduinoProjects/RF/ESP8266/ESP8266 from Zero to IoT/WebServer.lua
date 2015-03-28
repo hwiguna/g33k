@@ -5,6 +5,7 @@
 
 -- Configuration --
 serverPort = 80
+print("ESP listening at " .. wifi.sta.getip() .. ":" .. serverPort )
 
 -- I/O Pin constants --
 switchPin = 3 -- GPIO0

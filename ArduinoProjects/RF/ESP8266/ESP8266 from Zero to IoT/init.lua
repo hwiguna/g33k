@@ -10,7 +10,7 @@ function wait_wifi()
   else
     wifi_connected = true
     print("Got IP "..wifi_ip.."\n")
-    dofile("WebClient1.lua")
+    dofile("WebClient2.lua")
   end
 end
 
