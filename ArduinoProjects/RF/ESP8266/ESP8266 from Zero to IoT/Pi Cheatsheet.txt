@@ -1,8 +1,0 @@
-Linux Cheatsheet
-
-sudo sudo reboot
-sudo shutdown -h now
-
-ps aux | grep node
-kill -9 taskID
-
