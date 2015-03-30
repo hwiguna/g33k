@@ -22,13 +22,13 @@ function SendWebRequest_UponSwitchStateChange()
 	tmr.alarm( timerId, dly, 1, function() 
 	  switchValue = gpio.read( switchPin )
 	  if (switchValue ~= lastSwitchValue) then
-		print("memory=" .. node.heap())
+		--print("memory=" .. node.heap())
 		print("switchValue=" .. switchValue)
 		gpio.write(ledPin,switchValue)
 
 		print("Sending request to " .. config.serverIP.. "/" .. config.serverPort)
 		conn=net.createConnection(net.TCP, false) 
-		--conn:on("receive", function(conn, pl) print(pl) end)
+		conn:on("receive", function(conn, pl) print(pl) end)
 		conn:connect(config.serverPort, config.serverIP)
 		conn:send("GET /set?v=" .. switchValue .. " HTTP/1.1\r\n" .."Connection: keep-alive\r\nAccept: */*\r\n\r\n")
 

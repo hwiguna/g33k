@@ -34,6 +34,11 @@ var server = http.createServer( function (request, response) {
 	}
 });
 
+function callback(response) {
+	var str = '';
+	response.on('data', function(chunk) { str += chunk; });
+}
+
 function SendToESP( clientIP, request )
 {
 	console.log("SendToESP: " + clientIP + request);
@@ -42,11 +47,10 @@ function SendToESP( clientIP, request )
 	  host: clientIP,
 	  path: request
 	}
-	callback = function(response) {
-	  var str = '';
-	  response.on('data', function(chunk) { str += chunk; });
-	}
-	http.request(options, callback).end();
+	var req = http.request(options, callback);
+	
+	req.on('error',function(e) { console.log("Request error: " + e.message); });
+	req.end();
 }
 
 // Start listening for http requests
