@@ -12,11 +12,14 @@ RTC_DS1307 rtc;
 const int numberOfDigits = 4;
 const int segmentOnValue = 0; // Set to 1 if you need (+) to turn on a segment, set to 0 if you need (GND) to turn on a segment
 const int readRTCRateInMs = 100; // Check RTC every 100 ms.
-const bool testMode = true; // true shows MM:SS, false shows HH:MM
+const bool testMode = false; // true shows MM:SS, false shows HH:MM
+const bool showAmPm = true;
 
 // To keep things simpler, I've opted to mandate that pins must be consecutive.
 int segmentAPin = 2; // A=D2, B=D3, etc...
 int digit0Pin = 9; // Least significant digit (right most)=D9, next digit to its left=D10, etc...
+int colonPin = 13;
+int pmPin = A0;
 
 // Each array element represents the segment pattern.
 // Zeroth element is pattern for the digit "0", 1st element is "1", etc.
@@ -79,6 +82,9 @@ void SetupPins()
 
   for (int i = 0; i < numberOfDigits; i++)
     pinMode(digit0Pin + i, OUTPUT);
+
+  pinMode(colonPin, OUTPUT);
+  pinMode(pmPin, OUTPUT);
 }
 
 void ReadRTC()
@@ -87,6 +93,16 @@ void ReadRTC()
   int hour = now.hour();
   int minute = now.minute();
   int seconds = now.second();
+
+  if (showAmPm)
+  {
+    bool isPM = hour>12;
+    digitalWrite(pmPin, !isPM);
+    
+    if (hour==0) hour=12;
+    if (hour>12) hour-=12;
+  }
+
   if (testMode) {
     SetDigit(0, seconds % 10);
     SetDigit(1, seconds/ 10);
@@ -100,6 +116,9 @@ void ReadRTC()
     SetDigit(2, hour % 10);
     SetDigit(3, hour / 10);
   }
+
+  //-- Turn on colon between HH:MM when seconds is an odd number --
+  digitalWrite(colonPin, (seconds % 2));  
 }
 
 void SetDigit(int whichDigit, int whatToDisplay)
