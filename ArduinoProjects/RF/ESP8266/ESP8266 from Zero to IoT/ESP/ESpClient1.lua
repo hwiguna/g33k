@@ -1,4 +1,9 @@
 -- When switch value changes, send it to server
+-- DO NOT USE THIS VERSION!!!  Use latest version of EspClientx.lua.
+--
+-- Lesson learned from this version:
+-- When variables go out of scope, NodeMCU EVENTUALLY does garbage collection, causing unpredictable failure.
+-- In future versions, I encapsulate everything in a function so all variables remain alive for the life of the function.
 
 require "config"
 

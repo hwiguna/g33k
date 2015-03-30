@@ -2,7 +2,7 @@
 print(wifi.sta.getip())
 print(node.heap())
 
--- NodeMCU WebClient
+-- Request a web page from a remote server --
 serverIP = "192.168.254.101"
 serverPort = 8000
 conn=net.createConnection(net.TCP, false) 

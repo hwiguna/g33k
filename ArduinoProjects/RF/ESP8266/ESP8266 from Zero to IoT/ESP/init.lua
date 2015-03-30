@@ -10,10 +10,9 @@ function wait_wifi()
   else
     wifi_connected = true
     print("Got IP "..wifi_ip.."\n")
-    dofile("WebClient2.lua")
+    dofile("EspClient2.lua")
   end
 end
-
 -- Wait for WiFi --
 count=0
 wait_wifi()
