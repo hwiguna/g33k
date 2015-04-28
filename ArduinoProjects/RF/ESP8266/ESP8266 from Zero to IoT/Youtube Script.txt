@@ -14,6 +14,9 @@ ESP WebClient demo:
 
 === LINKS ===
 
+Hacking the ESP8266 pins to fit on a breadboard
+https://youtu.be/xAMFl9AAraU
+
 NodeMCU Firmware
 https://github.com/nodemcu/nodemcu-firmware
 
@@ -61,26 +64,29 @@ Why involve the Pi? Flexibility!
 	b. ESP = WebServer
 
 4. Pi WebServer demos:
-PiWebServer0.js -- Hello world
-PiWebServer1.js -- Show favicon.ico request
-PiWebServer2.js -- Respond to favicon.ico
-PiWebServer3.js -- Respond to requests
-PiWebServer4.js -- Pass requests from ESP A to ESP B
-PiWebServer5.js -- Send Email
+PiServer0.js -- Hello world
+PiServer1.js -- Show favicon.ico request
+PiServer2.js -- Respond to favicon.ico
+PiServer3.js -- Respond to requests
+PiServer4.js -- Pass requests from ESP A to ESP B
+PiServer5.js -- Send Email
 
-PiWebClient0.js -- Sends request to ESP
+PiClient0.js -- Sends request to ESP
 
+5. NodeMCU code:
 Blinky.lua -- Guess what this does? :-)
 PushButton1.lua -- Press button, control led
 
-WebClient0.lua -- Send a request to WebServer
-WebClient1.lua -- When pushbutton chages, send value to WebServer
+EspClient0.lua -- Send a request to WebServer
+EspClient1.lua -- When pushbutton chages, send value to WebServer
+EspClient2.lua -- When pushbutton chages, send value to WebServer
 
-WebServer.lua -- responds to set?v=x and get?v=x
+EspServer0.lua -- responds to set?v=x and get?v=x
 
-ESP A: WebClient1.lua -- When pushbutton chages, send value to WebServer
-Pi   : PiWebServer4.js -- Pass requests from ESP A to ESP B
-ESP B: WebServer.lua -- responds to set?v=x and get?v=x
+ESP A: EspClient2.lua -- When pushbutton chages, send value to WebServer
+Pi   : PiServer4.js -- Pass requests from ESP A to ESP B
+ESP B: EspServer0.lua -- responds to set?v=x and get?v=x
+
 
 
 
