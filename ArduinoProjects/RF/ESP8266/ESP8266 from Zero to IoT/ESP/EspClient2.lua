@@ -23,10 +23,10 @@ function SendWebRequest_UponSwitchStateChange()
 	  switchValue = gpio.read( switchPin )
 	  if (switchValue ~= lastSwitchValue) then
 		--print("memory=" .. node.heap())
-		print("switchValue=" .. switchValue)
+		--print("switchValue=" .. switchValue)
 		gpio.write(ledPin,switchValue)
 
-		print("Sending request to " .. config.serverIP.. "/" .. config.serverPort)
+		print("Sending request to " .. config.serverIP.. ":" .. config.serverPort .. "/set?v=" .. switchValue)
 		conn=net.createConnection(net.TCP, false) 
 		conn:on("receive", function(conn, pl) print(pl) end)
 		conn:connect(config.serverPort, config.serverIP)
