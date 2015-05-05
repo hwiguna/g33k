@@ -29,9 +29,9 @@ void setup()
 {
   size(400, 550, OPENGL);
   frameRate(30);
-  model = new OBJModel(this);
-  model.load("bunny.obj");
-  model.scale(20);
+//  model = new OBJModel(this);
+//  model.load("bunny.obj");
+  //model.scale(20);
   
   // Serial port setup.
   // Grab list of serial ports and choose one that was persisted earlier or default to the first port.
@@ -85,8 +85,10 @@ void draw()
 //  rotateX(radians(pitch));
 //  rotateY(radians(yaw));
 //  rotateZ(radians(roll));
-  rotateX(radians(pitch));
+
+// Y,X,Z works!
   rotateY(radians(2*PI-yaw));
+  rotateX(radians(pitch));
   rotateZ(radians(roll));
 
   pushMatrix();

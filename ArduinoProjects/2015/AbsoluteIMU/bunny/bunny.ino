@@ -101,14 +101,18 @@ void loop(void)
          +----------+
   */
 
+  float rot = 360.0 * (float)analogRead(A0) / 1023.0;
+
   /* The processing sketch expects data as roll, pitch, heading */
   Serial.print(F("Orientation: "));
-  Serial.print((float)event.orientation.x);
+  Serial.print((float)event.orientation.x + rot);
   Serial.print(F(" "));
   Serial.print((float)event.orientation.y);
   Serial.print(F(" "));
   Serial.print((float)event.orientation.z);
   Serial.println(F(""));
+  //Serial.print(rot);
+  //Serial.println(F(""));
 
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
