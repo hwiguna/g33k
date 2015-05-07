@@ -7,6 +7,7 @@
 // Hari Wiguna
 
 // v2 this one only works (I think it's because only one relay is on at one time)
+// v3 this works as long as we power off, unplug usb, and then power up using 2A psu on the arduino vIN
 
 // Use software serial library so we won't affect the relay module while uploading sketch
 #include <SoftwareSerial.h>
@@ -27,44 +28,74 @@ void setup()
   }
   char c = mySerial.read(); // ICSE012A=0xAB, ICSE013A=0xAD, ICSE014A=0xAC
   Serial.print("YES! received: ");
-  Serial.println(c,HEX);
+  Serial.println(c, HEX);
   delay(1000);
 
-//  bitPattern = 0xFF;
-//  Serial.print( "Send pattern to relays: ");
-//  Serial.println( bitPattern, BIN);
-//  mySerial.write( (byte)0x51);
-//  mySerial.write(bitPattern);
-//  delay(1000);
+  //  bitPattern = 0xFF;
+  //  Serial.print( "Send pattern to relays: ");
+  //  Serial.println( bitPattern, BIN);
+  //  mySerial.write( (byte)0x51);
+  //  mySerial.write(bitPattern);
+  //  delay(1000);
 
-//  bitPattern = 0xFF -16 -32 ; //-4 -8; // -1 -2 -4;
-//  Serial.print( "Send pattern to relays: ");
-//  Serial.println( bitPattern, BIN);
-//  mySerial.write( (byte)0x51); delay(50);
-//  mySerial.write(bitPattern);
-//  delay(1000);
+  //  bitPattern = 0xFF -16 -32 ; //-4 -8; // -1 -2 -4;
+  //  Serial.print( "Send pattern to relays: ");
+  //  Serial.println( bitPattern, BIN);
+  //  mySerial.write( (byte)0x51); delay(50);
+  //  mySerial.write(bitPattern);
+  //  delay(1000);
 
-// Switch(0, 1); delay(1000);
-// Switch(1, 1); delay(1000);
-// Switch(2, 1); delay(1000);
-// Switch(3, 1); delay(1000);
-// Switch(4, 1); delay(1000);
-// Switch(5, 1); delay(1000);
-// Switch(6, 1); delay(1000);
- //Switch(7, 0); delay(1000);
+  // Switch(0, 1); delay(1000);
+  // Switch(1, 1); delay(1000);
+  // Switch(2, 1); delay(1000);
+  // Switch(3, 1); delay(1000);
+  // Switch(4, 1); delay(1000);
+  // Switch(5, 1); delay(1000);
+  // Switch(6, 1); delay(1000);
+  //Switch(7, 0); delay(1000);
+
+//  AllOff(); delay(1000);
+//  Switch(0, 0); delay(1000);
+//  Switch(1, 0); delay(1000);
+//  Switch(2, 0); delay(1000);
+//  Switch(3, 0); delay(1000);
+//  Switch(4, 0); delay(1000);
+//  Switch(5, 0); delay(1000);
+//  Switch(6, 0); delay(1000);
+//  Switch(7, 0); delay(1000);
 }
 
 void loop() // run over and over
 {
-  OneAtATime();
-  //AllOnAllOff();
+  //OneAtATime();
+  //MultipleBits();
+  AllOn();
+  delay(1000);
+  AllOff();
+  delay(1000);
 }
 
-void AllOnAllOff()
+void AllOff()
 {
-  byte pattern = 0x03;
+  for (int i = 0; i < 8; i++) {
+    Switch(i, 1); // Off
+    delay(10);
+  }
+}
+
+void AllOn()
+{
+  for (int i = 0; i < 8; i++) {
+    Switch(i, 0); // On
+    delay(10);
+  }
+}
+
+void MultipleBits()
+{
+  byte pattern = 0xFF;
   mySerial.write( (byte)0x51);
-  mySerial.write(pattern);
+  mySerial.write( (byte)pattern);
   Serial.println(pattern, BIN);
 
   delay(500);
