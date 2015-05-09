@@ -40,13 +40,20 @@ void setup()
 {
   Serial.begin(9600); // Open built-in RX/TX for debugging purpose.
   mySerial.begin(9600); // This is RX/TX for the relay modeul
-  FindModule();
+  
+  InitModule();      // Blindly initialize module, only require RX on module to be wired to TX on Arduino
+  //WaitForModule(); // wait until module sends back its ID, require TX from module to be wired up to RX on Arduino
   delay(1000);
+}
+
+void InitModule()
+{
+  mySerial.write( (byte)0x50 ); // Relay module will send back acknowledgement, but we'll ignore it.
 }
 
 // When the module is powered up, it waits for 0x50 and sends back a device identifier.
 // The module would be unresponsive to commands unless this had ocurred.
-void FindModule()
+void WaitForModule()
 {
   // Keep sending 0x50 until we receive a reply from module.
   while (!mySerial.available()) {
@@ -64,7 +71,7 @@ void loop() // run over and over
   //OneAtATime();
   Blink();
   //Pot();
-  //BackAndForth(20); // Parameter is delay in miliseconds. lower = faster.
+  //BackAndForth(70); // Parameter is delay in miliseconds. lower = faster.
   //MultipleBits(); // This routine does NOT work
 }
 
