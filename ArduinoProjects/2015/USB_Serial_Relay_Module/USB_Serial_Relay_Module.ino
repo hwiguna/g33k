@@ -7,6 +7,7 @@
 //
 // Your fellow maker,
 // Hari Wiguna
+// youtube.com/hwiguna
 
 // Features:
 // - Control 8 relays using only one or two GPIO pins
@@ -31,7 +32,7 @@
 
 // Use software serial library so we won't affect the relay module while uploading sketch
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(10, 11); // RX, TX.  Connect pin 11 to the RX on the relay module.
+SoftwareSerial relay(10, 11); // RX, TX.  Connect pin 11 to the RX on the relay module.
 
 int bitPattern = 0xFF; // all 1s means all off
 int prevIndex = 0;
@@ -39,8 +40,8 @@ int prevIndex = 0;
 void setup()
 {
   Serial.begin(9600); // Open built-in RX/TX for debugging purpose.
-  mySerial.begin(9600); // This is RX/TX for the relay modeul
-  
+  relay.begin(9600); // This is RX/TX for the relay modeul
+
   InitModule();      // Blindly initialize module, only require RX on module to be wired to TX on Arduino
   //WaitForModule(); // wait until module sends back its ID, require TX from module to be wired up to RX on Arduino
   delay(1000);
@@ -48,7 +49,7 @@ void setup()
 
 void InitModule()
 {
-  mySerial.write( (byte)0x50 ); // Relay module will send back acknowledgement, but we'll ignore it.
+  relay.write( (byte)0x50 ); // Relay module will send back acknowledgement, but we'll ignore it.
 }
 
 // When the module is powered up, it waits for 0x50 and sends back a device identifier.
@@ -56,12 +57,12 @@ void InitModule()
 void WaitForModule()
 {
   // Keep sending 0x50 until we receive a reply from module.
-  while (!mySerial.available()) {
+  while (!relay.available()) {
     delay(100);
     Serial.println("Relay Module are you there?");
-    mySerial.write( (byte)0x50 ); // Relay module will send back acknowledgement
+    relay.write( (byte)0x50 ); // Relay module will send back acknowledgement
   }
-  char c = mySerial.read(); // ICSE012A=0xAB, ICSE013A=0xAD, ICSE014A=0xAC
+  char c = relay.read(); // ICSE012A=0xAB, ICSE013A=0xAD, ICSE014A=0xAC
   Serial.print("YES! received: ");
   Serial.println(c, HEX);
 }
@@ -69,9 +70,9 @@ void WaitForModule()
 void loop() // run over and over
 {
   //OneAtATime();
-  Blink();
+  //Blink();
   //Pot();
-  //BackAndForth(70); // Parameter is delay in miliseconds. lower = faster.
+  BackAndForth(20); // Parameter is delay in miliseconds. lower = faster.
   //MultipleBits(); // This routine does NOT work
 }
 
@@ -150,18 +151,16 @@ void BackAndForth(int delayMiliseconds)
 // Set state to 0 to turn it ON
 void Switch(byte which, byte state)
 {
-  mySerial.write( (byte)0x51);
+  relay.write( (byte)0x51);
   if (state == 1) {
-    //bitPattern = 0xFF;
     bitPattern = bitSet(bitPattern, which);
   }
   else {
-    //bitPattern = 0x00;
     bitPattern = bitClear(bitPattern, which);
   }
 
   Serial.println(bitPattern, BIN);
-  mySerial.write( (byte)bitPattern);
+  relay.write( (byte)bitPattern);
 }
 
 // This does NOT work.  Presumably because there is not enough current
@@ -170,14 +169,14 @@ void Switch(byte which, byte state)
 void MultipleBits()
 {
   int pattern = 0xFF;
-  mySerial.write( (byte)0x51);
-  mySerial.write( (byte)pattern);
+  relay.write( (byte)0x51);
+  relay.write( (byte)pattern);
   Serial.println(pattern, BIN);
 
   delay(1000);
   pattern = 0x00;
-  mySerial.write( (byte)0x51);
-  mySerial.write( (byte)pattern); // ON
+  relay.write( (byte)0x51);
+  relay.write( (byte)pattern); // ON
   Serial.println(0x00, BIN);
 
   delay(1000);
