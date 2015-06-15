@@ -63,26 +63,45 @@ void setup ()
 }
 
 void loop()
-{  
-  myMatrix.setPixel(0,11,red); // y=11 is the issue
-  delay(1000);
+{
+  //  myMatrix.setPixel(0,0+12,red); // y=11 is the issue
+  //  delay(1000);
+  //  myMatrix.clearScreen();
+  //  delay(1000);
+
   myMatrix.clearScreen();
+  //HelloYouTube();
+  MakeShiftLincoln();
+  Curtains();
+}
+
+void MakeShiftLincoln()
+{
+  myMatrix.hScroll(4, yellow, black, "        Welcome to      ");
+
+  myMatrix.printString(4,0, red, black, "Make");
+  delay(500);
+  myMatrix.printString(2,8, red, black, "Shift");
   delay(1000);
-//  myMatrix.clearScreen();
-//  char scrolltext_1[] = "     * Hello YouTube! *      ";
-//  char scrolltext_2[] = "     * Library by Silviu *      ";
-//
-//  myMatrix.clearScreen();
-//  myMatrix.drawHLine(1, 30, 0, red);
-//  myMatrix.drawHLine(1, 30, 8, red);
-//  myMatrix.drawVLine(0, 1, 7, red);
-//  myMatrix.drawVLine(31, 1, 7, red);
-//  myMatrix.printString(5, 1, red, black, "Hari");
-//
-//  myMatrix.hScroll(9, yellow, black, scrolltext_1);
-//  myMatrix.hScroll(9, red, black, scrolltext_2);
-//
-//   Curtains();
+
+  myMatrix.clearScreen();
+  myMatrix.hScroll(4, red, black, "      Lincoln      ");
+}
+
+void HelloYouTube()
+{
+  char scrolltext_1[] = "     * Hello YouTube! *      ";
+  char scrolltext_2[] = "     * Library by Silviu *      ";
+
+  myMatrix.clearScreen();
+  myMatrix.drawHLine(1, 30, 0, red);
+  myMatrix.drawHLine(1, 30, 8, red);
+  myMatrix.drawVLine(0, 1, 7, red);
+  myMatrix.drawVLine(31, 1, 7, red);
+  myMatrix.printString(5, 1, red, black, "Hari");
+
+  myMatrix.hScroll(9, yellow, black, scrolltext_1);
+  myMatrix.hScroll(9, red, black, scrolltext_2);
 }
 
 void Curtains()
@@ -97,10 +116,10 @@ void Curtains()
 
 void CurtainOpen(int color)
 {
-    for (int i = 0; i < 16; i++)
+  for (int i = 0; i < 16; i++)
   {
-    myMatrix.drawVLine(15-i, 0, 15, color);
-    myMatrix.drawVLine(16+i, 0, 15, color);
+    myMatrix.drawVLine(15 - i, 0, 15, color);
+    myMatrix.drawVLine(16 + i, 0, 15, color);
     delay(50);
   }
 }
@@ -108,10 +127,10 @@ void CurtainOpen(int color)
 
 void CurtainClose(int color)
 {
-    for (int i = 0; i < 16; i++)
+  for (int i = 0; i < 16; i++)
   {
     myMatrix.drawVLine(i, 0, 15, color);
-    myMatrix.drawVLine(31-i, 0, 15, color);
+    myMatrix.drawVLine(31 - i, 0, 15, color);
     delay(50);
   }
 }
