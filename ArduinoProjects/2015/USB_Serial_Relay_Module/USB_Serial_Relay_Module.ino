@@ -37,13 +37,18 @@ SoftwareSerial relay(10, 11); // RX, TX.  Connect pin 11 to the RX on the relay 
 int bitPattern = 0xFF; // all 1s means all off
 int prevIndex = 0;
 
+// bit pattern state felt backward to me, these constants are more natural and made the code easier read.
+// Thanks to youtube user Smitcher for suggesting this improvement!
+const int COIL_ON = 0; // Use this value to turn the relay coil ON.
+const int COIL_OFF = 1; // Use this value to turn the relay coil OFF (same state as when the module is not powered at all)
+
 void setup()
 {
   Serial.begin(9600); // Open built-in RX/TX for debugging purpose.
   relay.begin(9600); // This is RX/TX for the relay modeul
 
   InitModule();      // Blindly initialize module, only require RX on module to be wired to TX on Arduino
-  //WaitForModule(); // wait until module sends back its ID, require TX from module to be wired up to RX on Arduino
+  //WaitForModule(); // Wait until module sends back its ID, require TX from module to be wired up to RX on Arduino
   delay(1000);
 }
 
@@ -89,7 +94,7 @@ void Blink()
 void AllOff()
 {
   for (int i = 0; i < 8; i++) {
-    Switch(i, 1); // Off
+    Switch(i, COIL_OFF);
     delay(5);
   }
 }
@@ -98,7 +103,7 @@ void AllOff()
 void AllOn()
 {
   for (int i = 0; i < 8; i++) {
-    Switch(i, 0); // On
+    Switch(i, COIL_ON);
     delay(5);
   }
 }
@@ -108,9 +113,9 @@ void Pot()
 {
   int index = map( analogRead(A0), 0, 1000 - 100, 0, 7);
   if (index != prevIndex) {
-    Switch(prevIndex, 1); // Off
+    Switch(prevIndex, COIL_OFF);
     delay(10);
-    Switch(index, 0); // On
+    Switch(index, COIL_ON);
     delay(10);
     prevIndex = index;
   }
@@ -121,9 +126,9 @@ void Pot()
 void OneAtATime()
 {
   for (int i = 0; i < 8; i++) {
-    Switch(i, 0); // On
+    Switch(i, COIL_ON);
     delay(500);
-    Switch(i, 1); // Off
+    Switch(i, COIL_OFF);
     delay(5); // Give it some time before we send another command as the loop goes to next value.
   }
 }
@@ -131,15 +136,15 @@ void OneAtATime()
 void BackAndForth(int delayMiliseconds)
 {
   for (int i = 0; i < 8; i++) {
-    Switch(i, 0); // On
+    Switch(i, COIL_ON);
     delay(delayMiliseconds);
-    Switch(i, 1); // Off
+    Switch(i, COIL_OFF);
     delay(5); // Give it some time before we send another command as the loop goes to next value.
   }
   for (int i = 7; i > 0; i--) {
-    Switch(i, 0); // On
+    Switch(i, COIL_ON);
     delay(delayMiliseconds);
-    Switch(i, 1); // Off
+    Switch(i, COIL_OFF);
     delay(5); // Give it some time before we send another command as the loop goes to next value.
   }
 }
@@ -147,12 +152,12 @@ void BackAndForth(int delayMiliseconds)
 
 // Specify which relay to control (0..7)
 // and whether to turn it off/on.
-// Set state to 1 to turn it OFF
-// Set state to 0 to turn it ON
+// Set state to COIL_OFF to turn it OFF
+// Set state to COIL_ON to turn it ON
 void Switch(byte which, byte state)
 {
   relay.write( (byte)0x51);
-  if (state == 1) {
+  if (state == COIL_OFF) {
     bitPattern = bitSet(bitPattern, which);
   }
   else {
