@@ -1,6 +1,6 @@
 // ATTiny84 8x8 Matrix - ANODE Rows
 
-v2 - Adding SPI master to control second ATTiny
+v2 - Adding *SPI SLAVE* to listen for signal to switch row
 
 //=== SPI ===
 #include <SPI.h>

@@ -1,7 +1,7 @@
 // ATTiny84 8x8 Matrix - GREEN columns
 // by Hari Wiguna, 2015
 
-// v2 - Adding SPI master to control second ATTiny
+// v2 - Adding *SPI MASTER* to tell second ATTiny to switch row
 
 //=== SPI ===
 #include <tinySPI.h>               //http://github.com/JChristensen/tinySPI
