@@ -63,23 +63,23 @@ void SPISend(byte data)
 {
   //digitalWrite(SS, LOW); // Select and wait for slave.  LOW = Select Slave
   //Serial.println("\n[[[ Slave Selected.");
-  delay(20); // Give slave time to check his Slave Select pin
+  //delay(20); // Give slave time to check his Slave Select pin
 
   SPI.transfer(data); // Send data, ignore meaningless slave response (it didn't know what master wants)
   //Serial.print(data, DEC);
   //Serial.println(" sent.");
-  delay(20);// Wait for slave.
+  //delay(20);// Wait for slave.
 
-  byte rx = SPI.transfer(255); // Send garbage, Get slave response.
-  if (rx >= 0 && rx < 8)
-  {
+  //byte rx = SPI.transfer(255); // Send garbage, Get slave response.
+  //if (rx >= 0 && rx < 8)
+  //{
     //Serial.print("Slave acknowledged: ");
     //Serial.println(rx, DEC);
-  }
-  else
-  {
+  //}
+  //else
+  //{
     //Serial.println("Master does not expect that slave returned:" + String(rx) + ".");
-  }
+  //}
   //digitalWrite(SS, HIGH); // Disable slave.
   //Serial.println("Slave UNSELECTED ]]]");
   //delay(500); // Debounce master button.

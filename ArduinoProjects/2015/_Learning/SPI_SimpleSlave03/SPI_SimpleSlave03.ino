@@ -21,8 +21,8 @@
 #include <tinySPI.h>               //http://github.com/JChristensen/tinySPI
 //const int SS = 10;    // tinySPI.h does not define this
 const int SCK = USCK_DD_PIN; // Translate tinySPI's pin notations to standard SPI notations
-const int MISO = DO_DD_PIN;
-const int MOSI = DI_DD_PIN;
+const int MOSI = DO_DD_PIN; // PA5
+const int MISO = DI_DD_PIN; // PA6 
 #define SPDR USIDR
 #define SPSR USISR
 #define SPIF USIOIF
@@ -38,7 +38,9 @@ const int ON = HIGH;
 const int OFF = LOW;
 
 void SlaveInit(void) {
-  // Initialize SPI pins.
+  SPI.begin(); // TinySPI does not support Slave mode, so init as master first.
+  
+  // RE-initialize SPI pins as slave pins!
   pinMode(SCK, INPUT);
   pinMode(MOSI, INPUT);
   pinMode(MISO, INPUT);
@@ -71,21 +73,29 @@ void setup() {
 }
 
 void loop() {
-  rx = SPItransfer(255); // Send garbage (we don't know what master wants) and receive master command code
+  //rx = SPItransfer(255); // Send garbage (we don't know what master wants) and receive master command code
+  rx = SPDR;
+  SPDR = 255;
+  while (!(SPSR & (1 << SPIF)));
+  delay(10);
   //Serial.println("Initial garbage slave response code sent");
   //Serial.println("rx:" + String(rx) + ".");
   if (rx != -1 && rx >= 0 && rx < 8)
   {
     //Serial.println("Data received from master: " + String(rx));
-    SPItransfer(rx);// Acknowledge data
+    //SPItransfer(rx);// Acknowledge data
+    //rx = SPDR;
+//  SPDR = rx;
+//  while (!(SPSR & (1 << SPIF)));
+//  delay(10);
     for (int r = 0; r < 8; r++)
       digitalWrite(anodePins[pinIndex], (rx == r) ? ON : OFF);
   }
-  else
-  {
-    rx = SPItransfer(255);// Unrecognized command.
-    //Serial.println("** Unrecognized Command -1 slave response code sent.");
-    //Serial.println("rx:" + String(rx) + ".");
-  }
+//  else
+//  {
+//    rx = SPItransfer(255);// Unrecognized command.
+//    //Serial.println("** Unrecognized Command -1 slave response code sent.");
+//    //Serial.println("rx:" + String(rx) + ".");
+//  }
 }
 

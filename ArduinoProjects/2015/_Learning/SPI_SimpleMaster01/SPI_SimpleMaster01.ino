@@ -33,15 +33,15 @@ void setup() {
 void loop() {
   for (int i = 0; i < 8; i++)
   {
-    for (int c = 0; c < 8; c++)
-    {
-      Serial.print(String(c) + " ");
-      delay(100);
-      }
-      Serial.println();
-      SPISend(i);
-      delay(500);
-    
+//    for (int c = 0; c < 8; c++)
+//    {
+//      Serial.print(String(c) + " ");
+//      delay(100);
+//    }
+    Serial.println();
+    SPISend(i);
+    delay(500);
+
   }
 }
 
