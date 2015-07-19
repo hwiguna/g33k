@@ -3,6 +3,7 @@
 
 // v2 - Adding *SPI MASTER* to tell second ATTiny to switch row
 // v3 - Unable to get slave SPI and I2C, now just using PA7 pin to trigger the row change
+// v4 - Clear ports so when we switch row, we start with all columns off
 
 //== Column variables ==
 const int ON = LOW;
@@ -53,7 +54,6 @@ void loop() {
       digitalWrite(rowIncrementPin, HIGH);
       digitalWrite(rowIncrementPin, LOW);
     }
-
 
     //TODO: change this to PORTA command
     for (int c = 0; c < 8; c++) {
