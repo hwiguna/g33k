@@ -74,7 +74,7 @@ char rowPattern[][8] = {
   }
 };
 
-int dly = 2000;
+int dly = 1000;
 int p = 0;
 long nextFrame = 0;
 

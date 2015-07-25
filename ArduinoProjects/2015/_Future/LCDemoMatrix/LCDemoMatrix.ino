@@ -156,7 +156,7 @@ void single() {
 }
 
 void loop() { 
-  //writeArduinoOnMatrix();
+  writeArduinoOnMatrix();
   //rows();
   //columns();
   //single();
