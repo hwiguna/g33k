@@ -2,7 +2,7 @@
 // v02 - read button using direct port manipulation
 // v03 - Blink n times based on which button is pressed
 // v04 - Read buttons using interrupt instead of polling in loop()
-// v05 - Sleep!
+// v05 - Sleep
 
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
@@ -11,40 +11,92 @@
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-const byte button0 = PD2;
-const byte button1 = PD3;
-const byte button2 = PD4;
+volatile bool hit = false;
+volatile bool buttonState[10]; // 1=Pressed
 
 void setup() {
-  sbi(DDRB, PB5); // Pin D13 (PB5) as output
-  cbi(DDRD, button0); // D2 (PD2) as input
-  cbi(DDRD, button1);
-  cbi(DDRD, button2);
-
-set_sleep_mode(<mode>);
   cli(); // turn off interrupt while we setup interrupts
+
+  sbi(DDRB, PB5); // Pin D13 (PB5) as output
+  sbi(DDRB, PB4); // Pin D12 (PB4) as output
+
+  // Set D2..D11 aka PD2..PD7, PB0..PB3 to input
+  for (byte i = 0; i < 10; i++) {
+    pinMode(2 + i, INPUT);
+    digitalWrite(2 + i, HIGH); // Enable pullup resistor
+  }
+  ClearButtonStates();
+
+  // Listen to interrupts: PCINT0..PCINT3 (on D8..D11)
+  PCMSK0 = _BV(PCINT0) + _BV(PCINT1) + _BV(PCINT2) + _BV(PCINT3);
+  // Listen to interrupts: PCINT18..23 (on D2..D7)
+  PCMSK2 = 0xFF - _BV(PCINT16) - _BV(PCINT17); // All bits HIGH except lowest 2 bits (used by RX & TX)
+
+  sbi(PCICR, PCIE0);
   sbi(PCICR, PCIE2); // enable pin change interrupt: PCIE0=PCINT7..0|PCMSK0, PCIE1=PCINT14..8|PCMSK1, PCIE2=PCINT23..16|PCMSK2
-  //sbi(PCMSK2, PCINT19); // choose which pin(s) should fire the above pin change interrupt on PD2 / D02
-  PCMSK2 = _BV(PCINT20) + _BV(PCINT19) + _BV(PCINT18); // 18=D2, 19=D3, 20=D4
+
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 void loop() {
-  delay(1000);
-  cbi(PORTB, PB5);  // turn the LED off by making the voltage LOW
+  if (hit)
+  {
+    for (byte i = 0; i < 10; i++)
+    {
+      if (buttonState[i])
+      {
+        ClearButtonStates();
+        Blink(1+i);
+        break;
+      }
+    }
+
+    hit = false;
+  }
+}
+
+void ClearButtonStates()
+{
+  for (byte i = 0; i < 10; i++)
+  {
+    buttonState[i] = false;
+  }
 }
 
 // enabled interrupt X fires ISR(Interrupt Service Routine) Y: PCIE0>PCINT0_vect, PCIE1>PCINT1_vect, PCIE2>PCINT2_vect
+ISR(PCINT0_vect) {
+  cli(); // turn off interrupt to avoid switch noise
+  delay(1); // wait till switch settles
+  bool any = false;
+  for (byte i = 0; i < 4; i++)
+  {
+    buttonState[6 + i] = (PINB & _BV(i)) == 0; // If bit is low, that button is pressed
+    any = true;
+  }
+  hit = any;
+    sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+}
+
 ISR(PCINT2_vect) {
-  sbi(PORTB, PB5);  // turn the LED on (HIGH is the voltage level)
+  cli(); // turn off interrupt to avoid switch noise
+  delay(1); // wait till switch settles
+  bool any = false;
+  for (byte i = 0; i < 6; i++)
+  {
+    buttonState[i] = (PIND & _BV(2 + i)) == 0; // If bit is low, that button is pressed
+    any = true;
+  }
+  hit = any;
+    sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 void Blink(byte n)
 {
   for (byte i = 0; i < n; i++) {
+    delay(250);
     sbi(PORTB, PB5);  // turn the LED on (HIGH is the voltage level)
-    delay(300);
-    cbi(PORTB, PB5);  // turn the LED off by making the voltage LOW
     delay(200);
+    cbi(PORTB, PB5);  // turn the LED off by making the voltage LOW
+
   }
 }
