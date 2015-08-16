@@ -4,6 +4,8 @@
 // v04 - Read buttons using interrupt instead of polling in loop()
 // v05 - Sleep
 
+#include <avr/sleep.h>
+
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
@@ -17,14 +19,11 @@ volatile bool buttonState[10]; // 1=Pressed
 void setup() {
   cli(); // turn off interrupt while we setup interrupts
 
-  sbi(DDRB, PB5); // Pin D13 (PB5) as output
-  sbi(DDRB, PB4); // Pin D12 (PB4) as output
+  DDRD &= B00000011; // D2..D7  as Inputs, leave D0..D1 (RX/TX) alone
+  DDRB = B00110000;  // D8..D11 as inputs, D12,13 as outputs
+  PORTD |= B11111100; // pullups on D2..D7
+  PORTB |= B00001111; // pullups on D8..D11
 
-  // Set D2..D11 aka PD2..PD7, PB0..PB3 to input
-  for (byte i = 0; i < 10; i++) {
-    pinMode(2 + i, INPUT);
-    digitalWrite(2 + i, HIGH); // Enable pullup resistor
-  }
   ClearButtonStates();
 
   // Listen to interrupts: PCINT0..PCINT3 (on D8..D11)
@@ -39,6 +38,7 @@ void setup() {
 }
 
 void loop() {
+
   if (hit)
   {
     for (byte i = 0; i < 10; i++)
@@ -46,13 +46,22 @@ void loop() {
       if (buttonState[i])
       {
         ClearButtonStates();
-        Blink(1+i);
+        Blink(1 + i);
         break;
       }
     }
 
     hit = false;
   }
+
+  sleepNow();
+}
+
+void sleepNow()
+{
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
+  sleep_enable(); // set SE bit
+  sleep_mode(); // actually go to sleep!
 }
 
 void ClearButtonStates()
@@ -74,7 +83,7 @@ ISR(PCINT0_vect) {
     any = true;
   }
   hit = any;
-    sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 ISR(PCINT2_vect) {
@@ -87,7 +96,7 @@ ISR(PCINT2_vect) {
     any = true;
   }
   hit = any;
-    sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 void Blink(byte n)
