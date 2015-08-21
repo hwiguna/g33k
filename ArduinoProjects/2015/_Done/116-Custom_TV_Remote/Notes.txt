@@ -1,0 +1,6 @@
+HariFun#xyz - Custom TV Remote
+
+To see the IR code I used IRRecord by Chris Young
+To transmit the IR code, I used IRSendDemo by Chris Young
+
+My_Sender.send(NECX,0xE0E040BF, 20);
