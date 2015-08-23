@@ -3,4 +3,16 @@ HariFun#xyz - Custom TV Remote
 To see the IR code I used IRRecord by Chris Young
 To transmit the IR code, I used IRSendDemo by Chris Young
 
-My_Sender.send(NECX,0xE0E040BF, 20);
+Hari Samsung TV Codes:
+Power: My_Sender.send(NECX,0xE0E040BF, 20);
+Ch Up: Received NECx Value:0xE0E048B7
+Ch down: Received NECx Value:0xE0E008F7
+
+vol up : Received NECx Value:0xE0E0E01F
+vol down: Received NECx Value:0xE0E0D02F
+
+center: Received NECx Value:0xE0E016E9
+up: Received NECx Value:0xE0E006F9
+down:Received NECx Value:0xE0E08679
+left:Received NECx Value:0xE0E0A659
+right:Received NECx Value:0xE0E046B9

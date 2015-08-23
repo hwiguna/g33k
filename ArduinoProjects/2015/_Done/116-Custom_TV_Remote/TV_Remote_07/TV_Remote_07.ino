@@ -7,9 +7,9 @@
 // v06 - Mode Switch (Program vs Normal use)
 // v07 - Merge in IR library
 
-#include <avr/sleep.h>
+//#include <avr/sleep.h>
 
-#include <IRLib.h>
+//#include <IRLib.h>
 //#include <IRLibMatch.h>
 //#include <IRLibRData.h>
 //#include <IRLibTimer.h>
@@ -58,7 +58,7 @@ void setup() {
          +-------------------------------++-------------------------------++-------------------------------+
   Arduino|n/a|Rst| A5| A4| A3| A2| A1| A0||Xtl|Xtl|D13|D12|D11|D10| D9| D8|| D7| D6| D5| D4| D3| D2| D1| D0|
          +-------------------------------++-------------------------------++-------------------------------+
-    Info |n/a| - |   |   |   |   |Pgm|Bzz|| - | - |vUp|Dwn|IRr|Lft|Rgt|Ctr|| Up|vDn|cDn|cUp|IRt|Pwr| RX| TX|
+    Info |n/a| - |   |   |   |   |Pgm|Bzz|| - | - |vUp|Dwn|iRx|Lft|Rgt|Ctr|| Up|vDn|cDn|cUp|iTx|Pwr| RX| TX|
          +-------------------------------++-------------------------------++-------------------------------+
   Output?| - | - | 0 | 0 | 0 | 0 | 0 | 1 || - | - | 0 | 0 | 0 | 0 | 0 | 0 || 0 | 0 | 0 | 0 | 1 | 0 | - | - |
          +-------------------------------++-------------------------------++-------------------------------+
@@ -69,7 +69,10 @@ void setup() {
   DDRD  |= B00001000; // SET output pin bit for IRt(IR Transmit)
   PORTD |= B11110100; // SET pullups on input pins
   PCMSK2 = 0xFF - _BV(PCINT19) - _BV(PCINT17) - _BV(PCINT16); // Listen to interrupts: PCINT18..23 (on D2..D7)
+//  cbi(PCMSK2, PCINT16);
+//  cbi(PCMSK2, PCINT17);
 //  sbi(PCMSK2, PCINT18);
+//  cbi(PCMSK2, PCINT19);
 //  sbi(PCMSK2, PCINT20);
 //  sbi(PCMSK2, PCINT21);
 //  sbi(PCMSK2, PCINT22);
@@ -85,11 +88,12 @@ void setup() {
   PCMSK1 = _BV(PCINT8); // listen to interrupt on PC0/D14/A0
 
   //PCICR |= B00000111; // enable pin change interrupt: PCIE0=PCINT7..0|PCMSK0, PCIE1=PCINT14..8|PCMSK1, PCIE2=PCINT23..16|PCMSK2
-  sbi(PCICR, PCIE0);
-  sbi(PCICR, PCIE1);
+  //sbi(PCICR, PCIE0);
+  //sbi(PCICR, PCIE1);
   sbi(PCICR, PCIE2); // enable pin change interrupt: PCIE0=PCINT7..0|PCMSK0, PCIE1=PCINT14..8|PCMSK1, PCIE2=PCINT23..16|PCMSK2
 
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+  sbi(SREG, SREG_I);
 
   Blink(1); // Beep once to indicate that we're ready!
 }
@@ -111,6 +115,7 @@ void loop() {
   }
 
   sleepNow();
+  delay(1000);
 }
 
 void DoReceive()
@@ -146,24 +151,24 @@ void sleepNow()
 }
 
 // enabled interrupt X fires ISR(Interrupt Service Routine) Y: PCIE0>PCINT0_vect, PCIE1>PCINT1_vect, PCIE2>PCINT2_vect
-ISR(PCINT0_vect)
-{ 
-  cli(); // turn off interrupt to avoid switch noise
-  //if (!isTransmitting) 
-  //{
-    delay(1); // wait till switch settles
-    if (pressedButton == 0)
-    {
-      for (byte i = 0; i < 6; i++) // PCINT0 is for PORTB, only bits 0..5 are used. 6,7 are used by Arduino Crystal.
-      {
-        if ((PINB & _BV(i)) == 0) // If bit is low, that button is pressed
-          pressedButton = 8 + i;
-        break;
-      }
-    }
-  //}
-  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
-}
+//ISR(PCINT0_vect)
+//{ 
+//  cli(); // turn off interrupt to avoid switch noise
+//  //if (!isTransmitting) 
+//  //{
+//    delay(1); // wait till switch settles
+//    if (pressedButton == 0)
+//    {
+//      for (byte i = 0; i < 6; i++) // PCINT0 is for PORTB, only bits 0..5 are used. 6,7 are used by Arduino Crystal.
+//      {
+//        if ((PINB & _BV(i)) == 0) {// If bit is low, that button is pressed
+//          pressedButton = 8 + i;
+//        break;}
+//      }
+//    }
+//  //}
+//  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+//}
 
 ISR(PCINT2_vect)
 {
@@ -175,25 +180,26 @@ ISR(PCINT2_vect)
     {
       for (byte i = 2; i < 8; i++) // PCINT2 is for PORT D, we ignore RX&TX
       {
-        if ((PIND & _BV(i)) == 0) // If bit is low, that button is pressed
+        if ((PIND & _BV(i)) == 0) {// If bit is low, that button is pressed
           pressedButton = i;
-        break;
+          break;
+        }
       }
     }
   //}
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
-
-ISR(PCINT1_vect)
-{
-  cli(); // turn off interrupt to avoid switch noise
-  //if (!isTransmitting)
-  //{
-    delay(1); // wait till switch settles
-    isProgramming = (PINC & _BV(PC1)) == 0; // PCINT1 is for PORT C, we only need to watch for bit 1 (Pgm)
-  //}
-  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
-}
+//
+//ISR(PCINT1_vect)
+//{
+//  cli(); // turn off interrupt to avoid switch noise
+//  //if (!isTransmitting)
+//  //{
+//    delay(1); // wait till switch settles
+//    isProgramming = (PINC & _BV(PC1)) == 0; // PCINT1 is for PORT C, we only need to watch for bit 1 (Pgm)
+//  //}
+//  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
+//}
 
 void Blink(byte n)
 {

@@ -11,14 +11,17 @@
 #endif
 
 const byte button0 = PD2;
-const byte button1 = PD3;
+const byte button1 = PD5;
 const byte button2 = PD4;
 
 void setup() {
   sbi(DDRB, PB5); // Pin D13 (PB5) as output
   cbi(DDRD, button0); // D2 (PD2) as input
-  
-  sbi(SREG,SREG_I); // Enable global interrupt
+  cbi(DDRD, button1); // D2 (PD2) as input
+  cbi(DDRD, button2); // D2 (PD2) as input
+  DDRD  &= B00001011;
+  PORTD |= B00110100;
+  //sbi(SREG,SREG_I); // Enable global interrupt
 }
 
 void loop() {
