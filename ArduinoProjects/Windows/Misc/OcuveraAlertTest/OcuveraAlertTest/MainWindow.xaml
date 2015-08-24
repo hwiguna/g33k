@@ -1,0 +1,14 @@
+﻿<Window x:Class="OcuveraAlertTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ocuvera Alert Test" Height="150" Width="300"
+        Loaded="MainWindow_OnLoaded"
+        Closing="MainWindow_OnClosing"
+        >
+    <Grid>
+        <StackPanel Orientation="Vertical">
+        <Button x:Name="TestButton" Click="TestButton_OnClick" Height="50">Click Me!</Button>
+            <TextBlock x:Name="StatusTextblock"></TextBlock>
+        </StackPanel>
+    </Grid>
+</Window>
