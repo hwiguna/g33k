@@ -33,7 +33,7 @@ void loop()
 
 void establishContact() {
   while (Serial.available() <= 0) {
-    Serial.println("Ready!");   // send an initial string
-    delay(300);
+    Serial.println("Press any key...");   // send an initial string
+    delay(1000);
   }
 }
