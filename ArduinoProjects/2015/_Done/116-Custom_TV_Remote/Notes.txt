@@ -16,3 +16,19 @@ up: Received NECx Value:0xE0E006F9
 down:Received NECx Value:0xE0E08679
 left:Received NECx Value:0xE0E0A659
 right:Received NECx Value:0xE0E046B9
+
+Hari LG TV codes:
+Power: Received NEC Value:0x20DF10EF
+Ch up: Received NEC Value:0x20DF00FF
+Ch down: Received NEC Value:0x20DF807F
+
+vol up : RReceived NEC Value:0x20DF40BF
+vol down: Received NEC Value:0x20DFC03F
+
+center: Received NEC Value:0x20DF22DD
+up: Received NEC Value:0x20DF02FD
+down: Received NEC Value:0x20DF827D
+left: Received NEC Value:0x20DFE01F
+right: Received NEC Value:0x20DF609F
+
+

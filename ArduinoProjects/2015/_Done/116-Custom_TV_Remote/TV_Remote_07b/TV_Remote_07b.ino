@@ -6,9 +6,9 @@
 // v06 - Mode Switch (Program vs Normal use)
 // v07 - Merge in IR library
 
-//#include <avr/sleep.h>
+#include <avr/sleep.h>
 
-//#include <IRLib.h>
+#include <IRLib.h>
 //#include <IRLibMatch.h>
 //#include <IRLibRData.h>
 //#include <IRLibTimer.h>
@@ -21,7 +21,7 @@
 #endif
 
 // pressedButton Values (NOT I/O pin index)
-#define BTN_POWER 3
+#define BTN_POWER 2
 #define BTN_CHANNEL_UP 4
 #define BTN_CHANNEL_DOWN 5
 #define BTN_VOLUME_UP 18
@@ -37,7 +37,7 @@ volatile bool isProgramming = false;
 byte lastPressedButton = 0; // 0=None
 //volatile bool isTransmitting = false;
 
-//IRsend irSender;
+IRsend irSender;
 
 void setup() {
   /*
@@ -102,29 +102,27 @@ void loop() {
   {
     byte blinkCount = isProgramming ? pressedButton * 2 : pressedButton;
 
-    //    if (isProgramming)
-    //      DoReceive();
-    //    else
-    //      DoSend();
-
-    //delay(1000);
-    Blink(blinkCount);
+    if (isProgramming)
+      DoReceive();
+    else
+      DoSend_LG();
+      
+    Blink(1); // blinkCount
     lastPressedButton = pressedButton;
     pressedButton = 0; // Button press has been handled, we're ready for next button press
   }
 
   sleepNow();
-  delay(1000);
 }
 
 void DoReceive()
 {
 }
 
-void DoSend()
+void DoSend_Samsung()
 {
   //isTransmitting = true;
-  /*
+
   switch (pressedButton)
   {
     case BTN_POWER: irSender.send(NECX, 0xE0E040BF, 20); break;
@@ -138,15 +136,36 @@ void DoSend()
     case BTN_LEFT: irSender.send(NECX, 0xE0E0A659, 20); break;
     case BTN_RIGHT: irSender.send(NECX, 0xE0E046B9, 20); break;
   }
-  */
+
+  //isTransmitting = false;
+}
+
+void DoSend_LG()
+{
+  //isTransmitting = true;
+
+  switch (pressedButton)
+  {
+    case BTN_POWER: irSender.send(NEC, 0x20DF10EF, 20); break;
+    case BTN_CHANNEL_UP: irSender.send(NEC, 0x20DF00FF, 20); break;
+    case BTN_CHANNEL_DOWN: irSender.send(NEC, 0x20DF807F, 20); break;
+    case BTN_VOLUME_UP: irSender.send(NEC, 0x20DF40BF, 20); break;
+    case BTN_VOLUME_DOWN: irSender.send(NEC, 0x20DFC03F, 20); break;
+    case BTN_CENTER: irSender.send(NEC, 0x20DF22DD, 20); break;
+    case BTN_UP: irSender.send(NEC, 0x20DF02FD, 20); break;
+    case BTN_DOWN: irSender.send(NEC, 0x20DF827D, 20); break;
+    case BTN_LEFT: irSender.send(NEC, 0x20DFE01F, 20); break;
+    case BTN_RIGHT: irSender.send(NEC, 0x20DF609F, 20); break;
+  }
+
   //isTransmitting = false;
 }
 
 void sleepNow()
 {
-  //  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
-  //  sleep_enable(); // set SE bit
-  //  sleep_mode(); // actually go to sleep!
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
+  sleep_enable(); // set SE bit
+  sleep_mode(); // actually go to sleep!
 }
 
 // enabled interrupt X fires ISR(Interrupt Service Routine) Y: PCIE0>PCINT0_vect, PCIE1>PCINT1_vect, PCIE2>PCINT2_vect
@@ -207,7 +226,7 @@ ISR(PCINT1_vect)
     {
       if ((DDRC & _BV(i)) == 0 && (bits & _BV(i)) == 0) // If bit an INPUT and its value is low, that button is pressed
       {
-        pressedButton = 16+i;
+        pressedButton = 16 + i;
         break;
       }
     }
