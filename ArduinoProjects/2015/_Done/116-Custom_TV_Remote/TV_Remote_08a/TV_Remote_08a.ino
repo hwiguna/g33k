@@ -6,6 +6,7 @@
 // v06 - Mode Switch (Program vs Normal use)
 // v07 - Merge in IR library
 // v08 - It WORKS! Mode switch works, can record, save to EEPROM and recall IR code after power been removed!  Still many bugs.
+// v08a - Fixed bugs! Recording is much more reliable.  Quick succession of button presses sometimes do not work.
 
 #include <avr/sleep.h>
 #include <IRLib.h>
@@ -101,7 +102,7 @@ void setup() {
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
   //sbi(SREG, SREG_I);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   Blink(1); // Beep once to indicate that we're ready!
 
@@ -120,20 +121,21 @@ void loop() {
     wasProgramming = isProgramming;
   }
 
-  if (isProgramming)
-    DoReceive();
-
   if (pressedButton != 0)
   {
     //byte blinkCount = isProgramming ? pressedButton * 2 : pressedButton;
-    byte blinkCount = isProgramming ? 2 : 1; // Blink twice to confirm that we're ready to receive new IR, blink once to confirm normal button press
+    byte blinkCount = 1; //isProgramming ? 2 : 1; // Blink twice to confirm that we're ready to receive new IR, blink once to confirm normal button press
 
-    if (!isProgramming)
+    if (isProgramming)
+      DoReceive();
+    else
       DoSend();
 
     Blink(blinkCount); // blinkCount
     lastPressedButton = pressedButton;
-    pressedButton = 0; // Button press has been handled, we're ready for next button press
+
+    if (!isProgramming)
+      pressedButton = 0; // Button press has been handled, we're ready for next button press
   }
 
   if (!isProgramming)
@@ -143,21 +145,34 @@ void loop() {
 void DoSend()
 {
   ButtonInfo buttonInfo = buttonInfos[pressedButton];
+
+  Serial.print(F("Sending "));
+  Serial.print(Pnames(buttonInfo.codeType));
+  Serial.print(F(" Value:0x"));
+  Serial.println(buttonInfo.codeValue, HEX);
+
   irSender.send(buttonInfo.codeType, buttonInfo.codeValue, 20);
 }
 
 void DoReceive()
 {
-  //WARNING: My_Receiver.GetResults() is a blocking call!  We won't return until after we receive some IR
+  if (pressedButton == 0)
+    return;
+
+  Serial.println(F("Waiting to receive IR from original Remote for button "));
+  Serial.println(pressedButton, DEC);
+
   if (My_Receiver.GetResults(&My_Decoder)) {
     Serial.println(F("My_Receiver received IR.  Decoding..."));
     My_Decoder.decode();
     Serial.println(F("Decoding COMPLETED!"));
     storeCode();
+    
     Serial.print(F("Saved as button#"));
-    Serial.println(lastPressedButton, DEC);
-    delay(1000);
+    Serial.println(pressedButton,DEC);
+    
     My_Receiver.resume();
+    pressedButton = 0; // indicate that we got the IR code for the button, so stop waiting for IR
   }
 }
 
@@ -177,8 +192,6 @@ void storeCode(void) {
     //    codeType = UNKNOWN;
   }
   else {
-    Serial.print(F("Received "));
-    Serial.print(Pnames(buttonInfo.codeType));
     if (My_Decoder.value == REPEAT) {
       // Don't record a NEC repeat value as that's useless.
       Serial.println(F("repeat; ignoring."));
@@ -188,8 +201,8 @@ void storeCode(void) {
       codeBits = My_Decoder.bits;
     }
 
-    buttonInfos[lastPressedButton] = buttonInfo;
-    SaveToEEPROM(lastPressedButton, buttonInfo);
+    buttonInfos[pressedButton] = buttonInfo;
+    SaveToEEPROM(pressedButton, buttonInfo);
 
     Serial.print(F(" Value:0x"));
     Serial.println(My_Decoder.value, HEX);
@@ -219,7 +232,7 @@ void ReadFromEEPROM()
 
 void sleepNow()
 {
-  delay(2000); // Allow serial to print stuff before sleeping
+  delay(500); // Allow serial to print stuff before sleeping
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
   sleep_enable(); // set SE bit
   sleep_mode(); // actually go to sleep!
@@ -269,14 +282,14 @@ ISR(PCINT2_vect)
 ISR(PCINT1_vect)
 {
   cli(); // turn off interrupt to avoid switch noise
-  delay(5); // wait till switch settles
+  delay(1); // wait till switch settles
 
   byte bits = PINC;
   isProgramming = (bits & _BV(PC1)) == 0; // PCINT1 is for PORT C, we only need to watch for bit 1 (Pgm)
 
   if (pressedButton == 0)
   {
-    for (byte i = 1; i < 6; i++) // PCINT1 is for PORT C, we ignore buzzer on A0
+    for (byte i = 2; i < 6; i++) // PCINT1 is for PORT C, we ignore buzzer on A0, and slider switch on A1
     {
       if ((DDRC & _BV(i)) == 0 && (bits & _BV(i)) == 0) // If bit an INPUT and its value is low, that button is pressed
       {
