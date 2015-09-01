@@ -232,6 +232,7 @@ void ReadFromEEPROM()
 
 void sleepNow()
 {
+  Serial.println("Good night...");
   delay(500); // Allow serial to print stuff before sleeping
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
   sleep_enable(); // set SE bit

@@ -5,13 +5,13 @@
 // v05 - Sleep
 // v06 - Mode Switch (Program vs Normal use)
 // v07 - Merge in IR library
+// v08 - It WORKS! Mode switch works, can record, save to EEPROM and recall IR code after power been removed!  Still many bugs.
+// v08a - Fixed bugs! Recording is much more reliable.  Quick succession of button presses sometimes do not work.
 
 #include <avr/sleep.h>
-
 #include <IRLib.h>
-//#include <IRLibMatch.h>
-//#include <IRLibRData.h>
-//#include <IRLibTimer.h>
+#include <EEPROM.h>
+#include "ButtonInfo.h"
 
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
@@ -34,10 +34,18 @@
 
 volatile byte pressedButton = 0; // 0=None
 volatile bool isProgramming = false;
+bool wasProgramming = false;
 byte lastPressedButton = 0; // 0=None
-//volatile bool isTransmitting = false;
 
+int RECV_PIN = 11;
+IRrecv My_Receiver(RECV_PIN);
 IRsend irSender;
+IRdecode My_Decoder;
+
+ButtonInfo buttonInfo;  // Record containing ButtonNum, codeType, and codeValue
+int codeBits;           // The length of the code in bits
+
+ButtonInfo buttonInfos[23];
 
 void setup() {
   /*
@@ -79,12 +87,12 @@ void setup() {
 
   DDRB  &= B11100000; // CLEAR input pin bits. Leave highest three bits alone
   PORTB |= B00010111; // SET pullups on D8..D13, except D11,D13
-  PCMSK0 = _BV(PCINT0) + _BV(PCINT1) + _BV(PCINT2) + _BV(PCINT4); // Listen to interrupts: PCINT0..PCINT4 (on D8..D13)
+  PCMSK0 |= _BV(PCINT0) + _BV(PCINT1) + _BV(PCINT2) + _BV(PCINT4); // Listen to interrupts: PCINT0..PCINT4 (on D8..D13)
 
   DDRC  &= B11000001; // CLEAR A5,4,3,2,1 but not 0, and leave high bits alone
   DDRC  |= B00000001; // SET A0 as output (Buzzer)
   PORTC |= B00111110; // pullup on all input pins (even the ones we're not using)
-  PCMSK1 = _BV(PCINT9) + _BV(PCINT10); // listen to interrupt on PC1/A1, PC2/A2
+  PCMSK1 |= _BV(PCINT9) + _BV(PCINT10); // listen to interrupt on PC1/A1, PC2/A2
 
   PCICR |= B00000111; // enable pin change interrupt: PCIE0=PCINT7..0|PCMSK0, PCIE1=PCINT14..8|PCMSK1, PCIE2=PCINT23..16|PCMSK2
   //sbi(PCICR, PCIE0);
@@ -94,75 +102,138 @@ void setup() {
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
   //sbi(SREG, SREG_I);
 
+  Serial.begin(9600);
+
   Blink(1); // Beep once to indicate that we're ready!
+
+  ReadFromEEPROM();
+
+  Serial.println(F("Setup Completed!"));
 }
 
 void loop() {
+  if (isProgramming != wasProgramming)
+  {
+    Serial.print(F("Programming mode: "));
+    Serial.println(isProgramming, DEC);
+    if (isProgramming)
+      My_Receiver.enableIRIn(); // Re-enable receiver
+    wasProgramming = isProgramming;
+  }
+
   if (pressedButton != 0)
   {
-    byte blinkCount = isProgramming ? pressedButton * 2 : pressedButton;
+    //byte blinkCount = isProgramming ? pressedButton * 2 : pressedButton;
+    byte blinkCount = 1; //isProgramming ? 2 : 1; // Blink twice to confirm that we're ready to receive new IR, blink once to confirm normal button press
 
     if (isProgramming)
       DoReceive();
     else
-      DoSend_Samsung();
-      
-    Blink(1); // blinkCount
+      DoSend();
+
+    Blink(blinkCount); // blinkCount
     lastPressedButton = pressedButton;
-    pressedButton = 0; // Button press has been handled, we're ready for next button press
+
+    if (!isProgramming)
+      pressedButton = 0; // Button press has been handled, we're ready for next button press
   }
 
-  sleepNow();
+  if (!isProgramming)
+    sleepNow();
+}
+
+void DoSend()
+{
+  ButtonInfo buttonInfo = buttonInfos[pressedButton];
+
+  Serial.print(F("Sending "));
+  Serial.print(Pnames(buttonInfo.codeType));
+  Serial.print(F(" Value:0x"));
+  Serial.println(buttonInfo.codeValue, HEX);
+
+  irSender.send(buttonInfo.codeType, buttonInfo.codeValue, 20);
 }
 
 void DoReceive()
 {
+  if (pressedButton == 0)
+    return;
+
+  Serial.println(F("Waiting to receive IR from original Remote for button "));
+  Serial.println(pressedButton, DEC);
+
+  if (My_Receiver.GetResults(&My_Decoder)) {
+    Serial.println(F("My_Receiver received IR.  Decoding..."));
+    My_Decoder.decode();
+    Serial.println(F("Decoding COMPLETED!"));
+    storeCode();
+    
+    Serial.print(F("Saved as button#"));
+    Serial.println(pressedButton,DEC);
+    
+    My_Receiver.resume();
+    pressedButton = 0; // indicate that we got the IR code for the button, so stop waiting for IR
+  }
 }
 
-void DoSend_Samsung()
-{
-  //isTransmitting = true;
-
-  switch (pressedButton)
-  {
-    case BTN_POWER: irSender.send(NECX, 0xE0E040BF, 20); break;
-    case BTN_CHANNEL_UP: irSender.send(NECX, 0xE0E048B7, 20); break;
-    case BTN_CHANNEL_DOWN: irSender.send(NECX, 0xE0E008F7, 20); break;
-    case BTN_VOLUME_UP: irSender.send(NECX, 0xE0E0E01F, 20); break;
-    case BTN_VOLUME_DOWN: irSender.send(NECX, 0xE0E0D02F, 20); break;
-    case BTN_CENTER: irSender.send(NECX, 0xE0E016E9, 20); break;
-    case BTN_UP: irSender.send(NECX, 0xE0E006F9, 20); break;
-    case BTN_DOWN: irSender.send(NECX, 0xE0E08679, 20); break;
-    case BTN_LEFT: irSender.send(NECX, 0xE0E0A659, 20); break;
-    case BTN_RIGHT: irSender.send(NECX, 0xE0E046B9, 20); break;
+void storeCode(void) {
+  buttonInfo.codeType = My_Decoder.decode_type;
+  if (buttonInfo.codeType == UNKNOWN) {
+    Serial.println("Received unknown code, saving as raw");
+    // To store raw codes:
+    // Drop first value (gap)
+    // As of v1.3 of IRLib global values are already in microseconds rather than ticks
+    // They have also been adjusted for overreporting/underreporting of marks and spaces
+    //    rawCount = My_Decoder.rawlen - 1;
+    //    for (int i = 1; i <= rawCount; i++) {
+    //      rawCodes[i - 1] = My_Decoder.rawbuf[i];
+    //    };
+    //    My_Decoder.DumpResults();
+    //    codeType = UNKNOWN;
   }
+  else {
+    if (My_Decoder.value == REPEAT) {
+      // Don't record a NEC repeat value as that's useless.
+      Serial.println(F("repeat; ignoring."));
+    }
+    else {
+      buttonInfo.codeValue = My_Decoder.value;
+      codeBits = My_Decoder.bits;
+    }
 
-  //isTransmitting = false;
+    buttonInfos[pressedButton] = buttonInfo;
+    SaveToEEPROM(pressedButton, buttonInfo);
+
+    Serial.print(F(" Value:0x"));
+    Serial.println(My_Decoder.value, HEX);
+  }
 }
 
-void DoSend_LG()
+void SaveToEEPROM(byte buttonNumber, ButtonInfo buttonInfo)
 {
-  //isTransmitting = true;
+  int addr = buttonNumber * 5; // IRTYPES is a char, unsigned long is 4 bytes
+  EEPROM.put(addr, buttonInfo);
+}
 
-  switch (pressedButton)
+void ReadFromEEPROM()
+{
+  Serial.println(F("EEPROM values:"));
+  for (byte i = 0; i < 24; i++)
   {
-    case BTN_POWER: irSender.send(NEC, 0x20DF10EF, 20); break;
-    case BTN_CHANNEL_UP: irSender.send(NEC, 0x20DF00FF, 20); break;
-    case BTN_CHANNEL_DOWN: irSender.send(NEC, 0x20DF807F, 20); break;
-    case BTN_VOLUME_UP: irSender.send(NEC, 0x20DF40BF, 20); break;
-    case BTN_VOLUME_DOWN: irSender.send(NEC, 0x20DFC03F, 20); break;
-    case BTN_CENTER: irSender.send(NEC, 0x20DF22DD, 20); break;
-    case BTN_UP: irSender.send(NEC, 0x20DF02FD, 20); break;
-    case BTN_DOWN: irSender.send(NEC, 0x20DF827D, 20); break;
-    case BTN_LEFT: irSender.send(NEC, 0x20DFE01F, 20); break;
-    case BTN_RIGHT: irSender.send(NEC, 0x20DF609F, 20); break;
+    int addr = i * sizeof(buttonInfo);
+    EEPROM.get(addr, buttonInfos[i]);
+    Serial.print(i, DEC);
+    Serial.print(": Type=");
+    Serial.print(buttonInfos[i].codeType, DEC);
+    Serial.print(", Value=0x");
+    Serial.println(buttonInfos[i].codeValue, HEX);
   }
-
-  //isTransmitting = false;
 }
 
 void sleepNow()
 {
+  Serial.println("Good night...");
+  delay(500); // Allow serial to print stuff before sleeping
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
   sleep_enable(); // set SE bit
   sleep_mode(); // actually go to sleep!
@@ -172,9 +243,8 @@ void sleepNow()
 ISR(PCINT0_vect)
 {
   cli(); // turn off interrupt to avoid switch noise
-  //if (!isTransmitting)
-  //{
   delay(1); // wait till switch settles
+
   if (pressedButton == 0)
   {
     for (byte i = 0; i < 6; i++) // PCINT0 is for PORTB, only bits 0..5 are used. 6,7 are used by Arduino Crystal.
@@ -185,15 +255,13 @@ ISR(PCINT0_vect)
       }
     }
   }
-  //}
+
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 ISR(PCINT2_vect)
 {
   cli(); // turn off interrupt to avoid switch noise
-  //if (!isTransmitting)
-  //{
   delay(1); // wait till switch settles
 
   if (pressedButton == 0)
@@ -208,21 +276,21 @@ ISR(PCINT2_vect)
       }
     }
   }
-  //}
+
   sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 ISR(PCINT1_vect)
 {
   cli(); // turn off interrupt to avoid switch noise
-  //if (!isTransmitting)
-  //{
   delay(1); // wait till switch settles
+
+  byte bits = PINC;
+  isProgramming = (bits & _BV(PC1)) == 0; // PCINT1 is for PORT C, we only need to watch for bit 1 (Pgm)
+
   if (pressedButton == 0)
   {
-    byte bits = PINC;
-    isProgramming = (bits & _BV(PC1)) == 0; // PCINT1 is for PORT C, we only need to watch for bit 1 (Pgm)
-    for (byte i = 1; i < 6; i++) // PCINT1 is for PORT C, we ignore buzzer on A0
+    for (byte i = 2; i < 6; i++) // PCINT1 is for PORT C, we ignore buzzer on A0, and slider switch on A1
     {
       if ((DDRC & _BV(i)) == 0 && (bits & _BV(i)) == 0) // If bit an INPUT and its value is low, that button is pressed
       {
@@ -230,9 +298,9 @@ ISR(PCINT1_vect)
         break;
       }
     }
-    //}
-    sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
   }
+
+  sei(); // enable interrupt.  I think same as: sbi(SREG, SREG_I); // Enable global interrupt
 }
 
 void Blink(byte n)
