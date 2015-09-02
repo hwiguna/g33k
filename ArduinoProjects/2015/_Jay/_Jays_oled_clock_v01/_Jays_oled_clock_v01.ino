@@ -626,7 +626,7 @@ void loop()
   if (newSeconds != prevSeconds)
   {
     prevSeconds = newSeconds;
-    String dateStr = Pad(rtc.getDay()) + "/" + Pad(rtc.getMonth()) + "/" + Pad(rtc.getYear());
+    String dateStr = Pad(rtc.getMonth()) + "/" + Pad(rtc.getDay()) + "/" + Pad(rtc.getYear());
     //Serial.print(dateStr);
 
     //Serial.print("\t");
