@@ -8,7 +8,7 @@
   
   Built on top of code from:
   NewHaven Display: http://www.newhavendisplay.com/nhd15128128ugc3-p-5602.html
-  RTCZero library:  https://www.arduino.cc/en/Tutorial/SimpleRTC
+  RTCZero library:  https://github.com/MarkusLange/RTCZero
 */
 
 #include <RTCZero.h>
