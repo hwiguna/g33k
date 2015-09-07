@@ -640,7 +640,6 @@ void setup()
   //Serial.begin(9600);
   setup_oled();
   setup_rtc();
-  PrintBig(10, 64 - 4 - 16, "test");
 }
 
 byte prevSeconds;
@@ -652,7 +651,7 @@ void loop()
   if (newSeconds != prevSeconds)
   {
     prevSeconds = newSeconds;
-    String dateStr = Pad(now.month()) + "/" + Pad(now.day()) + "/" + Pad(now.year());
+    String dateStr = Pad(now.month()) + "/" + Pad(now.day()) + "/" + Pad(now.year()-2000);
     //Serial.print(dateStr);
 
     //Serial.print("\t");
