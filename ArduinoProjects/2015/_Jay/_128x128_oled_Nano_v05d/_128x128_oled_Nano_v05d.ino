@@ -184,7 +184,7 @@ void OLED_Command_128128RGB(unsigned char c)        // send command to OLED
     case 0:   
       digitalWrite(CS_PIN, LOW); // 
       digitalWrite(RS_PIN, LOW); // Command
-      PORTDx(c);
+      PORTD = c;
       digitalWrite(RW_PIN, LOW); // Write?
       digitalWrite(E_PIN, HIGH);
       digitalWrite(E_PIN, LOW);
@@ -193,7 +193,7 @@ void OLED_Command_128128RGB(unsigned char c)        // send command to OLED
     case 1:   
       digitalWrite(CS_PIN, LOW);
       digitalWrite(RS_PIN, LOW);
-      PORTDx(c);
+      PORTD = c;
       digitalWrite(WR_PIN, LOW);
       digitalWrite(WR_PIN, HIGH);
       digitalWrite(CS_PIN, HIGH);
@@ -233,7 +233,7 @@ void OLED_Data_128128RGB(unsigned char d)        // send data to OLED
   {
     case 0:   digitalWrite(CS_PIN, LOW);
       digitalWrite(RS_PIN, HIGH);
-      PORTDx(d);
+      PORTD = d;
       digitalWrite(RW_PIN, LOW);
       digitalWrite(E_PIN, HIGH);
       digitalWrite(E_PIN, LOW);
@@ -241,7 +241,7 @@ void OLED_Data_128128RGB(unsigned char d)        // send data to OLED
       break;
     case 1:   digitalWrite(CS_PIN, LOW);
       digitalWrite(RS_PIN, HIGH);
-      PORTDx(d);
+      PORTD = d;
       digitalWrite(WR_PIN, LOW);
       digitalWrite(WR_PIN, HIGH);
       digitalWrite(CS_PIN, HIGH);
@@ -549,7 +549,7 @@ void setup()                                       // for Arduino, runs first at
     case 2:
       pinMode(SDI_PIN, OUTPUT);                   // configure SDI_PIN as output
       pinMode(SCL_PIN, OUTPUT);                   // configure SCL_PIN as output
-      PORTDx(0x00);                               // reset SDI_PIN and SCL_PIN, ground DB[5..0] of the display
+      PORTD = 0;                                  // reset SDI_PIN and SCL_PIN, ground DB[5..0] of the display
       digitalWrite(BS0_PIN, LOW);                 // reset BS0_PIN
       digitalWrite(BS1_PIN, LOW);                 // reset BS1_PIN
       digitalWrite(WR_PIN, LOW);                  // reset WR_PIN
