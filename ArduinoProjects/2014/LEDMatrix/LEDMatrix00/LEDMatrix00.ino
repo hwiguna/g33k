@@ -72,7 +72,39 @@ int numCols = numZones * 8;
 // First char is @, next is A, B, etc.  Only lower case, no symbols.  
 // The @ will display as space character.
 byte alphabets[][5] = {
+  {0,0,0,0,0}, // Space
+  {0,0,0,0,0}, // !
+  {0,0,0,0,0}, // "
+  {0,0,0,0,0}, // #, etc...
   {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {0,0,0,0,0},
+  {62, 65, 65, 65, 62}, // 0
+  {0, 33, 127, 1, 0},   // 1
+  {39, 73, 73, 73, 49}, // 2
+  {34, 65, 73, 73, 54}, // 3
+  {120, 8, 8, 8, 127},  // 4
+  {121, 73, 73, 73, 70},// 5
+  {62, 73, 73, 73, 38}, // 6
+  {96, 67, 76, 80, 96}, // 7
+  {54, 73, 73, 73, 54}, // 8
+  {50, 73, 73, 73, 62}, // 9
+  {0, 0, 36, 0, 0}, // :
+  {0, 0, 38, 0, 0}, // ;
+  {8, 28, 54, 34, 0}, // <
+  {0, 20, 20, 20, 0}, // =
+  {34, 54, 28, 8, 0}, // >
+  {32, 64, 69, 72, 48}, // ?
+  {0,0,0,0,0}, // @
   {31, 36, 68, 36, 31},
   {127, 73, 73, 73, 54},
   {62, 65, 65, 65, 34},
@@ -143,7 +175,7 @@ void RefreshDisplay()
     digitalWrite(latchPin2, HIGH);  //Return the latch pin high to signal chip that it no longer needs to listen for information
 
     //-- Wait a little bit to let humans see what we've pushed out onto the matrix --
-    delayMicroseconds(500);
+    //delayMicroseconds(100);
   }
 }
 
@@ -162,11 +194,11 @@ void Plot(int col, int row, bool isOn)
 // Plot each character of the message one column at a time, updated the display, shift bitmap left.
 void AlphabetSoup()
 {
-  char msg[] = "THE OBLIGATORY ARDUINO LED MATRIX PROJECT  ";
+  char msg[] = "WELCOME TO MAKE LINCOLN 2015  ";
 
   for (int charIndex=0; charIndex < (sizeof(msg)-1); charIndex++)
   {
-    int alphabetIndex = msg[charIndex] - '@';
+    int alphabetIndex = msg[charIndex] - ' ';
     if (alphabetIndex < 0) alphabetIndex=0;
     
     //-- Draw one character of the message --
