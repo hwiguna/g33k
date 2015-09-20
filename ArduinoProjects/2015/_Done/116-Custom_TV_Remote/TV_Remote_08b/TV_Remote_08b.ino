@@ -233,6 +233,7 @@ void ReadFromEEPROM()
 void sleepNow()
 {
   Serial.println("Good night...");
+  //Blink(3);
   delay(500); // Allow serial to print stuff before sleeping
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // pick sleep mode to use
   sleep_enable(); // set SE bit
@@ -306,9 +307,11 @@ ISR(PCINT1_vect)
 void Blink(byte n)
 {
   for (byte i = 0; i < n; i++) {
-    sbi(PORTC, PC0);  // Beep on
+    //sbi(PORTC, PC0);  // Beep on
+    sbi(PORTB, PB5);  // Beep on
     delay(50);
-    cbi(PORTC, PC0);  // Beep off
+    //cbi(PORTC, PC0);  // Beep off
+    cbi(PORTB, PB5);  // Beep off
     delay(250);
   }
 }
