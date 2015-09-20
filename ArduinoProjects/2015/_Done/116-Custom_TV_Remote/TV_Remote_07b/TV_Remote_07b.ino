@@ -238,9 +238,11 @@ ISR(PCINT1_vect)
 void Blink(byte n)
 {
   for (byte i = 0; i < n; i++) {
-    sbi(PORTC, PC0);  // Beep on
+    //sbi(PORTC, PC0);  // Beep on
+    sbi(PORTB, PB5);  // Beep on
     delay(50);
-    cbi(PORTC, PC0);  // Beep off
+    //cbi(PORTC, PC0);  // Beep off
+    cbi(PORTB, PB5);  // Beep off
     delay(250);
   }
 }
