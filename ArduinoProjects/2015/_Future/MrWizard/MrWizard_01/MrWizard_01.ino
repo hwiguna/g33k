@@ -74,7 +74,7 @@ int  prevmm;
 int  prevdd;
 int  prevyy;
 int  mm = 9;
-int  dd = 14;
+int  dd = 19;
 int  yy = 2015;
 
 void DisplayInputScreen(int mm, int dd, int yyyy)
