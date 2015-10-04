@@ -51,7 +51,7 @@ byte mm = 58;
 byte phh = 0;
 byte pmm = 0;
 
-String line;
+char line[80] = "";
 
 void setup ()
 {
@@ -69,17 +69,38 @@ void setup ()
 
 void loop()
 {
-  if (Serial.available() > 0) {
-    int inByte = Serial.read();
-    if (inByte!=0x10) {
-      line += inByte;
-    }
-  }
+  CheckSerialPort();
   //Count();
   //SampleClockFace();
   //IncrementTime();
 }
 
+void CheckSerialPort()
+{
+  if (Serial.available() > 0) {
+    int len = strlen(line);
+    int inByte = Serial.read();
+    if (inByte != 10) {
+      line[ len ] = inByte;
+      line[ len + 1 ] = 0x00;
+    }
+    else
+    {
+      line[ len-1 ] = 0x00; // Kill CR and LF
+      if ( strlen(line) > 0 && line[0] == '#' ) {
+        phh = 0;
+        pmm = 0;
+        myMatrix.clearScreen();
+        SampleClockFace();
+      }
+      else {
+        myMatrix.clearScreen();
+        myMatrix.printString(0, 0, yellow, black, line);
+      }
+      line[0] = 0x00;
+    }
+  }
+}
 void IncrementTime()
 {
   if (++mm > 59)
@@ -96,13 +117,13 @@ void SampleClockFace()
 {
   byte y0 = 3;
 
-  if (phh / 10 != hh / 10 && phh/10>0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
+  if (phh / 10 != hh / 10 && phh / 10 > 0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, phh % 10, black);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, pmm / 10, black);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, pmm % 10, black);
 
   DrawColon(black);
-    
+
   if ((hh / 10) > 0) DrawDigit(0 * 8 - 1, y0, hh / 10, digitColor);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
