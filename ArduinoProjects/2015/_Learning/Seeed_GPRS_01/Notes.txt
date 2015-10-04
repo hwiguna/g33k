@@ -1,0 +1,33 @@
+My tracfone# 531 739 4027
+
+Set baud rate:
+AT+IPR=19200
+
+Set non binary mode:
+AT+CMGF=1
+
+Send text message (end message by sending 0x1A)
+AT+CMGS="4022610809"
+
+Start voice call
+ATD + +15155207974;
+ATD + +86138xxxxx615;
+
+Answer a call
+ATA
+
+Speaker Level
+AT+CLVL
+
+microphone level
+AT+CMIC
+
+External headset jack control
+AT+CEXTHS
+at+cexths=1 did not help
+
+Mute mode
+AT+CMUT
+
+
+
