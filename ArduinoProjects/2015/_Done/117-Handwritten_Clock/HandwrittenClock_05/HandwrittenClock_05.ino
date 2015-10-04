@@ -14,7 +14,7 @@ v05 - Turn it into a slave (listen to serial port for commands from ESP)
   http://goo.gl/1fj38d
 */
 
-// myMatrix library Copyright (c) 2015 Silviu - www.openhardware.ro
+// myMatrix library Copyright (c) 2015 Silviu - http://openhardware.ro/mymatrix
 #include "myMATRIX.h"
 
 // Wiring for 16x32 Red Green LED Matrix Panel
@@ -32,7 +32,6 @@ byte digitColor = yellow;
 byte drawSpeed = 30; // Smaller = faster
 byte eraseSpeed = drawSpeed; // Smaller = faster
 
-
 // Thanks to my awesome wife for helping me enter these coordinates!
 byte zero[][2] = {{2, 0}, {3, 0}, {4, 1}, {5, 2}, {5, 3}, {5, 4}, {5, 5}, {5, 6}, {5, 7}, {4, 8}, {3, 9}, {2, 9}, {1, 8}, {0, 7}, {0, 6}, {0, 5}, {0, 4}, {0, 3}, {0, 2}, {1, 1}};
 byte one[][2] = {{1, 2}, {2, 1}, {3, 0}, {3, 1}, {3, 2}, {3, 3}, {3, 4}, {3, 5}, {3, 6}, {3, 7}, {3, 8}, {1, 9}, {2, 9}, {3, 9}, {4, 9}, {5, 9}};
@@ -48,8 +47,11 @@ int16_t eraser[][2] = {{ -1, 0}, {1, -1}, {5, -1}, {3, 0}, {1, 1}, { -1, 2}, { -
 
 byte hh = 12;
 byte mm = 58;
+byte ss = 00;
 byte phh = 0;
 byte pmm = 0;
+byte pss = 0;
+unsigned long lastReceive;
 
 char line[80] = "";
 
@@ -70,9 +72,13 @@ void setup ()
 void loop()
 {
   CheckSerialPort();
-  //Count();
-  //SampleClockFace();
-  //IncrementTime();
+
+  if (h!=ph || mm!=pmm || ss!=pss) {
+    DrawTime();
+    phh = hh;
+    pmm = mm;
+    pss = ss;
+  }
 }
 
 void CheckSerialPort()
@@ -81,17 +87,17 @@ void CheckSerialPort()
     int len = strlen(line);
     int inByte = Serial.read();
     if (inByte != 10) {
-      line[ len ] = inByte;
-      line[ len + 1 ] = 0x00;
+      if (inByte!=13) {
+        line[ len ] = inByte;
+        line[ len + 1 ] = 0x00;
+      }
     }
     else
     {
-      line[ len-1 ] = 0x00; // Kill CR and LF
       if ( strlen(line) > 0 && line[0] == '#' ) {
-        phh = 0;
-        pmm = 0;
-        myMatrix.clearScreen();
-        SampleClockFace();
+        hh = toByte(line,2);
+        mm = toByte(line,5);
+        ss = toByte(line,8);
       }
       else {
         myMatrix.clearScreen();
@@ -100,6 +106,14 @@ void CheckSerialPort()
       line[0] = 0x00;
     }
   }
+}
+
+byte toByte(char *str, byte pos)
+{
+  char buf[3];
+  strncpy(str,buf, pos, 2);
+  buf[2]=0;
+  return atoi(buf);
 }
 void IncrementTime()
 {
@@ -113,27 +127,28 @@ void IncrementTime()
   }
 }
 
-void SampleClockFace()
+void DrawTime()
 {
+  //-- Draw frame --
+  myMatrix.clearScreen();
+  myMatrix.drawHLine(0, 31, 0, green);
+  myMatrix.drawHLine(0, 31, 1, green);
+  myMatrix.drawHLine(0, 31, 14, green);
+  myMatrix.drawHLine(0, 31, 15, green);
+
   byte y0 = 3;
+
+  DrawColon( ss%2 ? digitColor : black ); // Draw colon when second is an odd #
 
   if (phh / 10 != hh / 10 && phh / 10 > 0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, phh % 10, black);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, pmm / 10, black);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, pmm % 10, black);
 
-  DrawColon(black);
-
   if ((hh / 10) > 0) DrawDigit(0 * 8 - 1, y0, hh / 10, digitColor);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, mm % 10, digitColor);
-
-  phh = hh;
-  pmm = mm;
-
-  BlinkColon();
-  //delay(1000);
 }
 
 void Eraser(byte x0, byte y0)
@@ -171,29 +186,6 @@ void DrawColon(byte color)
   myMatrix.drawVLine(15, 9, 10, color);
 }
 
-void Count()
-{
-  //-- Count from zero to nine --
-  for (int n = 0; n < 10; n++)
-  {
-    //-- Draw frame --
-    myMatrix.clearScreen();
-    myMatrix.drawHLine(0, 31, 0, green);
-    myMatrix.drawHLine(0, 31, 1, green);
-    myMatrix.drawHLine(0, 31, 14, green);
-    myMatrix.drawHLine(0, 31, 15, green);
-
-    //-- Draw four digits --
-    for (int d = 0; d < 4; d++)
-    {
-      byte x0 = d * 8;
-      byte y0 = 3;
-      DrawDigit(x0, y0, n, digitColor);
-    }
-    delay(500);
-  }
-}
-
 void DrawDigit(byte x0, byte y0, byte n, byte color)
 {
   switch (n)
@@ -210,6 +202,7 @@ void DrawDigit(byte x0, byte y0, byte n, byte color)
     case 9: DrawDigit(x0, y0, nine, sizeof(nine), color); break;
   }
 }
+
 void DrawDigit(byte x0, byte y0, byte dots[][2], byte siz, byte color)
 {
   for (int i = 0; i < siz / 2; i++)

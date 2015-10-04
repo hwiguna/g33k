@@ -13,7 +13,6 @@ int timeZone = -5;
 int getTimeEveryXmillis = 5 * 1000; // every 10 seconds
 
 unsigned long timeToGetTime;
-unsigned long gEpoch;
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 
@@ -86,15 +85,19 @@ void GetTimeFromInternet()
     // now convert NTP time into everyday time:
     // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
     const unsigned long seventyYears = 2208988800UL;
-    gEpoch = secsSince1900 - seventyYears;
+    unsigned long epoch = secsSince1900 - seventyYears;
 
     //-- Send Epoch to Arduino --
+    byte hh = (epoch  % 86400L) / 3600;
+    byte mm = (epoch  % 3600) / 60;
+    byte ss = epoch % 60;
     Serial.print("#");
-    //Serial.println(gEpoch);
-  
-    //    byte hh = (epoch  % 86400L) / 3600;
-    //    byte mm = (epoch  % 3600) / 60;
-    //    byte ss = epoch % 60;
+    Serial.print(hh / 10);
+    Serial.print(hh % 10);
+    Serial.print(mm / 10);
+    Serial.print(mm % 10);
+    Serial.print(ss / 10);
+    Serial.println(ss % 10);
   }
 }
 
