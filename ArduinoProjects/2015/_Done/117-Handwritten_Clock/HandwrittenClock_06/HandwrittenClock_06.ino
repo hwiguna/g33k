@@ -9,6 +9,7 @@ v02 - Implement eraser
 v03 - Count (fake clock)
 v04 - undraw instead of erase
 v05 - Turn it into a slave (listen to serial port for commands from ESP)
+v06 - punted on having ESP as master, now Arduino is master requesting time from ESP
 
   Thanks to Gearbest.com for providing the matrix
   http://goo.gl/1fj38d
@@ -51,7 +52,9 @@ byte ss = 00;
 byte phh = 0;
 byte pmm = 0;
 byte pss = 0;
-unsigned long lastReceive;
+
+int refreshEveryXmillis = 100;
+unsigned long timeToRefresh;
 
 char line[80] = "";
 
@@ -61,32 +64,27 @@ void setup ()
 
   //-- Draw frame --
   myMatrix.clearScreen();
-  myMatrix.drawHLine(0, 31, 0, green);
-  myMatrix.drawHLine(0, 31, 1, green);
-  myMatrix.drawHLine(0, 31, 14, green);
-  myMatrix.drawHLine(0, 31, 15, green);
+//  myMatrix.drawHLine(0, 31, 0, green);
+//  myMatrix.drawHLine(0, 31, 1, green);
+//  myMatrix.drawHLine(0, 31, 14, green);
+//  myMatrix.drawHLine(0, 31, 15, green);
 
   Serial.begin(19200);
 }
 
 void loop()
-{
-  CheckSerialPort();
-
+{  
   if (millis() > timeToRefresh)
   {
-    if (hh!=phh || mm!=pmm || ss!=pss) {
-      //DrawTime();
-      phh = hh;
-      pmm = mm;
-      pss = ss;
-    }
-
-    timeToRefresh = millis() + refreshFreqency;
+    Serial.println("?"); // Ask ESP, what time is it?
+    timeToRefresh = millis() + refreshEveryXmillis;
   }
+
+  // Don't know when ESP going to reply, so keep checking
+  ListenForResponseFromESP();
 }
 
-void CheckSerialPort()
+void ListenForResponseFromESP()
 {
   if (Serial.available() > 0) {
     int len = strlen(line);
@@ -99,17 +97,24 @@ void CheckSerialPort()
     }
     else
     { // It *IS* linefeed! We got a line collected, process it.
-      if ( strlen(line) > 0 && line[0] == '#' ) {
-        lastReceive = millis();
-        hh = toByte(line,1); 
-        mm = toByte(line,4); 
-        ss = toByte(line,7); 
+      char cmd[80];
+      strcpy(cmd, line);
+      line[0] = 0x00;
+      if ( strlen(cmd) > 0 && cmd[0] == '#' ) {
+        hh = toByte(cmd,1); 
+        mm = toByte(cmd,3); 
+        ss = toByte(cmd,5); 
+        if (hh!=phh || mm!=pmm || ss!=pss) {
+          DrawTime();
+          phh = hh;
+          pmm = mm;
+          pss = ss;
+        }
       }
       else {
-        myMatrix.clearScreen();
-        myMatrix.printString(0, 0, yellow, black, line);
+        //myMatrix.clearScreen();
+        //myMatrix.printString(0, 0, yellow, black, line);
       }
-      line[0] = 0x00;
     }
   }
 }
@@ -136,17 +141,13 @@ void IncrementTime()
 
 void DrawTime()
 {
-  //-- Draw frame --
-  myMatrix.clearScreen();
-  myMatrix.drawHLine(0, 31, 0, green);
-  myMatrix.drawHLine(0, 31, 1, green);
-  myMatrix.drawHLine(0, 31, 14, green);
-  myMatrix.drawHLine(0, 31, 15, green);
+  byte y0 = 0;
 
-  byte y0 = 3;
+  DrawColon(digitColor);
 
-  DrawColon( ss%2 ? digitColor : black ); // Draw colon when second is an odd #
-
+  sprintf(line, "%02d", ss);
+  myMatrix.printString(15, 9, yellow, black, line);
+  
   if (phh / 10 != hh / 10 && phh / 10 > 0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, phh % 10, black);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, pmm / 10, black);
@@ -156,6 +157,8 @@ void DrawTime()
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, mm % 10, digitColor);
+
+  DrawColon(black);
 }
 
 void Eraser(byte x0, byte y0)

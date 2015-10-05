@@ -9,6 +9,8 @@ v02 - Implement eraser
 v03 - Count (fake clock)
 v04 - undraw instead of erase
 v05 - Turn it into a slave (listen to serial port for commands from ESP)
+v06 - punted on having ESP as master, now Arduino is master requesting time from ESP
+v07 - Seconds as progress bar
 
   Thanks to Gearbest.com for providing the matrix
   http://goo.gl/1fj38d
@@ -45,13 +47,19 @@ byte eight[][2] = {{3, 0}, {4, 0}, {5, 1}, {5, 2}, {5, 3}, {4, 4}, {2, 4}, {0, 5
 byte nine[][2] = {{4, 4}, {3, 5}, {1, 5}, {0, 4}, {0, 3}, {0, 2}, {0, 1}, {1, 0}, {3, 0}, {4, 0}, {4, 1}, {5, 1}, {5, 2}, {5, 3}, {5, 4}, {5, 5}, {5, 6}, {5, 7}, {4, 8}, {3, 9}, {1, 9}};
 int16_t eraser[][2] = {{ -1, 0}, {1, -1}, {5, -1}, {3, 0}, {1, 1}, { -1, 2}, { -1, 4}, {1, 3}, {3, 2}, {5, 1}, {5, 3}, {3, 4}, {1, 5}, { -1, 6}, { -1, 8}, {1, 7}, {3, 6}, {5, 5}, {5, 7}, {3, 8}, {1, 9}, {5, 9}};
 
-byte hh = 12;
-byte mm = 58;
-byte ss = 00;
-byte phh = 0;
-byte pmm = 0;
-byte pss = 0;
-unsigned long lastReceive;
+byte hh = 0;
+byte mm = 0;
+byte ss = 0;
+byte phh = 99; // Force all digits to be drawn the first time we get actual time.
+byte pmm = 99;
+byte pss = 99;
+
+int refreshEveryXmillis = 250; // Make sure this is enough time to do UpdateSecondsProgress()
+unsigned long timeToRefresh;
+
+// Progress bars to indicate seconds
+int halfSec = 0;
+unsigned long timeForProgress;
 
 char line[80] = "";
 
@@ -61,55 +69,139 @@ void setup ()
 
   //-- Draw frame --
   myMatrix.clearScreen();
-  myMatrix.drawHLine(0, 31, 0, green);
-  myMatrix.drawHLine(0, 31, 1, green);
-  myMatrix.drawHLine(0, 31, 14, green);
-  myMatrix.drawHLine(0, 31, 15, green);
+  //  myMatrix.drawHLine(0, 31, 0, green);
+  //  myMatrix.drawHLine(0, 31, 1, green);
+  //  myMatrix.drawHLine(0, 31, 14, green);
+  //  myMatrix.drawHLine(0, 31, 15, green);
 
   Serial.begin(19200);
 }
 
 void loop()
 {
-  CheckSerialPort();
-
   if (millis() > timeToRefresh)
   {
-    if (hh!=phh || mm!=pmm || ss!=pss) {
-      //DrawTime();
-      phh = hh;
-      pmm = mm;
-      pss = ss;
+    Serial.println("?"); // Ask ESP, what time is it?
+    timeToRefresh = millis() + refreshEveryXmillis;
+  }
+
+  // Don't know when ESP going to reply, so keep checking
+  ListenForResponseFromESP();
+
+  UpdateSecondsProgress();
+}
+
+void UpdateSecondsProgress()
+{
+  if (millis() > timeForProgress)
+  {
+    timeForProgress = millis() + 1000;
+    
+    byte xm = (ss + 1) / 4;
+    if (xm<3) xm=3; // Small effect looks terrible, so fake them out for small seconds.
+    for (byte x = 0; x <= xm; x++)
+    {
+      myMatrix.drawHLine(15 - x, 16 + x, 1, green);
+      myMatrix.drawHLine(15 - x, 16 + x, 14, green);
+      delay(150 / (xm + 1));
     }
 
-    timeToRefresh = millis() + refreshFreqency;
+    for (byte x = xm; x > 0; x--)
+    {
+      myMatrix.drawHLine(0, 16 - x, 1, black);
+      myMatrix.drawHLine(15 + x, 31, 1, black);
+      myMatrix.drawHLine(0, 16 - x, 14, black);
+      myMatrix.drawHLine(15 + x, 31, 14, black);
+      delay(150 / (xm + 1));
+    }
+  }
+}
+void UpdateSecondsProgress_1()
+{
+  if (ss == 0 || ss < pss) { // Erase when we start seconds over
+    myMatrix.fillRectangle(0, 0, 31, 1, black);
+    myMatrix.fillRectangle(0, 14, 31, 15, black);
+  }
+  else
+  {
+    byte row = ss / 15; // All four rows is 60 seconds, so a fourth of that is 15
+    byte xm = ss % 15;
+    byte y = 0;
+    switch (row)
+    {
+      case 0: y = 0; break;
+      case 1: y = 1; break;
+      case 2: y = 14; break;
+      case 3: y = 15; break;
+    }
+    for (byte x = 0; x <= xm; x++)
+    {
+      myMatrix.drawHLine(15 - x, 16 + x, y, green);
+      delay(100 / (xm + 1));
+    }
+
+    for (byte x = xm; x > 0; x--)
+    {
+      myMatrix.drawHLine(15 - x, 16 + x, y, black);
+      delay(100 / (xm + 1));
+    }
   }
 }
 
-void CheckSerialPort()
+
+void UpdateSecondsProgress_0()
+{
+  if (ss == 0 || ss < pss) { // Erase when we start seconds over
+    myMatrix.fillRectangle(0, 0, 31, 1, black);
+    myMatrix.fillRectangle(0, 14, 31, 15, black);
+  }
+  else
+  {
+    byte row = ss / 15; // All four rows is 60 seconds, so a fourth of that is 15
+    byte x = ss % 15;
+    byte y = 0;
+    switch (row)
+    {
+      case 0: y = 0; break;
+      case 1: y = 1; break;
+      case 2: y = 14; break;
+      case 3: y = 15; break;
+    }
+    myMatrix.drawHLine(15 - x, 16 + x, y, green);
+  }
+}
+
+void ListenForResponseFromESP()
 {
   if (Serial.available() > 0) {
     int len = strlen(line);
     int inByte = Serial.read();
     if (inByte != 10) { // NOT Linefeed
-      if (inByte!=13) { // NOT Carriage Return
+      if (inByte != 13) { // NOT Carriage Return
         line[ len ] = inByte; // Collect it.
         line[ len + 1 ] = 0x00;
       }
     }
     else
     { // It *IS* linefeed! We got a line collected, process it.
-      if ( strlen(line) > 0 && line[0] == '#' ) {
-        lastReceive = millis();
-        hh = toByte(line,1); 
-        mm = toByte(line,4); 
-        ss = toByte(line,7); 
+      char cmd[80];
+      strcpy(cmd, line);
+      line[0] = 0x00;
+      if ( strlen(cmd) > 0 && cmd[0] == '#' ) {
+        hh = toByte(cmd, 1);
+        mm = toByte(cmd, 3);
+        ss = toByte(cmd, 5);
+        if (hh != phh || mm != pmm || ss != pss) {
+          DrawTime();
+          phh = hh;
+          pmm = mm;
+          pss = ss;
+        }
       }
       else {
-        myMatrix.clearScreen();
-        myMatrix.printString(0, 0, yellow, black, line);
+        //myMatrix.clearScreen();
+        //myMatrix.printString(0, 0, yellow, black, line);
       }
-      line[0] = 0x00;
     }
   }
 }
@@ -117,35 +209,21 @@ void CheckSerialPort()
 byte toByte(char *str, byte pos)
 {
   char buf[3];
-  strncpy(buf, str+pos,2);
-  buf[2]=0;
+  strncpy(buf, str + pos, 2);
+  buf[2] = 0;
   return atoi(buf);
-}
-
-void IncrementTime()
-{
-  if (++mm > 59)
-  {
-    mm = 0;
-    if (++hh > 12)
-    {
-      hh = 0;
-    }
-  }
 }
 
 void DrawTime()
 {
-  //-- Draw frame --
-  myMatrix.clearScreen();
-  myMatrix.drawHLine(0, 31, 0, green);
-  myMatrix.drawHLine(0, 31, 1, green);
-  myMatrix.drawHLine(0, 31, 14, green);
-  myMatrix.drawHLine(0, 31, 15, green);
-
   byte y0 = 3;
 
-  DrawColon( ss%2 ? digitColor : black ); // Draw colon when second is an odd #
+  //DrawColon( ss%2==0 ? digitColor : black);
+  DrawColon(digitColor);
+  //UpdateSecondsProgress();
+
+  //sprintf(line, "%02d", ss);
+  //myMatrix.printString(15, 9, yellow, black, line);
 
   if (phh / 10 != hh / 10 && phh / 10 > 0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, phh % 10, black);
@@ -156,6 +234,8 @@ void DrawTime()
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, mm % 10, digitColor);
+
+  //DrawColon(black);
 }
 
 void Eraser(byte x0, byte y0)
