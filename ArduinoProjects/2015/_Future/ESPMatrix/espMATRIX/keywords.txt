@@ -1,0 +1,38 @@
+#######################################
+# Syntax Coloring Map For myMATRIX
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+myMATRIX	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+clearScreen	KEYWORD2
+fillRectangle	KEYWORD2
+drawRectangle	KEYWORD2
+drawHLine	KEYWORD2
+drawVLine	KEYWORD2
+printString	KEYWORD2
+hScroll	KEYWORD2
+Init	KEYWORD2
+setPixel	KEYWORD2
+
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+myMatrix	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+red	LITERAL1
+green	LITERAL1
+yellow	LITERAL1
+black	LITERAL1

@@ -17,16 +17,29 @@ v05 - Turn it into a slave (listen to serial port for commands from ESP)
 // myMatrix library Copyright (c) 2015 Silviu - www.openhardware.ro
 #include "espMATRIX.h"
 
+#include <Ticker.h>
+Ticker flipper;
+
 // Wiring for 16x32 Red Green LED Matrix Panel
-#define RowA_Pin 2
-#define RowB_Pin 3
-#define RowC_Pin 4
-#define RowD_Pin 5
-#define OE_Pin 6
-#define Red_Pin 7
-#define Green_Pin 8
-#define CLK_Pin 9
-#define STB_Pin 10
+#define RowA_Pin 16
+#define RowB_Pin 14
+#define RowC_Pin 12
+#define RowD_Pin 13
+#define OE_Pin 2
+#define Red_Pin 1
+#define Green_Pin 4
+#define CLK_Pin 3
+#define STB_Pin 5
+
+//#define RowA_Pin 2
+//#define RowB_Pin 3
+//#define RowC_Pin 4
+//#define RowD_Pin 5
+//#define OE_Pin 6
+//#define Red_Pin 7
+//#define Green_Pin 8
+//#define CLK_Pin 9
+//#define STB_Pin 10
 
 byte digitColor = yellow;
 byte drawSpeed = 30; // Smaller = faster
@@ -51,6 +64,9 @@ byte mm = 58;
 byte phh = 0;
 byte pmm = 0;
 
+unsigned long timeToInc;
+bool timeToRefresh = false;
+
 String line;
 
 void setup ()
@@ -64,20 +80,44 @@ void setup ()
   myMatrix.drawHLine(0, 31, 14, green);
   myMatrix.drawHLine(0, 31, 15, green);
 
-  Serial.begin(115200);
+  //Serial.begin(115200);
+  
+  SampleClockFace();
+
+
+  flipper.attach_ms(1, refresh);
 }
 
 void loop()
 {
-  if (Serial.available() > 0) {
-    int inByte = Serial.read();
-    if (inByte!=0x10) {
-      line += inByte;
-    }
-  }
+//  if (Serial.available() > 0) {
+//    int inByte = Serial.read();
+//    if (inByte!=0x10) {
+//      line += inByte;
+//    }
+//  }
   //Count();
-  //SampleClockFace();
-  //IncrementTime();
+  if (millis() > timeToInc)
+  {
+  SampleClockFace();
+  IncrementTime();
+//  //myMatrix.Show();
+  timeToInc = millis() + 1000;
+  }
+
+//  if (timeToRefresh) {
+//    flipper.detach();
+//    myMatrix.Show();
+//    timeToRefresh = false;
+//    flipper.attach_ms(0.5, refresh);
+//  }
+//  
+}
+
+void refresh()
+{
+  //timeToRefresh=true;
+  myMatrix.Show();
 }
 
 void IncrementTime()
@@ -111,7 +151,7 @@ void SampleClockFace()
   phh = hh;
   pmm = mm;
 
-  BlinkColon();
+  //BlinkColon();
   //delay(1000);
 }
 
