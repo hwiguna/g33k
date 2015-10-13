@@ -36,7 +36,7 @@ void setup() {
 //=== the loop function runs over and over again forever ===
 void loop() {
   SimonSays();
-  PlayerSays();
+  //PlayerSays();
   delay(1000);
 }
 
