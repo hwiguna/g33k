@@ -63,6 +63,7 @@ byte hh = 12;
 byte mm = 58;
 byte phh = 0;
 byte pmm = 0;
+bool isBusy = false;
 
 unsigned long timeToInc;
 bool timeToRefresh = false;
@@ -75,49 +76,36 @@ void setup ()
 
   //-- Draw frame --
   myMatrix.clearScreen();
-  myMatrix.drawHLine(0, 31, 0, green);
-  myMatrix.drawHLine(0, 31, 1, green);
-  myMatrix.drawHLine(0, 31, 14, green);
-  myMatrix.drawHLine(0, 31, 15, green);
+//  myMatrix.drawHLine(0, 31, 0, green);
+//  myMatrix.drawHLine(0, 31, 1, green);
+//  myMatrix.drawHLine(0, 31, 14, green);
+//  myMatrix.drawHLine(0, 31, 15, green);
 
   //Serial.begin(115200);
-  
+
   SampleClockFace();
 
-
-  flipper.attach_ms(1, refresh);
+  flipper.attach_ms(1.5, refresh);
 }
 
 void loop()
 {
-//  if (Serial.available() > 0) {
-//    int inByte = Serial.read();
-//    if (inByte!=0x10) {
-//      line += inByte;
-//    }
-//  }
-  //Count();
   if (millis() > timeToInc)
   {
-  SampleClockFace();
-  IncrementTime();
-//  //myMatrix.Show();
-  timeToInc = millis() + 1000;
+    IncrementTime();
+    SampleClockFace();
+    timeToInc = millis() + 1000;
   }
-
-//  if (timeToRefresh) {
-//    flipper.detach();
-//    myMatrix.Show();
-//    timeToRefresh = false;
-//    flipper.attach_ms(0.5, refresh);
-//  }
-//  
+  delay(100);
 }
 
 void refresh()
 {
-  //timeToRefresh=true;
-  myMatrix.Show();
+  if (!isBusy) {
+    isBusy = true;
+    myMatrix.Show();
+    isBusy = false;
+  }
 }
 
 void IncrementTime()
@@ -136,13 +124,13 @@ void SampleClockFace()
 {
   byte y0 = 3;
 
-  if (phh / 10 != hh / 10 && phh/10>0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
+  if (phh / 10 != hh / 10 && phh / 10 > 0) DrawDigit(0 * 8 - 1, y0, phh / 10, black);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, phh % 10, black);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, pmm / 10, black);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, pmm % 10, black);
 
   DrawColon(black);
-    
+
   if ((hh / 10) > 0) DrawDigit(0 * 8 - 1, y0, hh / 10, digitColor);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
