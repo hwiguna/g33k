@@ -5,6 +5,14 @@
 // 01 - modify to work with Chinese knockoff
 // 02 - Draw Happy Halloween & Pumpkin Face
 
+// Wiring:
+// Arduino A4 --> OLED SDA
+// Arduino A5 --> OLED SCL
+// Arduino D2 --> OLED VCC
+// Arduino Gnd--> OLED Gnd
+//
+// Potentiometers are on Gnd and +5V, wipers go to A0, A2, A2
+
 /*********************************************************************
 This is an example for our Monochrome OLEDs based on SSD1306 drivers
 
@@ -31,9 +39,11 @@ All text above, and the splash screen must be included in any redistribution
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
 
-int prevR = -1;
-int prevM = -1;
-int prevH = -1;
+int prevEyeSize = -1;
+int prevEyeRotation = 0;
+int prevMouthWidth = -1;
+int eyeSep = 2;
+int headR = 50;
 
 #define LOGO16_GLCD_HEIGHT 16
 #define LOGO16_GLCD_WIDTH  16
@@ -61,116 +71,25 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 #endif
 
 void setup()   {
-  Serial.begin(9600);
-
+  // This is a hack to get my Chinese OLED to work.
+  // I power the OLED using D2 because my OLED does not have a reset pin.
+  // Without this hack, my oled displays static random dots.
   pinMode(2, OUTPUT);
   digitalWrite(2, LOW);
-  delay(100); // IMPORTANT! Wait a second before sending I2C commands!
+  delay(100);
   digitalWrite(2, HIGH);
 
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
   display.clearDisplay();
-
-  /*
-    // draw a single pixel
-    display.drawPixel(10, 10, WHITE);
-    // Show the display buffer on the hardware.
-    // NOTE: You _must_ call display after making any drawing commands
-    // to make them visible on the display hardware!
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw many lines
-    testdrawline();
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw rectangles
-    testdrawrect();
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw multiple rectangles
-    testfillrect();
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw mulitple circles
-    testdrawcircle();
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw a white circle, 10 pixel radius
-    display.fillCircle(display.width()/2, display.height()/2, 10, WHITE);
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    testdrawroundrect();
-    delay(2000);
-    display.clearDisplay();
-
-    testfillroundrect();
-    delay(2000);
-    display.clearDisplay();
-
-    testdrawtriangle();
-    delay(2000);
-    display.clearDisplay();
-
-    testfilltriangle();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw the first ~12 characters in the font
-    testdrawchar();
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-
-    // draw scrolling text
-    testscrolltext();
-    delay(2000);
-    display.clearDisplay();
-
-    // text display tests
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0,0);
-    display.println("Hello, world!");
-    display.setTextColor(BLACK, WHITE); // 'inverted' text
-    display.println(3.141592);
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
-    display.print("0x"); display.println(0xDEADBEEF, HEX);
-    display.display();
-    delay(2000);
-
-    // miniature bitmap display
-    display.clearDisplay();
-    display.drawBitmap(30, 16,  logo16_glcd_bmp, 16, 16, 1);
-    display.display();
-
-    // invert the display
-    display.invertDisplay(true);
-    delay(1000);
-    display.invertDisplay(false);
-    delay(1000);
-  */
 }
 
-
 void loop() {
-  int r = map(analogRead(A0), 0, 1023, 0, display.height() / 2);
-  int h = map(analogRead(A1), 0, 1023, 0, display.width() / 2);
-  int m = map(analogRead(A2), 0, 1023, 0, display.width() / 2);
-  if (r != prevR || m != prevM || h != prevH)
+  int eyeSize = map(analogRead(A0), 0, 1023, 0, display.height() / 2);
+  int eyeRotation = map(analogRead(A1), 0, 1023, 0, 360);
+  int mouthWidth = map(analogRead(A2), 0, 1023, 0, display.width() / 2);
+
+  if (eyeSize != prevEyeSize || eyeRotation != prevEyeRotation || mouthWidth != prevMouthWidth)
   {
     display.setTextColor(WHITE);
     display.setCursor(8, 0);
@@ -178,23 +97,45 @@ void loop() {
     display.println("Halloween!");
 
     //-- Head --
-    display.drawCircle(display.width() / 2, display.height() / 2, prevH, BLACK);
-    display.drawCircle(display.width() / 2, display.height() / 2, h, WHITE);
+    display.drawCircle(display.width() / 2, display.height() / 2, headR, WHITE);
 
-    //-- Eyes --
-    display.drawCircle(display.width() / 2 - prevR, display.height() / 2, prevR, BLACK);
-    display.drawCircle(display.width() / 2 - r, display.height() / 2, r, WHITE);
+    //-- Left Eye --
+    DrawEye(display.width() / 2 - prevEyeSize - eyeSep, display.height() / 2, prevEyeSize, prevEyeRotation, BLACK);
+    DrawEye(display.width() / 2 - eyeSize - eyeSep, display.height() / 2, eyeSize, eyeRotation, WHITE);
 
-    display.drawCircle(display.width() / 2 + prevR, display.height() / 2, prevR, BLACK);
-    display.drawCircle(display.width() / 2 + r, display.height() / 2, r, WHITE);
+    //-- Right Eye --
+    DrawEye(display.width() / 2 + prevEyeSize + eyeSep, display.height() / 2, prevEyeSize, prevEyeRotation, BLACK);
+    DrawEye(display.width() / 2 + eyeSize + eyeSep, display.height() / 2, eyeSize, eyeRotation, WHITE);
 
-    DrawMouth(prevM, BLACK);
-    DrawMouth(m, WHITE);
+    //-- Mouth --
+    DrawMouth(prevMouthWidth, BLACK);
+    DrawMouth(mouthWidth, WHITE);
+
     display.display();
-    prevR = r;
-    prevH = h;
-    prevM = m;
+
+    prevEyeSize = eyeSize;
+    prevEyeRotation = eyeRotation;
+    prevMouthWidth = mouthWidth;
   }
+}
+
+void DrawEye(int x0, int y0, int r, int rotation, int color)
+{
+  //    display.drawCircle(display.width() / 2 - r, display.height() / 2, r, WHITE);
+  //    display.drawCircle(display.width() / 2 + r, display.height() / 2, r, WHITE);
+
+  int x[3], y[3];
+  for (int i = 0; i < 3; i++)
+  {
+    float angle = (rotation * 2 * PI / 360) + i * 2 * PI / 3;
+    x[i] = x0 + sin(angle) * r;
+    y[i] = y0 + cos(angle) * r;
+  }
+  display.drawTriangle(
+    x[0], y[0],
+    x[1], y[1],
+    x[2], y[2],
+    color);
 }
 
 void DrawMouth(byte width, int color)
@@ -223,148 +164,4 @@ void DrawMouth(byte width, int color)
   display.drawLine( x5, y1, x6, y0, color);
   display.drawLine( x6, y0, x7, y1, color);
   display.drawLine( x7, y1, x8, y0, color);
-}
-
-void testdrawchar(void) {
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 0);
-
-  for (uint8_t i = 0; i < 168; i++) {
-    if (i == '\n') continue;
-    display.write(i);
-    if ((i > 0) && (i % 21 == 0))
-      display.println();
-  }
-  display.display();
-}
-
-void testdrawcircle(void) {
-  for (int16_t i = 0; i < display.height(); i += 2) {
-    display.drawCircle(display.width() / 2, display.height() / 2, i, WHITE);
-    display.display();
-  }
-}
-
-void testfillrect(void) {
-  uint8_t color = 1;
-  for (int16_t i = 0; i < display.height() / 2; i += 3) {
-    // alternate colors
-    display.fillRect(i, i, display.width() - i * 2, display.height() - i * 2, color % 2);
-    display.display();
-    color++;
-  }
-}
-
-void testdrawtriangle(void) {
-  for (int16_t i = 0; i < min(display.width(), display.height()) / 2; i += 5) {
-    display.drawTriangle(display.width() / 2, display.height() / 2 - i,
-                         display.width() / 2 - i, display.height() / 2 + i,
-                         display.width() / 2 + i, display.height() / 2 + i, WHITE);
-    display.display();
-  }
-}
-
-void testfilltriangle(void) {
-  uint8_t color = WHITE;
-  for (int16_t i = min(display.width(), display.height()) / 2; i > 0; i -= 5) {
-    display.fillTriangle(display.width() / 2, display.height() / 2 - i,
-                         display.width() / 2 - i, display.height() / 2 + i,
-                         display.width() / 2 + i, display.height() / 2 + i, WHITE);
-    if (color == WHITE) color = BLACK;
-    else color = WHITE;
-    display.display();
-  }
-}
-
-void testdrawroundrect(void) {
-  for (int16_t i = 0; i < display.height() / 2 - 2; i += 2) {
-    display.drawRoundRect(i, i, display.width() - 2 * i, display.height() - 2 * i, display.height() / 4, WHITE);
-    display.display();
-  }
-}
-
-void testfillroundrect(void) {
-  uint8_t color = WHITE;
-  for (int16_t i = 0; i < display.height() / 2 - 2; i += 2) {
-    display.fillRoundRect(i, i, display.width() - 2 * i, display.height() - 2 * i, display.height() / 4, color);
-    if (color == WHITE) color = BLACK;
-    else color = WHITE;
-    display.display();
-  }
-}
-
-void testdrawrect(void) {
-  for (int16_t i = 0; i < display.height() / 2; i += 2) {
-    display.drawRect(i, i, display.width() - 2 * i, display.height() - 2 * i, WHITE);
-    display.display();
-  }
-}
-
-void testdrawline() {
-  for (int16_t i = 0; i < display.width(); i += 4) {
-    display.drawLine(0, 0, i, display.height() - 1, WHITE);
-    display.display();
-  }
-  for (int16_t i = 0; i < display.height(); i += 4) {
-    display.drawLine(0, 0, display.width() - 1, i, WHITE);
-    display.display();
-  }
-  delay(250);
-
-  display.clearDisplay();
-  for (int16_t i = 0; i < display.width(); i += 4) {
-    display.drawLine(0, display.height() - 1, i, 0, WHITE);
-    display.display();
-  }
-  for (int16_t i = display.height() - 1; i >= 0; i -= 4) {
-    display.drawLine(0, display.height() - 1, display.width() - 1, i, WHITE);
-    display.display();
-  }
-  delay(250);
-
-  display.clearDisplay();
-  for (int16_t i = display.width() - 1; i >= 0; i -= 4) {
-    display.drawLine(display.width() - 1, display.height() - 1, i, 0, WHITE);
-    display.display();
-  }
-  for (int16_t i = display.height() - 1; i >= 0; i -= 4) {
-    display.drawLine(display.width() - 1, display.height() - 1, 0, i, WHITE);
-    display.display();
-  }
-  delay(250);
-
-  display.clearDisplay();
-  for (int16_t i = 0; i < display.height(); i += 4) {
-    display.drawLine(display.width() - 1, 0, 0, i, WHITE);
-    display.display();
-  }
-  for (int16_t i = 0; i < display.width(); i += 4) {
-    display.drawLine(display.width() - 1, 0, i, display.height() - 1, WHITE);
-    display.display();
-  }
-  delay(250);
-}
-
-void testscrolltext(void) {
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  display.setCursor(10, 0);
-  display.clearDisplay();
-  display.println("scroll");
-  display.display();
-
-  display.startscrollright(0x00, 0x0F);
-  delay(2000);
-  display.stopscroll();
-  delay(1000);
-  display.startscrollleft(0x00, 0x0F);
-  delay(2000);
-  display.stopscroll();
-  delay(1000);
-  display.startscrolldiagright(0x00, 0x07);
-  delay(2000);
-  display.startscrolldiagleft(0x00, 0x07);
-  delay(2000);
-  display.stopscroll();
 }
