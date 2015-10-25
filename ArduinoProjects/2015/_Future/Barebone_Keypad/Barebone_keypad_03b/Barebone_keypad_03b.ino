@@ -71,9 +71,9 @@ void loop() {
 #ifndef LEONARDO
   UsbKeyboard.update();
 #endif
-  
+
   //digitalWrite(13, !digitalRead(13)); // I don't understand this, but it's in Oxer's code
-  
+
   for (byte c = 0; c < 10; c++)
   {
     digitalWrite(columnPins[c], LOW);
@@ -81,7 +81,7 @@ void loop() {
     {
       if (digitalRead(rowPins[r]) == 0)
       {
-	    int Mods = Shift() + RedShift();
+        int Mods = Shift() + RedShift();
 
         if (r == 0 && c == 0) {
           HIT(KEY_1, Mods);
@@ -208,9 +208,9 @@ void loop() {
         }
         while (digitalRead(rowPins[c]) == 0) delay(10);
 
-        #ifdef LEONARDO
+#ifdef LEONARDO
         Keyboard.releaseAll();
-        #endif
+#endif
       }
     }
     digitalWrite(columnPins[c], HIGH);
@@ -218,9 +218,9 @@ void loop() {
 
 #ifndef LEONARDO
 #if BYPASS_TIMER_ISR  // check if timer isr fixed.
-  delayMs(20);
+  delayMs(50);
 #else
-  delay(20);
+  delay(50);
 #endif
 #endif
 }
