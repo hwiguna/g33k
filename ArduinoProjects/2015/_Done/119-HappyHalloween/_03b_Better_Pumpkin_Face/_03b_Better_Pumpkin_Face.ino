@@ -44,7 +44,7 @@ int prevEyeSize = -1;
 int prevEyeRotation = 0;
 int prevEyeSlant = 0;
 int prevMouthWidth = -1;
-int eyeSep = 2;
+int eyeSep = 5;
 int headR = 50;
 unsigned long timeToAnimate;
 unsigned long animationSpeed = 100;
@@ -97,12 +97,15 @@ void setup()   {
 }
 
 void loop() {
-  eyeSize = map(analogRead(A0), 0, 1023, 0, display.height() / 2);
-  int eyeSlant = map(analogRead(A1), 0, 1023, 0, 120);
-  int grinHeight = map(analogRead(A2), 0, 1023, -15, +10);
+  eyeSize = 12; //map(analogRead(A0), 0, 1023, 0, display.height() / 2);
+  eyeRotation = map(analogRead(A0), 0, 1023, 0, 360);
+  int eyeSlant = map(analogRead(A1), 0, 1023, 0, 90);
+  int grinHeight = map(analogRead(A2), 0, 1023, +10, -15);
 
   if (eyeSize != prevEyeSize || eyeRotation != prevEyeRotation || eyeSlant != prevEyeSlant || mouthWidth != prevMouthWidth || grinHeight != prevGrinHeight)
   {
+    display.clearDisplay();
+
     display.setTextColor(WHITE);
     display.setCursor(8, 0);
     display.setTextSize(2);
@@ -112,11 +115,9 @@ void loop() {
     display.drawCircle(display.width() / 2, display.height() / 2, headR, WHITE);
 
     //-- Eyes --
-    DrawEyes(display.width() / 2, display.height() / 2, prevEyeSize, prevEyeRotation, prevEyeSlant, BLACK);
-    DrawEyes(display.width() / 2, display.height() / 2, eyeSize, eyeRotation, eyeSlant, WHITE);
+    DrawEyes(display.width() / 2, display.height() / 2 - 4, eyeSize, eyeRotation, eyeSlant, WHITE);
 
     //-- Mouth --
-    DrawMouth2(prevMouthWidth, prevGrinHeight, BLACK);
     DrawMouth2(mouthWidth, grinHeight, WHITE);
 
     display.display();
@@ -130,8 +131,8 @@ void loop() {
 
   if (millis() > timeToAnimate)
   {
-    //AnimateEyeSize();
-    AnimateEyeRotation();
+    AnimateEyeSize();
+    //AnimateEyeRotation();
     //AnimateMouth();
     timeToAnimate = millis() + animationSpeed;
   }
@@ -164,7 +165,8 @@ void DrawEyes(int x0, int y0, int r, int rotation, int slant, int color)
   for (int i = 0; i < 3; i++)
   {
     float angle = (rotation * 2 * PI / 360) + i * 2 * PI / 3;
-    angle += slant;
+    if (i == 0)
+      angle += (slant * 2 * PI/360);
     s[i] = sin(angle) * r;
     c[i] = cos(angle) * r;
   }
@@ -214,6 +216,11 @@ void DrawMouth1(byte width, byte grinHeight, int color)
 
 void DrawMouth2(byte width, int grinHeight, int color)
 {
+  /*
+    / B --- C \
+   A           D
+    \ F --- E /
+   */
   int baseWidth = 10;
   int xOrigin =  display.width() / 2;
   int aX = xOrigin - width;
@@ -231,8 +238,6 @@ void DrawMouth2(byte width, int grinHeight, int color)
   int dY = aY;
   int eY = y1;
   int fY = eY;
-
-  //display.drawLine( xOrigin - width, 61, xOrigin + width, 61, color);
 
   display.drawLine( aX, aY, bX, bY, color);
   display.drawLine( bX, bY, cX, cY, color);
