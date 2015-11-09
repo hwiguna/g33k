@@ -64,9 +64,9 @@ void setup ()
 void loop()
 {
   myMatrix.clearScreen();
-  HariFun();
+  //HariFun();
   //HelloYouTube();
-  //MakeShiftLincoln();
+  MakeShiftLincoln();
   //Curtains();
 }
 
@@ -88,7 +88,7 @@ void HariFun()
 
 void MakeShiftLincoln()
 {
-  myMatrix.hScroll(4, yellow, black, "        Welcome to      ");
+  myMatrix.hScroll(4, yellow, black, "      We are...      ");
 
   myMatrix.printString(4,0, red, black, "Make");
   delay(500);

@@ -65,6 +65,8 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
   B01110000, B01110000,
   B00000000, B00110000
 };
+  #define SSD1306_LCDWIDTH                  128
+  #define SSD1306_LCDHEIGHT                 64
 
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
@@ -73,8 +75,8 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 int  prevmm;
 int  prevdd;
 int  prevyy;
-int  mm = 9;
-int  dd = 19;
+int  mm = 11;
+int  dd = 7;
 int  yy = 2015;
 
 void DisplayInputScreen(int mm, int dd, int yyyy)
