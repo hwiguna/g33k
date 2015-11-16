@@ -1,6 +1,7 @@
 // RGB Spire Tester
 // Hari Wiguna 2015
 // v1 - test all levels, not worrying about color sequence
+// v2 - make sure that colors are tested in same sequence for all levels
 
 byte pinStart = 2; // Connect spire to D2, d3, D4, D5
 
@@ -16,13 +17,13 @@ void loop() {
     pinMode(pinStart + i, OUTPUT);
     digitalWrite(pinStart + i, HIGH);
     
-    for (byte j = 0; j < 4; j++) {
-      if (i != j) {
-        pinMode(pinStart + j, OUTPUT);
-        Flash(pinStart + j);
-        pinMode(pinStart + j, INPUT);
-        delay(1000);
-      }
+    for (byte j = 0; j < 3; j++) {
+      byte c = i+1+j;
+      if (c>3) c=c-4;
+        pinMode(pinStart + c, OUTPUT);
+        Flash(pinStart + c);
+        pinMode(pinStart + c, INPUT);
+        delay(300);
     }
 
     digitalWrite(pinStart + i, LOW);
