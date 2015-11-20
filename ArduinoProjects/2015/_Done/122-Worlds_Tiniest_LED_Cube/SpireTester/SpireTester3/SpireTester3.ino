@@ -12,20 +12,20 @@ void setup() {
 }
 
 void loop() {
-  for (byte i = 0; i < 4; i++) {
+  for (int i = 3; i >= 0; i--) {
+    byte gnd = pinStart + i;
+    pinMode(gnd, OUTPUT);
+    digitalWrite(gnd, HIGH);
 
-    pinMode(pinStart + i, OUTPUT);
-    digitalWrite(pinStart + i, HIGH);
-
-    for (byte j = 0; j < 3; j++) {
+    for (byte j = 2; j < 3; j++) {
       byte c = i + 1 + j;
       if (c > 3) c = c - 4;
       Flash(pinStart + c);
-      delay(300);
+      delay(50);
     }
 
-    digitalWrite(pinStart + i, LOW);
-    pinMode(pinStart + i, INPUT);
+    digitalWrite(gnd, LOW);
+    pinMode(gnd, INPUT);
   }
   //delay(20);
 }

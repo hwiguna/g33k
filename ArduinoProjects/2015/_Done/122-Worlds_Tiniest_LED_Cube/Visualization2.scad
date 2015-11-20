@@ -1,17 +1,27 @@
-ledX=3.4;
-ledY=2.77;
+ledX=2.77;
+ledY=3.4;
 ledZ=1.81;
-offset = 5; //ledX*2;
+offset = 8; //ledX*2;
 sz=20;
 
 $fn=16;
 module LED()
 {
-    //difference() {
-      cube([ledX,ledY,ledZ], center=true);
-      translate([0,0,0.7])
-        circle(d=ledY-0.3);
-    //};
+    union() {
+      color("Black",0.1) cube([ledX,ledY,ledZ], center=true);
+        
+      translate([ledX/3,ledY/3,0.5]) color("red")
+        cube(ledY/3,center=true);
+        
+      translate([-ledX/3,ledY/3,0.5]) color("GreenYellow")
+        cube(ledY/3,center=true);
+        
+      translate([-ledX/3,-ledY/3,0.5]) color("Blue")
+        cube(ledY/3,center=true);
+        
+      translate([ledX/3,-ledY/3,0.5]) color("Black")
+        cube(ledY/3,center=true);
+    }
 }
 
 translate([-1.5*offset,-1.5*offset,-1.5*offset])
@@ -21,15 +31,10 @@ translate([-1.5*offset,-1.5*offset,-1.5*offset])
       for(z = [0 : 3])
         translate([x*offset,y*offset,z*offset])
         {
-          if (z==1 || z==3) {
-            rotate([0,0, 90])
-              LED();}
-          else {
-            rotate([0,0, 0])
+            rotate([0,0,-z*90])
               LED();
-          };
         };
   }
 
-color(green,0.2)
-  cube([sz,sz,sz], center=true);
+//color(yellow,0.2)
+//  cube([sz,sz,sz], center=true);
