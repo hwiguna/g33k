@@ -3,8 +3,8 @@
 int column[]={0,1,2,3,4,5,6,7,8,9,10,11};
 int row[] = {14,15,16,17,18};
 
-int hourPin = 12;
-int minutePin = 13;
+int hourButtonPin = 12;   // Other button leg should go to ground, no pullup resistor needed.
+int minuteButtonPin = 13; // Other button leg should go to ground, no pullup resistor needed.
 
 void setup()
 {
@@ -21,20 +21,20 @@ void setup()
   }
 
   //-- Setup button pins --
-  pinMode(hourPin,INPUT_PULLUP);
-  pinMode(minutePin,INPUT_PULLUP);
+  pinMode(hourButtonPin,INPUT_PULLUP);
+  pinMode(minuteButtonPin,INPUT_PULLUP);
 }
 
 void CheckButtons()
 {
-  if (digitalRead(hourPin)==0) {
+  if (digitalRead(hourButtonPin)==0) {
     int hh = hourFormat12() + 1;
     if (hh>12) hh=0;
     setTime(hh, minute(), second(), day(), month(), year());
     delay(100);
   }
 
-  if (digitalRead(minutePin)==0) {
+  if (digitalRead(minuteButtonPin)==0) {
     int mm = minute() + 1;
     if (mm>59) mm=0;
     setTime(hourFormat12(), mm, second(), day(), month(), year());
