@@ -21,7 +21,7 @@ void loop() {
       byte c = i + 1 + j;
       if (c > 3) c = c - 4;
       Flash(pinStart + c);
-      delay(300);
+      delay(1000);
     }
 
     digitalWrite(pinStart + i, LOW);
