@@ -659,9 +659,6 @@ design rules under a new name.</description>
 <contactref element="JP3" pad="8"/>
 <wire x1="24.13" y1="2.54" x2="24.13" y2="27.94" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="N$81">
-<via x="12.7" y="19.05" extent="1-16" drill="0.5"/>
-</signal>
 <signal name="N$82">
 </signal>
 <signal name="N$85">
