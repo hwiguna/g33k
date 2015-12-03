@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="10" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -38,7 +38,7 @@
 <layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
@@ -63,31 +63,39 @@
 <pad name="GREEN" x="1.5" y="1.5" drill="0.3302" diameter="0.6096"/>
 <pad name="BLUE" x="-1.5" y="1.5" drill="0.3302" diameter="0.6096"/>
 </package>
+<package name="10MIL">
+<pad name="R" x="1.27" y="-1.27" drill="0.5"/>
+<pad name="G" x="1.27" y="1.27" drill="0.5"/>
+<pad name="B" x="-1.27" y="1.27" drill="0.5"/>
+<pad name="A" x="-1.27" y="-1.27" drill="0.5"/>
+</package>
 </packages>
 <symbols>
 <symbol name="PILLAR">
-<pin name="GREEN" x="2.54" y="2.54" visible="pin" length="point"/>
-<pin name="RED" x="2.54" y="-2.54" visible="pin" length="point"/>
-<pin name="+" x="-2.54" y="-2.54" length="point" rot="R180"/>
-<pin name="BLUE" x="-2.54" y="2.54" visible="pin" length="point" rot="R180"/>
-<circle x="-2.54" y="2.54" radius="0.254" width="0.254" layer="94"/>
-<circle x="-2.54" y="-2.54" radius="0.254" width="0.254" layer="94"/>
-<circle x="2.54" y="2.54" radius="0.254" width="0.254" layer="94"/>
-<circle x="2.54" y="-2.54" radius="0.254" width="0.254" layer="94"/>
+<pin name="G" x="1.27" y="1.27" visible="off" length="point"/>
+<pin name="R" x="1.27" y="-1.27" visible="off" length="point"/>
+<pin name="A" x="-1.27" y="-1.27" visible="off" length="point" rot="R180"/>
+<pin name="B" x="-1.27" y="1.27" visible="off" length="point" rot="R180"/>
+<circle x="-1.27" y="1.27" radius="0.254" width="0.254" layer="94"/>
+<circle x="-1.27" y="-1.27" radius="0.254" width="0.254" layer="94"/>
+<circle x="1.27" y="1.27" radius="0.254" width="0.254" layer="94"/>
+<circle x="1.27" y="-1.27" radius="0.254" width="0.254" layer="94"/>
+<rectangle x1="-1.27" y1="-1.27" x2="1.27" y2="1.27" layer="95"/>
+<text x="0" y="1.778" size="0.6096" layer="95" align="bottom-center">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="PILLAR">
+<deviceset name="PILLAR" prefix="P">
 <gates>
 <gate name="G$1" symbol="PILLAR" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="PILLAR_PADS">
+<device name="" package="10MIL">
 <connects>
-<connect gate="G$1" pin="+" pad="+"/>
-<connect gate="G$1" pin="BLUE" pad="BLUE"/>
-<connect gate="G$1" pin="GREEN" pad="GREEN"/>
-<connect gate="G$1" pin="RED" pad="RED"/>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="B" pad="B"/>
+<connect gate="G$1" pin="G" pad="G"/>
+<connect gate="G$1" pin="R" pad="R"/>
 </connects>
 <technologies>
 <technology name=""/>

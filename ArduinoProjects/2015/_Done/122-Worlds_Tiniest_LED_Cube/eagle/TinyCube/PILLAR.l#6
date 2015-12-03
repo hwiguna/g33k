@@ -81,11 +81,10 @@
 <circle x="1.27" y="1.27" radius="0.254" width="0.254" layer="94"/>
 <circle x="1.27" y="-1.27" radius="0.254" width="0.254" layer="94"/>
 <rectangle x1="-1.27" y1="-1.27" x2="1.27" y2="1.27" layer="95"/>
-<text x="0" y="2.54" size="1.27" layer="95" font="fixed" align="bottom-center">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="PILLAR" prefix="P">
+<deviceset name="PILLAR">
 <gates>
 <gate name="G$1" symbol="PILLAR" x="0" y="0"/>
 </gates>

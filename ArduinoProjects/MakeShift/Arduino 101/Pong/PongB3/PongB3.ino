@@ -43,7 +43,7 @@ void DelayBall()
   unsigned long timeout = millis() + ballDelay;
   while (millis() < timeout)
   {
-    if ((ballPosition != 0 )&& (digitalRead(btnLeft) == IsPressed)) {
+    if ((ballPosition != 0 ) && (digitalRead(btnLeft) == IsPressed)) {
       GameOver(0);
       break;
     }
@@ -89,6 +89,7 @@ void GameOver(int which)
     delay(100);
   }
   ballDirection = 0;
+  ballDelay = 200;
 }
 
 void MoveBall()
@@ -112,6 +113,7 @@ void WaitForRightPlayer()
     if (digitalRead(btnRight) == IsPressed) {
       delay(debounceDelay); // allow button to flutter
       ballDirection = -1;
+      ballDelay =  ballDelay -  5;
       break;
     }
   }
@@ -128,6 +130,7 @@ void WaitForLeftPlayer()
     if (digitalRead(btnLeft) == IsPressed) {
       delay(debounceDelay); // allow button to flutter
       ballDirection = +1;
+      ballDelay =  ballDelay - 5;
       break;
     }
   }

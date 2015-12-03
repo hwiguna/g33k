@@ -352,10 +352,10 @@ UsedLibrary="PILLAR.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="-6312 370 -5389 1042"
+Loc="319 119 1242 791"
 State=2
 Number=0
 
 [Desktop]
-Screen="9600 2160"
+Screen="1920 1080"
 Window="Win_1"

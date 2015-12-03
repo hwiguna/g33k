@@ -39,17 +39,13 @@ void GameOver(int player)
   
   if (player == 0) // player 0 lost
   {
-    // Indicate that player 1 wins
-    digitalWrite(led0 + 7, HIGH);
-    digitalWrite(led0 + 6, HIGH);
-    digitalWrite(led0 + 5, HIGH);
+    // Indicate that player 0 Lost
+    digitalWrite(led0, HIGH);
   }
   else
   {
-    // Indicate that player 0 wins
-    digitalWrite(led0, HIGH);
-    digitalWrite(led0 + 1, HIGH);
-    digitalWrite(led0 + 2, HIGH);
+    // Indicate that player 1 lost
+    digitalWrite(led0+7, HIGH);
   }
 }
 
