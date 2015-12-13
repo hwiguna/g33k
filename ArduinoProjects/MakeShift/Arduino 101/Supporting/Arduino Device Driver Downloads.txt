@@ -1,0 +1,5 @@
+Arduino device driver for Macintosh:
+http://kiguino.moos.io/2014/12/31/how-to-use-arduino-nano-mini-pro-with-CH340G-on-mac-osx-yosemite.html
+
+Arduino device driver for Windows:
+http://www.microcontrols.org/arduino-uno-clone-ch340-ch341-chipset-usb-drivers/
