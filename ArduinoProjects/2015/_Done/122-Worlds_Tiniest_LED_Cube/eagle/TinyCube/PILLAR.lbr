@@ -82,6 +82,10 @@
 <text x="-0.635" y="0.635" size="0.4064" layer="25" align="center">R</text>
 <text x="-0.635" y="-0.762" size="0.4064" layer="25" align="center">G</text>
 <text x="0.635" y="-0.762" size="0.4064" layer="25" align="center">B</text>
+<rectangle x1="-0.635" y1="1.143" x2="0.635" y2="1.397" layer="25"/>
+<rectangle x1="1.143" y1="-0.635" x2="1.397" y2="0.635" layer="25"/>
+<rectangle x1="-1.397" y1="-0.635" x2="-1.143" y2="0.635" layer="25"/>
+<rectangle x1="-0.635" y1="-1.397" x2="0.635" y2="-1.143" layer="25"/>
 </package>
 </packages>
 <symbols>
