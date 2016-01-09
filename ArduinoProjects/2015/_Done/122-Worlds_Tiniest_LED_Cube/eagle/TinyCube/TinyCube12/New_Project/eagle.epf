@@ -1,7 +1,7 @@
 [Eagle]
 Version="07 05 00"
 Platform="Windows"
-Serial="62191E841E-LSR-WLM-1EL"
+Serial="740106C74B-LSR-WLM-1SS"
 Globals="Globals"
 Desktop="Desktop"
 
@@ -349,11 +349,12 @@ UsedLibrary="C:/app/hwiguna/product/EagleCAD/lbr/zetex.lbr"
 UsedLibrary="C:/app/hwiguna/product/EagleCAD/lbr/zilog.lbr"
 UsedLibrary="C:/Users/hwiguna/Documents/eagle/CustomPart/smallpad.lbr"
 UsedLibrary="C:/app/hwiguna/product/EagleCAD/lbr/Hari/TinyHeader.lbr"
+UsedLibrary="C:/Users/hwiguna/Documents/GitHub/g33k/ArduinoProjects/2015/_Done/122-Worlds_Tiniest_LED_Cube/eagle/TinyCube/PILLAR.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="914 0 1831 1047"
-State=2
+Loc="63 -8 1911 1048"
+State=1
 Number=0
 
 [Desktop]
