@@ -1,0 +1,11 @@
+[ ] Red/green indicator to indicated that user is done!, are you ready confirms.
+
+sample code that is guaranteed to work.
+to match the wiring, to eliminate two points of failure.
+
+pitfalls to watch out:
+split power bus
+Cody did not get the way breadboard works.  
+he shorted a resistor in one breadboard metal group.
+
+input pullup was confusng
