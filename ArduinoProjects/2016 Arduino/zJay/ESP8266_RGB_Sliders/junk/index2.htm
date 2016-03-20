@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> - My ASP.NET Application</title>
+	
+    <!-- <link href="/Content/bootstrap.css" rel="stylesheet"/> -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<link href="/Content/site.css" rel="stylesheet"/>
+
+    <script src="/Scripts/modernizr-2.6.2.js"></script>
+
+
+</head>
+<body>
+<!--    <div class="navbar navbar-inverse navbar-fixed-top">
+         <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Application name</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/Home/About">About</a></li>
+                    <li><a href="/Home/Contact">Contact</a></li>
+                </ul>
+                    <ul class="nav navbar-nav navbar-right">
+        <li><a href="/Account/Register" id="registerLink">Register</a></li>
+        <li><a href="/Account/Login" id="loginLink">Log in</a></li>
+    </ul>
+
+            </div>
+        </div>
+    </div> -->
+	
+    <div class="container body-content">
+        
+<!-- <link href="/content/bootstrap-slider.min.css" rel="stylesheet"> -->
+<link href="bootstrap-slider.min.css" rel="stylesheet">
+
+<style type='text/css'>
+    #ex1Slider .slider-selection {
+        background: #BABABA;
+    }
+</style>
+
+<div class="row">
+<div class=col-md-12">
+<p>
+    <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14" />
+    <div id="out1">???</div>
+
+	</div>
+
+
+        <hr />
+        <footer>
+            <p>This page is brought to you by ESP8266</p>
+        </footer>
+    </div>
+</div>
+    <!-- <script src="/Scripts/jquery-1.10.2.js"></script> -->
+	<script src="jquery-1.12.0.min.js"></script>
+	
+<script src="/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <!-- <script src="/Scripts/bootstrap.js"></script> -->
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+<script src="/Scripts/respond.js"></script>
+
+    
+    <!-- <script type='text/javascript' src="/scripts/bootstrap-slider.min.js"></script> -->
+	<script type='text/javascript' src="bootstrap-slider.min.js"></script>
+	
+	
+    <script type='text/javascript'>
+
+        $('#ex1').slider({
+            formatter: function(value) {
+
+                $.ajax({
+                    url: "/dog/Bark",
+                    data: "a="+ value,
+                    context: document.body
+                }).done(function(data) {
+                    $('#out1').html("receieved " + data);
+                });
+
+                return 'Current value: ' + value;
+            }
+        });
+
+    </script>
+
+
+</body>
+</html>
