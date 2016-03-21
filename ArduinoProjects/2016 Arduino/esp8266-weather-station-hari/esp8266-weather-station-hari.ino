@@ -50,15 +50,18 @@ String apiKey = "66fab07952a6789b";
 String country = "NE";
 String city = "Lincoln";
 
-const byte credentialCount = 2;
-const char* credentials[] =
-{
-  "ssid1","pwd1",
-  "ssid2","pwd2"
-};
+// Declare and set these two variables here or in an include file
+//const byte credentialCount = 2; //IMPORTANT! Change this to match how many credentials you have!
+//const char* credentials[] =
+//{
+//  "ssid1","pwd1",
+//  "ssid2","pwd2"
+//};
+#include "C:\Users\hwiguna\Documents\Creds\creds.txt"
 
-char ssid[16];
-char password[16];
+const byte bufMax = 20;
+char ssid[bufMax];
+char password[bufMax];
 
 int numberOfFrames = 4;
 
@@ -194,7 +197,7 @@ void ScanWiFi()
   {
     Serial.print(n);
     Serial.println(" networks found");
-    for (int i = 0; i < n && !found; ++i)
+    for (int i = 0; (i < n) && !found; ++i)
     {
       // Print SSID and RSSI for each network found
       Serial.print(i + 1);
@@ -206,8 +209,8 @@ void ScanWiFi()
       Serial.print((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "* ");
       delay(10);
 
-      char foundssid[16];
-      WiFi.SSID(i).toCharArray(foundssid, 16);
+      char foundssid[bufMax];
+      WiFi.SSID(i).toCharArray(foundssid, bufMax);
 
       for (byte i = 0; i < credentialCount; i++)
       {
@@ -224,10 +227,8 @@ void ScanWiFi()
     }
   }
   Serial.println("");
-
-  // Wait a bit before scanning again
-  delay(5000);
 }
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -249,25 +250,22 @@ void setup() {
     counter++;
   }
 
-  Serial.println("x1");
-
   timeClient.updateTime();
 
-  Serial.println("x2");
-
   display.setFrameCallbacks(numberOfFrames, frameCallbacks);
+  
   // how many ticks does a slide of frame take?
   display.setFrameTransitionTicks(10);
+  
   // how many ticks should we wait until the next transition begins?
   display.setFrameWaitTicks(150);
+  
   wunderground.updateConditions(apiKey, country, city);
 
-  Serial.println("x3");
   wunderground.updateForecast(apiKey, country, city);
   lastUpdate = timeClient.getFormattedTime();
 
   ticker.attach(10 * 60, setReadyForWeatherUpdate);
-
 }
 
 
