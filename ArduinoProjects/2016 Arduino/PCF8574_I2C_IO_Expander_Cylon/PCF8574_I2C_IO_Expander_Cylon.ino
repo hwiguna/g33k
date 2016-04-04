@@ -3,17 +3,35 @@
 int mode = 0;
 uint8_t error, address, curVal, val;
 
+void LedRefresh(uint8 addr)
+{
+  Wire.beginTransmission(addr);
+  Wire.write(~val);
+  error = Wire.endTransmission();
+}
+
 void OutputDemo()
 {
   for (val = 0; val <= 255; val++)
   {
     Serial.print(val);
     Serial.print(" ");
-    Wire.beginTransmission(address);
-    Wire.write(~val);
-    error = Wire.endTransmission();
+    LedRefresh(address);
     Serial.println(error);
     delay(200);
+  }
+}
+
+void CylonDemo()
+{
+  for (uint8 chip = 0; chip < 2; chip++)
+  {
+    for (uint8 i = 0; i < 9; i++)
+    {
+      val = 0x01 << i;
+      LedRefresh(address + chip);
+      delay(200);
+    }
   }
 }
 
@@ -101,17 +119,18 @@ void ToggleDemo()
 void setup() {
   Serial.begin(9600);
   //Wire.begin(); // Arduino needs (SDA=A4,SCL=A5)
-  Wire.begin(0,2); // ESP8266 needs (SDA=GPIO0,SCL=GPIO2)
-  address = 0x21;
+  Wire.begin(0, 2); // ESP8266 needs (SDA=GPIO0,SCL=GPIO2)
+  address = 0x20;
   curVal = 0xFF; // all off
 
-  OutputDemo();
+  //OutputDemo();
 }
 
 void loop() {
   //InputDemo();
   //IODemo();
   //ToggleDemo();
+  CylonDemo();
 }
 
 //  //-- Show current bit states --
