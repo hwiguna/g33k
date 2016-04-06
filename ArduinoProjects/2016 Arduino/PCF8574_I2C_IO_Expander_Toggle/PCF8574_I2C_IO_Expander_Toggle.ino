@@ -19,11 +19,17 @@ void OutputDemo()
 
 void InputDemo()
 {
-  Wire.beginTransmission( address );
+  //-- To read we need to first set all outputs to HIGH --
+  Wire.beginTransmission(address);
   Wire.write(0xFF); // Get ready to read all bits
+  error = Wire.endTransmission();
+
+  //-- Read all switches --
+  Wire.beginTransmission( address );
   Wire.requestFrom((int)address, 1); // Ask for 1 byte from slave
   val = ~Wire.read(); // read that one byte
   error = Wire.endTransmission();
+
   Serial.print(val, BIN);
   Serial.print(" ");
   Serial.println(error);
