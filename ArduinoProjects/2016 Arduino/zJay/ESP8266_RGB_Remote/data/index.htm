@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP8266 RGB LED Remote</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.1/css/bootstrap-slider.min.css" rel="stylesheet">
+
+    <style type='text/css'>
+        .hw-slider {
+            margin-bottom: 30px; 
+        }
+
+         #redSlider .slider-selection {
+             background: #FF0000;
+         }
+
+        #greenSlider .slider-selection {
+            background: #00FF00;
+        }
+
+        #blueSlider .slider-selection {
+            background: #0000FF;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container body-content">
+        <h1>ESP8266 RGB LED Remote</h1>
+
+        <div class="row hw-slider">
+            <div class="col-md-1">Red</div>
+            <div class=col-md-10">
+                <input id="red" data-slider-id='redSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255" />
+            </div>
+        </div>
+
+        <div class="row hw-slider">
+            <div class="col-md-1">Green</div>
+            <div class=col-md-10">
+                <input id="green" data-slider-id='greenSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255"/>
+            </div>
+        </div>
+
+        <div class="row hw-slider">
+            <div class="col-md-1">Blue</div>
+            <div class=col-md-10">
+                <input id="blue" data-slider-id='blueSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255" />
+            </div>
+        </div>
+        <div id="out1">???</div>
+    </div>
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.1/bootstrap-slider.min.js"></script>
+
+<script type='text/javascript'>
+
+    $('#red').slider({
+        formatter: function (value) {
+
+            $.ajax({
+                url: "/set",
+                data: "r=" + value,
+                context: document.body
+            }).done(function (data) {
+                $('#out1').html("received " + data);
+            });
+
+            return 'Current value: ' + value;
+        }
+    });
+
+    $('#green').slider();
+    $('#blue').slider();
+
+
+</script>

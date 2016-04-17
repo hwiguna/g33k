@@ -1,10 +1,5 @@
-/*
-    This sketch sends data via HTTP GET requests to data.sparkfun.com service.
-
-    You need to get streamId and privateKey at data.sparkfun.com and paste them
-    below. Or just customize this script to talk to other HTTP servers.
-
-*/
+// PCF8574 WebServer, listens for /inline?state=
+// Hari Wiguna, 2016
 
 #include <ESP8266WiFi.h>
 
@@ -21,9 +16,7 @@ const byte bufMax = 20;
 char ssid[bufMax];
 char password[bufMax];
 
-//int num = 258;
-
-const char* host = "192.168.254.114";
+const char* host = "192.168.254.114"; // As reported by the webserver
 
 void ScanWiFi()
 {
@@ -101,13 +94,6 @@ uint8_t ReadButtons(uint8 offset)
   val = ~Wire.read(); // read that one byte, invert so pressing the button would set the bit high
   error = Wire.endTransmission();
 
-//  Serial.print("buttons on chip ");
-//  Serial.print(offset);
-//  Serial.print(" = ");
-//  Serial.print(val, BIN);
-//  Serial.print(" ");
-//  Serial.println(error);
-
   return val;
 }
 
@@ -177,13 +163,13 @@ void loop() {
     }
 
     // Read all the lines of the reply from server and print them to Serial
-//    while (client.available()) {
-//      String line = client.readStringUntil('\r');
-//      Serial.print(line);
-//    }
+    //    while (client.available()) {
+    //      String line = client.readStringUntil('\r');
+    //      Serial.print(line);
+    //    }
 
-//    Serial.println();
-//    Serial.println("closing connection");
+    //    Serial.println();
+    //    Serial.println("closing connection");
 
     prevValue = value;
   }

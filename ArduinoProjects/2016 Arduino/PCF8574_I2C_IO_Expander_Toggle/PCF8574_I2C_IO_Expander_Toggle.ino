@@ -1,6 +1,8 @@
+// PCF8574 Binary Counter Test
+// Hari Wiguna, 2016
+
 #include <Wire.h>
 
-int mode = 0;
 uint8_t error, address, curVal, val;
 
 void OutputDemo()
@@ -74,16 +76,16 @@ void ToggleDemo()
   val = Wire.read(); // read that one byte
   error = Wire.endTransmission();
 
-  Serial.print(val, HEX);
-  Serial.print(" ");
+  //Serial.print(val, HEX);
+  //Serial.print(" ");
   if ( val != 0xFF) // Unless they're all high...
   {
     //-- Process --
-    Serial.print(curVal, BIN);
-    Serial.print(" ");
+    //Serial.print(curVal, BIN);
+    //Serial.print(" ");
     curVal ^= ~val;  // Invert every switch that is pressed (LOW).
-    Serial.print(curVal, BIN);
-    Serial.print(" ");
+    //Serial.print(curVal, BIN);
+    //Serial.print(" ");
   }
 
   //-- Wait for button release --
@@ -95,7 +97,7 @@ void ToggleDemo()
     error = Wire.endTransmission();
   }
 
-  Serial.println();
+  //Serial.println();
 
   //-- Output --
   Wire.beginTransmission(address);
@@ -104,20 +106,90 @@ void ToggleDemo()
   delay(100); // Allow humans to see curVal
 }
 
+
+
+void ExplosionDemo()
+{
+  //-- To read we need to first set all outputs to HIGH --
+  Wire.beginTransmission(address);
+  Wire.write(0xFF); // Get ready to read all bits
+  error = Wire.endTransmission();
+
+  //-- Read all switches --
+  Wire.beginTransmission( address );
+  Wire.requestFrom((int)address, 1); // Ask for 1 byte from slave
+  val = Wire.read(); // read that one byte
+  error = Wire.endTransmission();
+
+  //Serial.print(val, HEX);
+  //Serial.print(" ");
+  if ( val != 0xFF) // Unless they're all high...
+  {
+    //-- Process --
+    //Serial.print(curVal, BIN);
+    //Serial.print(" ");
+    curVal ^= ~val;  // Invert every switch that is pressed (LOW).
+    //Serial.print(curVal, BIN);
+    //Serial.print(" ");
+  }
+
+  //-- Wait for button release --
+  while ( val != 0xFF )
+  {
+    Wire.beginTransmission( address );
+    Wire.requestFrom((int)address, 1); // Ask for 1 byte from slave
+    val = Wire.read(); // read that one byte
+    error = Wire.endTransmission();
+  }
+
+  //Serial.println();
+
+// Find lowest pressed switch --
+int sw = -1;
+for (byte b=0; b<8; b++)
+if (bitRead(curVal,b)==0) {
+  sw = b;
+  curVal=0xFF;
+  exit;
+}
+  //=== Explode ===
+  if(sw!=-1)
+  for (int i=0; i<8; i++)
+  {
+  uint8_t oo = 0xFF;
+    int left = sw-i;
+    int rite = sw+i;
+    if (left>=0)  bitClear(oo,left);
+    if (rite<=7)  bitClear(oo,rite);
+  
+  //-- Output --
+  Wire.beginTransmission(address);
+  Wire.write(oo);
+  error = Wire.endTransmission();
+  
+  delay(70); // Allow humans to see curVal
+  
+   Wire.beginTransmission(address);
+  Wire.write(0xFF);
+  error = Wire.endTransmission();
+  }
+}
+
 void setup() {
   Serial.begin(9600);
-  //Wire.begin(); // Arduino needs (SDA=A4,SCL=A5)
-  Wire.begin(0,2); // ESP8266 needs (SDA=GPIO0,SCL=GPIO2)
-  address = 0x21;
+  Wire.begin(); // Arduino needs (SDA=A4,SCL=A5)
+  //Wire.begin(0,2); // ESP8266 needs (SDA=GPIO0,SCL=GPIO2)
+  address = 0x20;
   curVal = 0xFF; // all off
 
-  OutputDemo();
+  //OutputDemo();
 }
 
 void loop() {
   //InputDemo();
   //IODemo();
   //ToggleDemo();
+  ExplosionDemo();
 }
 
 //  //-- Show current bit states --

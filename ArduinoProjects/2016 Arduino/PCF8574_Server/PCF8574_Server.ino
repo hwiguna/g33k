@@ -1,3 +1,6 @@
+// PCF8574 WebServer, listens for /inline?state=
+// Hari Wiguna, 2016
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -17,8 +20,6 @@ char ssid[bufMax];
 char password[bufMax];
 
 ESP8266WebServer server(80);
-
-const int led = 13;
 
 void ScanWiFi()
 {
@@ -85,19 +86,6 @@ void LedRefresh(uint8 addr)
   error = Wire.endTransmission();
 }
 
-void CylonDemo()
-{
-  for (uint8 chip = 0; chip < 2; chip++)
-  {
-    for (uint8 i = 0; i < 9; i++)
-    {
-      val = 0x01 << i;
-      LedRefresh(address + chip);
-      delay(200);
-    }
-  }
-}
-
 void SetLeds(int num)
 {
   val = num & 0xFF;
@@ -109,13 +97,10 @@ void SetLeds(int num)
 
 //------------------------------------
 void handleRoot() {
-  digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(led, 0);
 }
 
 void handleNotFound(){
-  digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -128,12 +113,9 @@ void handleNotFound(){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
 }
 
 void setup(void){
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
   Serial.begin(115200);
 
   ScanWiFi(); 
@@ -157,6 +139,8 @@ void setup(void){
 
   server.on("/", handleRoot);
 
+
+  //=== PCF8574 Specific code ===
   server.on("/inline", [](){
     String state = server.arg("state");
     int num = state.toInt();
@@ -164,6 +148,8 @@ void setup(void){
     server.send(200, "text/plain", out);
     SetLeds(num);
   });
+  //=== PCF8574 Specific code ===
+
 
   server.onNotFound(handleNotFound);
 
@@ -171,11 +157,11 @@ void setup(void){
   Serial.println("HTTP server started");
 
   //--- LED ---
+  //Wire.begin(); // Arduino needs (SDA=A4,SCL=A5)
   Wire.begin(0, 2); // ESP8266 needs (SDA=GPIO0,SCL=GPIO2)
   address = 0x20;
 }
 
 void loop(void){
   server.handleClient();
-  //CylonDemo();
 }

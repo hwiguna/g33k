@@ -138,9 +138,9 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-//  if (MDNS.begin("esp8266")) {
-//    Serial.println("MDNS responder started");
-//  }
+  if (MDNS.begin("esp8266")) {
+    Serial.println("MDNS responder started");
+  }
 
   server.on("/test", []() {
     server.send(200, "text/plain", "ESP Server is working :-)");
