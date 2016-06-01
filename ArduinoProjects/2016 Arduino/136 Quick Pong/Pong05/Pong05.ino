@@ -14,10 +14,7 @@ u8g_uint_t paddleWidth = 2;
 u8g_uint_t paddleHeight = ballHeight * 3;
 
 //== Game variables ==
-u8g_uint_t courtWidth, courtHeight;
-u8g_uint_t x, y;
-u8g_uint_t dx, dy;
-u8g_uint_t py0, py1;
+u8g_uint_t courtWidth,courtHeight, x,y, dx,dy, py0,py1;
 unsigned long timeToMove = 0;
 
 //== Methods ==
@@ -103,18 +100,10 @@ void setup(void) {
   u8g.setRot180();  // flip screen
 
   // assign default color value
-  if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
-    u8g.setColorIndex(255);     // white
-  }
-  else if ( u8g.getMode() == U8G_MODE_GRAY2BIT ) {
-    u8g.setColorIndex(3);         // max intensity
-  }
-  else if ( u8g.getMode() == U8G_MODE_BW ) {
-    u8g.setColorIndex(1);         // pixel on
-  }
-  else if ( u8g.getMode() == U8G_MODE_HICOLOR ) {
-    u8g.setHiColorByRGB(255, 255, 255);
-  }
+  if ( u8g.getMode() == U8G_MODE_R3G3B2 ) u8g.setColorIndex(255); // white
+  if ( u8g.getMode() == U8G_MODE_GRAY2BIT ) u8g.setColorIndex(3); // max intensity
+  if ( u8g.getMode() == U8G_MODE_BW ) u8g.setColorIndex(1);       // pixel on
+  if ( u8g.getMode() == U8G_MODE_HICOLOR ) u8g.setHiColorByRGB(255, 255, 255);
 
   courtWidth = u8g.getWidth();
   courtHeight = u8g.getHeight();
@@ -124,18 +113,14 @@ void setup(void) {
 
 void loop(void) {
   u8g.firstPage();
-
   do {
     py0 = map( analogRead(p0Pin), 0, 1023, 0, u8g.getHeight() - paddleHeight);
-    drawPaddle(0, py0);
-
     py1 = map( analogRead(p1Pin), 0, 1023, 0, u8g.getHeight() - paddleHeight);
+    drawPaddle(0, py0);
     drawPaddle(courtWidth - paddleWidth, py1);
-
     DrawCourt();
     DrawBall();
     MoveBall();
   } while ( u8g.nextPage() );
-
 }
 
