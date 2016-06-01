@@ -22,8 +22,8 @@ u8g_uint_t py0;
 u8g_uint_t py1;
 u8g_uint_t courtWidth;
 u8g_uint_t courtHeight;
-byte litePin = 7; //TODO: Kill
-int liteBrightness = 100; //TODO: Kill
+byte p0Pin = A1;
+byte p1Pin = A0;
 
 unsigned long timeToMove = 0;
 const int tapeMax = 40;
@@ -37,13 +37,7 @@ int instantReplaySpeed = 100;
 int messageSpeed = 1000;
 
 #define STATE_RESET 0
-#define STATE_GET_READY 1
-#define STATE_GET_SET 2
-#define STATE_GET_GO 3
 #define STATE_IN_GAME 4
-#define STATE_END_OF_ROUND 5
-#define STATE_INSTANT_REPLAY 6
-#define STATE_PAUSE 7
 byte state = STATE_RESET;
 
 void drawPaddle(u8g_uint_t x, u8g_uint_t y)
@@ -57,53 +51,51 @@ bool hitsPaddle(u8g_uint_t py)
 }
 
 void PlayGame() {
-  py0 = map( analogRead(A0), 0, 1023, 0, u8g.getHeight() - paddleHeight);
+  py0 = map( analogRead(p0Pin), 0, 1023, 0, u8g.getHeight() - paddleHeight);
   drawPaddle(0, py0);
 
-  py1 = map( analogRead(A1), 0, 1023, 0, u8g.getHeight() - paddleHeight);
+  py1 = map( analogRead(p1Pin), 0, 1023, 0, u8g.getHeight() - paddleHeight);
   drawPaddle(courtWidth - paddleWidth, py1);
 
   //-- Draw court --
   u8g.drawHLine(0, 0, courtWidth);
   u8g.drawHLine(0, courtHeight - 1, courtWidth);
 
-  // Draw Ball --
+byte dash = 3;
+  for (byte y=0; y<(courtHeight/dash/2); y++)
+  {
+  u8g.drawVLine(courtWidth/2, 2 + y*dash*2, dash);
+  }
+  
+  //-- Draw Ball --
   u8g.drawBox(x, y, ballWidth, ballHeight);
 
   if (millis() > timeToMove) {
     x = x + dx;
     u8g_int_t prevDx = dx;
     u8g_int_t prevDy = dy;
-    if ( (x <= 0) && hitsPaddle(py0) ) {dx = -dx; Beep();}
-    if ( ((x + ballWidth) >= courtWidth) && hitsPaddle(py1)) {dx = -dx; Beep();}
+    if (x <= 0)
+      if (hitsPaddle(py0)) {
+        dx = -dx;
+        Beep();
+      }
+      else
+        state = STATE_RESET;
+
+    if ((x + ballWidth) >= courtWidth)
+      if (hitsPaddle(py1)) {
+        dx = -dx;
+        Beep();
+      }
+      else
+        state = STATE_RESET;
 
     y = y + dy;
-    if ( (y <= 0) || ((y + ballHeight) >= u8g.getHeight())) {dy = -dy; Beep();}
-
-    //-- Record Positions --
-    tapePy0[tapePos] = py0;
-    tapePy1[tapePos] = py1;
-    tapeX[tapePos] = x;
-    tapeY[tapePos] = y;
-    Serial.print("tapePos=");
-    Serial.println(tapePos);
-    tapePos++;
-    if (tapePos >= tapeMax) tapePos = 0;
-
-    timeToMove = millis() + animationSpeed;
-
-    // Someone failed to bounce the ball, prepare for instant replay state
-    if (x < 0 || x > courtWidth) {
-      f = tapePos;
-      state = STATE_END_OF_ROUND;
-      timeToMove = millis() + messageSpeed;
+    if ( (y <= 0) || ((y + ballHeight) >= u8g.getHeight())) {
+      dy = -dy;
+      Beep();
     }
-//    else {
-//      if ((prevDx!=dx) || (prevDy!=dy))
-//      {
-//        tone(2, 1047, 2);
-//      }
-//    }
+    timeToMove = millis() + animationSpeed;
   }
 }
 
@@ -159,9 +151,6 @@ void setup(void) {
   Serial.print("courtWidth=");
   Serial.println(courtWidth);
   courtHeight = u8g.getHeight();
-
-  pinMode(litePin, OUTPUT);
-  //analogWrite(litePin,liteBrightness);
   Serial.println("start");
 
   state = STATE_RESET;
@@ -183,28 +172,13 @@ void DrawFrame(int f)
 
 }
 
-void InstantReplay()
-{
-  Serial.print("*f=");
-  Serial.println(f);
 
-  DrawFrame(f);
-
-  if (millis() > timeToMove) {
-    f++;
-    if (f >= tapeMax) f = 0;
-    if (f == tapePos) {
-      state = STATE_PAUSE;
-    }
-    timeToMove = millis() + instantReplaySpeed;
-  }
-}
 
 void DisplayMessage(char* message)
 {
   u8g.setFont(u8g_font_osb21);
   u8g.setFontPosCenter(); // vertical alignment
-  u8g.drawStr( (courtWidth - u8g.getStrWidth(message))/2, courtHeight/2, message);
+  u8g.drawStr( (courtWidth - u8g.getStrWidth(message)) / 2, courtHeight / 2, message);
 
   if (millis() > timeToMove) {
     state++;
@@ -224,8 +198,10 @@ void Reset()
 {
   x = courtWidth / 2;
   y = courtHeight / 2;
+  dx = -dx;
+  dy = -dy;
   if (millis() > timeToMove) {
-    state = STATE_GET_READY;
+    state = STATE_IN_GAME;
     timeToMove = millis() + messageSpeed;
   }
 }
@@ -235,13 +211,13 @@ void loop(void) {
 
   do {
     if (state == STATE_RESET ) Reset();
-    if (state == STATE_GET_READY ) DisplayMessage("Ready");
-    if (state == STATE_GET_SET ) DisplayMessage("Set");
-    if (state == STATE_GET_GO ) DisplayMessage("Go!");
+    //    if (state == STATE_GET_READY ) DisplayMessage("Ready");
+    //    if (state == STATE_GET_SET ) DisplayMessage("Set");
+    //    if (state == STATE_GET_GO ) DisplayMessage("Go!");
     if (state == STATE_IN_GAME) PlayGame();
-    if (state == STATE_END_OF_ROUND) DisplayMessage("Replay");
-    if (state == STATE_INSTANT_REPLAY) InstantReplay();
-    if (state == STATE_PAUSE) PauseThenReset();
+    //    if (state == STATE_END_OF_ROUND) DisplayMessage("Replay");
+    //    if (state == STATE_INSTANT_REPLAY) InstantReplay();
+    //    if (state == STATE_PAUSE) PauseThenReset();
   } while ( u8g.nextPage() );
 
 }
