@@ -1,0 +1,41 @@
+#######################################
+# Syntax Coloring Map For PCD8544_SPI
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+PCD8544_SPI	KEYWORD1
+PCD8544_SPI_FB	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+clear	KEYWORD2
+gotoXY	KEYWORD2
+writeBitmap	KEYWORD2
+renderAll	KEYWORD2
+renderString	KEYWORD2
+setPixel	KEYWORD2
+writeLine	KEYWORD2
+writeRect	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+PIN_DC	LITERAL1
+PIN_RESET	LITERAL1
+PIN_CE	LITERAL1
+PINS_CE_DC	LITERAL1
+PCD8544_COMMAND	LITERAL1
+PCD8544_DATA	LITERAL1
+PCD8544_X_PIXELS	LITERAL1
+PCD8544_Y_PIXELS	LITERAL1
+PCD8544_ROWS	LITERAL1
+PCD8544_SUCCESS	LITERAL1
+PCD8544_ERROR	LITERAL1
+BUF_LEN	LITERAL1
