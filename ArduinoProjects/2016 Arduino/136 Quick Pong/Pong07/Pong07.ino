@@ -9,7 +9,8 @@ byte p0Pin = A1;
 byte p1Pin = A0;
 u8g_uint_t ballWidth = 4;
 u8g_uint_t ballHeight = 4;
-u8g_uint_t animationSpeed = 40; //25;
+u8g_uint_t initialAnimationSpeed = 36;
+u8g_uint_t animationSpeed = initialAnimationSpeed;
 u8g_uint_t paddleWidth = 2;
 u8g_uint_t paddleHeight = ballHeight * 3;
 
@@ -52,12 +53,13 @@ void BounceX()
 {
   Beep();
   dx = -dx;
-  animationSpeed--;
+  animationSpeed -= 2; // Speed up with every bounce off paddle
 }
 
 void Missp0() // Left player missed the ball, start ball at right paddle
 {
   score1++;
+  animationSpeed = initialAnimationSpeed;
   x = courtWidth - ballWidth - 1;
   y = py1 + (paddleHeight - ballHeight) / 2;
   dx = -1;
@@ -68,6 +70,7 @@ void Missp0() // Left player missed the ball, start ball at right paddle
 void Missp1() // Right player missed the ball, start ball at left paddle
 {
   score0++;
+  animationSpeed = initialAnimationSpeed;
   x = 0;
   y = py0 + (paddleHeight - ballHeight) / 2;
   dx = +1;
