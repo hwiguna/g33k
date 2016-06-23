@@ -8,6 +8,8 @@
 
 //== Preferences ==
 U8GLIB_PCD8544 u8g(13, 11, 9, 8, 10); // SPI Com: SCK = 13, MOSI = 11, CS = 9, A0/DataCommand = 8, Reset = 10
+
+// Analog pins where we connect the potentiometers to
 int paddle0Pin = A1;
 int paddle1Pin = A0;
 
@@ -39,9 +41,12 @@ void MoveBall()
 
 void DrawPaddle(u8g_uint_t paddleX, int paddlePin)
 {
-  int analogValue = analogRead(paddlePin);
-  u8g_uint_t paddleY = map(analogValue, 0,1023, 0,courtHeight-paddleHeight);
+  int analogValue = analogRead(paddlePin); // returns 0 through 1023
   
+  // Convert analogValue ranging from 0..1023 to paddleY ranging from 0..(courtHeight-paddleHeight)
+  u8g_uint_t paddleY = map(analogValue, 0,1023, 0,courtHeight-paddleHeight);
+
+  // Draw the paddle
   u8g.drawBox(paddleX, paddleY, paddleWidth, paddleHeight);
 }
 
