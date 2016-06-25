@@ -31,7 +31,7 @@ u8g_uint_t zoomSpeed = 1;
 
 //== Maze ==
 byte maze[][1] = {
-  {B00100000},
+  {B01110000},
   {B00000000},
   {B01010000},
   {B01000000},
@@ -40,8 +40,7 @@ byte maze[][1] = {
   {B00010000},
   {B01000000},
 };
-u8g_uint_t youCol=2, youRow=7;
-
+u8g_uint_t youCol=2, youRow=7, rowDir=-1;
 
 void XToCorners(u8g_uint_t x, Point* points) {
   u8g_uint_t y = (u8g_uint_t)(1.0 * x * ratio);
@@ -59,17 +58,6 @@ void DrawWalls(Point* outer, Point* inner, byte col, byte row)
   bool hasLeftFrontWall  = bitRead(maze[row - 1][0], 7 - (col - 1));
   bool hasBackWall       = bitRead(maze[row - 1][0], 7 - col);
   bool hasRightFrontWall = bitRead(maze[row - 1][0], 7 - (col + 1));
-
-  if (millis() > timeToDebug) {
-    Debug("hasLeftSideWall", hasLeftSideWall);
-    Debug("hasFrontWall", hasFrontWall);
-    Debug("hasRightSideWall", hasRightSideWall);
-
-    Debug("hasLeftFrontWall", hasLeftFrontWall);
-    Debug("hasBackWall", hasBackWall);
-    Debug("hasRightFrontWall", hasRightFrontWall);
-    timeToDebug = millis() + 5000;
-  }
 
   //-- Left Side Wall --
   if (hasLeftSideWall) {
@@ -123,13 +111,13 @@ void DrawWalls(Point* outer, Point* inner, byte col, byte row)
 void DrawMaze()
 {
     if (millis() > timeToMove) {
-      
        zoom += zoomSpeed;
        if (zoom>=hInset)
        {
         zoom=0;
-        youRow -= 1;
-        if (youRow==0) zoomSpeed=0;
+        youRow += rowDir;
+        if (youRow<1) {youRow=7; }
+        //if (youRow>7) {youRow=7; rowDir=-1; zoomSpeed=+1;}
        }
 
       XToCorners(screenHalfWidth - hInset * 0       , corners[0]);
@@ -137,15 +125,6 @@ void DrawMaze()
       XToCorners(screenHalfWidth - hInset * 2 + zoom, corners[2]);
       XToCorners(screenHalfWidth - hInset * 3 + zoom, corners[3]);
     
-//      DebugPoint("corners[0][0]", corners[0][0]);
-//      DebugPoint("corners[0][1]", corners[0][1]);
-//      DebugPoint("corners[0][2]", corners[0][2]);
-//      DebugPoint("corners[0][3]", corners[0][3]);
-//    
-//      DebugPoint("corners[1][0]", corners[1][0]);
-//      DebugPoint("corners[1][1]", corners[1][1]);
-//      DebugPoint("corners[1][2]", corners[1][2]);
-//      DebugPoint("corners[1][3]", corners[1][3]);
       timeToMove = millis() + 100;
     }
 
@@ -154,7 +133,6 @@ void DrawMaze()
   DrawWalls(corners[0], corners[1], youCol, youRow);
   DrawWalls(corners[1], corners[2], youCol, youRow-1);
   DrawWalls(corners[2], corners[3], youCol, youRow-2);
-
 }
 
 void setup(void) {
@@ -167,21 +145,6 @@ void setup(void) {
 
   hInset = screenWidth / 7;
   ratio = 1.0 * screenHalfHeight / screenHalfWidth;
-
-//  XToCorners(screenHalfWidth - hInset * 0, corners[0]);
-//  XToCorners(screenHalfWidth - hInset * 1, corners[1]);
-//  XToCorners(screenHalfWidth - hInset * 2, corners[2]);
-//  XToCorners(screenHalfWidth - hInset * 3, corners[3]);
-//
-//  DebugPoint("corners[0][0]", corners[0][0]);
-//  DebugPoint("corners[0][1]", corners[0][1]);
-//  DebugPoint("corners[0][2]", corners[0][2]);
-//  DebugPoint("corners[0][3]", corners[0][3]);
-//
-//  DebugPoint("corners[1][0]", corners[1][0]);
-//  DebugPoint("corners[1][1]", corners[1][1]);
-//  DebugPoint("corners[1][2]", corners[1][2]);
-//  DebugPoint("corners[1][3]", corners[1][3]);
 }
 
 void loop(void) {
