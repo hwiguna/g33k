@@ -1,3 +1,5 @@
+unsigned long timeToDebug;
+
 void Debug(String label, int value)
 {
   Serial.print(label);

@@ -25,6 +25,14 @@ void MoveForward()
   if (youDir == 3 && youCol > 0) youCol--; // Facing West
 }
 
+void MoveBackward()
+{
+  if (youDir == 0 && youRow < 7) youRow++; // Facing North
+  if (youDir == 1 && youCol > 0) youCol--; // Facing East
+  if (youDir == 2 && youRow > 0) youRow--; // Facing South
+  if (youDir == 3 && youCol < 7) youCol++; // Facing West
+}
+
 void GoHome()
 {
   youRow = 6;
@@ -41,7 +49,7 @@ void CheckButtons()
   if (!digitalRead(leftPin)) TurnLeft();
   if (!digitalRead(rightPin)) TurnRight();
   if (!digitalRead(upPin)) MoveForward();
-  if (!digitalRead(downPin)) GoHome();
+  if (!digitalRead(downPin)) MoveBackward();
 
   if (youRow != oldRow || youCol != oldCol || youDir != oldDir) {
     Serial.println("==============");
