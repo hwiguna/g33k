@@ -5,10 +5,6 @@ u8g_uint_t shift;
 u8g_uint_t x0, y0;
 bool blocked;
 
-//== Screen ==
-u8g_uint_t screenWidth, screenHeight;
-u8g_uint_t screenHalfWidth, screenHalfHeight;
-
 void SetupDrawing()
 {
   u8g.setRot180();  // flip screen
@@ -87,21 +83,21 @@ void DebugWalls()
   }
 }
 
-void SlideFromRight(byte depth, Point* outs, Point* ins)
+void TurnRightAnimation(byte depth, Point* outs, Point* ins)
 {
-  for (byte i=0;i<4;i++) {
-    if (depth!=0)
-      outs[i].X = outs[i].X / (turnSpeed - hShift);
-    ins[i].X = ins[i].X /  (turnSpeed - hShift);
+  for (byte i = 0; i < 4; i++) {
+    //if (depth != 0)
+      outs[i].X = max(0, outs[i].X -   hShift);
+    ins[i].X = max(0,ins[i].X -   hShift);
   }
 }
 
-void SlideFromLeft(byte depth, Point* outs, Point* ins)
+void TurnLeftAnimation(byte depth, Point* outs, Point* ins)
 {
-  for (byte i=0;i<4;i++) {
-    if (depth!=0)
-      outs[i].X = outs[i].X / hShift;
-    ins[i].X = ins[i].X /  hShift;
+  for (byte i = 0; i < 4; i++) {
+    //if (depth != 0)
+      outs[i].X = min(screenWidth,outs[i].X + hShift);
+    ins[i].X = min(screenWidth,ins[i].X +  hShift);
   }
 }
 
@@ -111,8 +107,8 @@ void DrawWalls(byte depth, byte col, byte row)
   XToCorners(screenHalfWidth - hInset * depth       + (depth == 0 ? 0 : zoom), outs);
   XToCorners(screenHalfWidth - hInset * (depth + 1) + zoom, ins);
 
-  if (youRotDir > 0) SlideFromLeft(depth, outs, ins);
-  if (youRotDir < 0) SlideFromRight(depth, outs, ins);
+  if (youRotDir > 0) TurnRightAnimation(depth, outs, ins);
+  if (youRotDir < 0) TurnLeftAnimation(depth, outs, ins);
 
   if (youDir == 0) LookNorth(row - depth, col);
   if (youDir == 1) LookEast(row, col + depth);

@@ -5,10 +5,6 @@ u8g_uint_t shift;
 u8g_uint_t x0, y0;
 bool blocked;
 
-//== Screen ==
-u8g_uint_t screenWidth, screenHeight;
-u8g_uint_t screenHalfWidth, screenHalfHeight;
-
 void SetupDrawing()
 {
   u8g.setRot180();  // flip screen
@@ -72,37 +68,52 @@ void DrawBackWall(Point* outs, Point* ins)
   u8g.drawLine(ins[3].X, ins[3].Y, ins[0].X, ins[0].Y);
 }
 
-void DebugWalls()
+//void DebugWalls(byte depth, byte col, byte row)
+//{
+//  if (millis() > timeToDebug)
+//  {
+//    Serial.println("--------------------------");
+//    Debug("depth", depth);
+//    Debug("col", col);
+//    Debug("row", row);
+//    Debug("hasFrontLeftWall", hasFrontLeftWall);
+//    Debug("hasFrontWall", hasFrontWall);
+//    Debug("hasFrontRightWall", hasFrontRightWall);
+//    Debug("hasBackLeftWall", hasBackLeftWall);
+//    Debug("hasBackWall", hasBackWall);
+//    Debug("hasBackRightWall", hasBackRightWall);
+//    timeToDebug = millis() + 2000;
+//  }
+//}
+
+void TurnRightAnimation(Point* outs, Point* ins)
 {
-  if (millis() > timeToDebug)
-  {
-    Serial.println("--------------------------");
-    Debug("hasFrontLeftWall", hasFrontLeftWall);
-    Debug("hasFrontWall", hasFrontWall);
-    Debug("hasFrontRightWall", hasFrontRightWall);
-    Debug("hasBackLeftWall", hasBackLeftWall);
-    Debug("hasBackWall", hasBackWall);
-    Debug("hasBackRightWall", hasBackRightWall);
-    timeToDebug = millis() + 2000;
+  for (byte i = 0; i < 4; i++) {
+    outs[i].X = max(0, outs[i].X -   hShift);
+    ins[i].X = max(0,ins[i].X -   hShift);
   }
 }
 
-void SlideFromRight(byte depth, Point* outs, Point* ins)
+void TurnLeftAnimation(Point* outs, Point* ins)
 {
-  for (byte i=0;i<4;i++) {
-    if (depth!=0)
-      outs[i].X = outs[i].X / (turnSpeed - hShift);
-    ins[i].X = ins[i].X /  (turnSpeed - hShift);
+  for (byte i = 0; i < 4; i++) {
+    outs[i].X = min(screenWidth,outs[i].X + hShift);
+    ins[i].X = min(screenWidth,ins[i].X +  hShift);
   }
 }
 
-void SlideFromLeft(byte depth, Point* outs, Point* ins)
+void BumpAnimation(byte depth, Point* outs, Point* ins)
 {
-  for (byte i=0;i<4;i++) {
-    if (depth!=0)
-      outs[i].X = outs[i].X / hShift;
-    ins[i].X = ins[i].X /  hShift;
+  //if (depth==0) Buzz();
+  int offset = vShift==0 ? -2 : +2;
+  for (byte i = 0; i < 4; i++) {
+    outs[i].X = min(screenWidth-1,max(0,outs[i].X - offset));
+    ins[i].X = min(screenWidth-1,max(0,ins[i].X -  offset));
   }
+//  for (byte i = 0; i < 4; i++) {
+//    outs[i].Y = min(screenHeight-1,max(0,outs[i].Y - offset));
+//    ins[i].Y = min(screenHeight-1,max(0,ins[i].Y -  offset));
+//  }
 }
 
 void DrawWalls(byte depth, byte col, byte row)
@@ -111,14 +122,15 @@ void DrawWalls(byte depth, byte col, byte row)
   XToCorners(screenHalfWidth - hInset * depth       + (depth == 0 ? 0 : zoom), outs);
   XToCorners(screenHalfWidth - hInset * (depth + 1) + zoom, ins);
 
-  if (youRotDir > 0) SlideFromLeft(depth, outs, ins);
-  if (youRotDir < 0) SlideFromRight(depth, outs, ins);
+  if (youRotDir > 0) TurnRightAnimation(outs, ins);
+  if (youRotDir < 0) TurnLeftAnimation(outs, ins);
+  if (bumpCount > 0) BumpAnimation(depth,outs,ins);
 
   if (youDir == 0) LookNorth(row - depth, col);
   if (youDir == 1) LookEast(row, col + depth);
   if (youDir == 2) LookSouth(row + depth, col);
   if (youDir == 3) LookWest(row, col - depth);
-  //DebugWalls();
+  //DebugWalls(depth,row,col);
 
   if (hasFrontWall)
     DrawFrontWall(outs, ins);

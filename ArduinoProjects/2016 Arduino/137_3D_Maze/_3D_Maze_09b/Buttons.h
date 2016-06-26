@@ -11,9 +11,10 @@ u8g_uint_t hInset;
 //== Animation ==
 unsigned long timeToMove;
 u8g_uint_t zoom = 0;
-u8g_uint_t zoomSpeed = 0;
+u8g_uint_t zoomDir = 0;
+u8g_uint_t zoomSpeed = 2;
 u8g_uint_t hShift = 0;
-u8g_uint_t turnSpeed = 10; // higher = slower
+u8g_uint_t turnSpeed = 16; // higher = faster
 
 void SetupButtons() {
   pinMode(upPin, INPUT_PULLUP);
@@ -24,13 +25,11 @@ void SetupButtons() {
 
 void TurnLeft()
 {
-  if (--youDir<0) youDir=3;
   youRotDir = -1;
 }
 
 void TurnRight()
 {
-  if (++youDir>3) youDir=0;
   youRotDir = +1;
 }
 
@@ -44,7 +43,7 @@ void MoveForward()
     Beep();
   else {
     zoom = 0;
-    zoomSpeed = 1;
+    zoomDir = +zoomSpeed;
   }
 }
 
@@ -58,28 +57,31 @@ void MoveBackward()
     Beep();
   else {
     zoom = hInset;
-    zoomSpeed = -1;
+    zoomDir = -zoomSpeed;
   }
 }
 
 void Animate()
 {
   if (youRotDir!=0 && millis() > timeToMove) {
-    hShift += 1;
-    if ((hShift<= 0) || (hShift>turnSpeed))
+    hShift += turnSpeed;
+    if ((hShift<= 0) || (hShift>=screenWidth))
     {
       hShift = 0;
+      youDir += youRotDir;
+      if (youDir<0) youDir=3;
+      if (youDir>3) youDir=0;
       youRotDir = 0;  
     }
-    timeToMove = millis() + 50;
+    timeToMove = millis() + 30;
   }
   
-  if (zoomSpeed!=0 && millis() > timeToMove) {
-    zoom += zoomSpeed;
+  if (zoomDir!=0 && millis() > timeToMove) {
+    zoom += zoomDir;
     if (zoom >= hInset || zoom <= 0)
     {
       zoom=0;
-      zoomSpeed = 0;
+      zoomDir = 0;
       youRow += youRowDir;
       youCol += youColDir;
       youRowDir=youColDir=0;
