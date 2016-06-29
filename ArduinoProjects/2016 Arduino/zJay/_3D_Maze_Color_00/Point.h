@@ -9,9 +9,9 @@
 class Point
 {
   public:
-    void Set(u8g_uint_t x, u8g_uint_t y);
-    u8g_uint_t X;
-    u8g_uint_t Y;
+    void Set(int x, int y);
+    int X;
+    int Y;
 };
 
 #endif

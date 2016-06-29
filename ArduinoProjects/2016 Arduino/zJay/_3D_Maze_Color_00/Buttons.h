@@ -6,15 +6,15 @@ byte downPin = 4;
 byte leftPin = 6;
 byte rightPin = 5;
 
-u8g_uint_t hInset;
+int hInset;
 
 //== Animation ==
 unsigned long timeToMove;
-u8g_uint_t zoom = 0;
-u8g_uint_t zoomDir = 0;
-u8g_uint_t zoomSpeed = 2;
-u8g_uint_t hShift = 0;
-u8g_uint_t turnSpeed = 16; // higher = faster
+int zoom = 0;
+int zoomDir = 0;
+int zoomSpeed = 2;
+int hShift = 0;
+int turnSpeed = 16; // higher = faster
 int bumpCount;
 int vShift = 1;
 

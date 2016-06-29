@@ -12,12 +12,12 @@
 // v0.10 - Detect Success, play winning song, fixed bugs
 
 //== Screen ==
-#include "U8glib.h"// LCD library
-U8GLIB_PCD8544 u8g(13, 11, 9, 8, 10); // SPI Com: SCK = 13, MOSI = 11, CS = 9, A0/DataCommand = 8, Reset = 10
-u8g_uint_t screenWidth, screenHeight;
-u8g_uint_t screenHalfWidth, screenHalfHeight;
+int screenWidth, screenHeight;
+int screenHalfWidth, screenHalfHeight;
+uint16_t lineColor, backgroundColor;
 
 //== See tabs above... ==
+#include "Lcd.h"   // TFTLCD specific code
 #include "Point.h" // Handy way to pass around X and Y as one variable
 #include "Debug.h" // Prints variables to Serial Monitor
 #include "Maze.h"  // The maze itself and routines to check where the walls are
@@ -27,6 +27,7 @@ u8g_uint_t screenHalfWidth, screenHalfHeight;
 
 void setup(void) {
   Serial.begin(9600); // Only used for debugging
+  SetupLcd();
   ResetMaze();        // Setup initial player position & facing direction
   SetupDrawing();     // Get screen size, horiz vs vert ratio
   SetupButtons();     // Setup pushbutton I/O pin modes to input with internal pullup resistor
@@ -36,10 +37,5 @@ void loop(void) {
   CheckEscape();  // Have user reached any of the maze edges?
   CheckButtons(); // Handle user pushbuttons
   Animate();      // Compute animation variables
-
-  // This u8g loop updates the screen (calling DrawMaze multiple times if necessary)
-  u8g.firstPage();
-  do {
-    DrawMaze();   // Draw the maze (incorporating the animation parameters)
-  } while ( u8g.nextPage() );
+  DrawMaze();     // Draw the maze (incorporating the animation parameters)
 }

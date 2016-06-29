@@ -2,23 +2,20 @@
 // Magic where the fake 3D happens
 
 float ratio;
-u8g_uint_t shift;
-u8g_uint_t x0, y0;
+int shift;
+int x0, y0;
 bool blocked;
 
 void SetupDrawing()
 {
-  u8g.setRot180();  // flip screen
-  screenWidth = u8g.getWidth();
-  screenHeight = u8g.getHeight();
   x0 = screenHalfWidth = screenWidth / 2;
   y0 = screenHalfHeight = screenHeight / 2;
   hInset = screenWidth / 7;
   ratio = 1.0 * screenHalfHeight / screenHalfWidth;
 }
 
-void XToCorners(u8g_uint_t x, Point* points) {
-  u8g_uint_t y = (u8g_uint_t)(1.0 * x * ratio);
+void XToCorners(int x, Point* points) {
+  int y = (int)(1.0 * x * ratio);
   points[0].Set(x0 - x, y0 - y); // 0 = top left
   points[1].Set(x0 + x, y0 - y); // 1 = top right
   points[2].Set(x0 + x, y0 + y); // 2 = bottom right
@@ -27,46 +24,46 @@ void XToCorners(u8g_uint_t x, Point* points) {
 
 void DrawFrontLeftWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(outs[0].X, outs[0].Y, ins[0].X, ins[0].Y);
-  u8g.drawLine(ins[0].X, ins[0].Y, ins[3].X, ins[3].Y);
-  u8g.drawLine(ins[3].X, ins[3].Y, outs[3].X, outs[3].Y);
+  tft.drawLine(outs[0].X, outs[0].Y, ins[0].X, ins[0].Y,lineColor);
+  tft.drawLine(ins[0].X, ins[0].Y, ins[3].X, ins[3].Y,lineColor);
+  tft.drawLine(ins[3].X, ins[3].Y, outs[3].X, outs[3].Y,lineColor);
 }
 
 void DrawFrontRightWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(outs[1].X, outs[1].Y, ins[1].X, ins[1].Y);
-  u8g.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y);
-  u8g.drawLine(ins[2].X, ins[2].Y, outs[2].X, outs[2].Y);
+  tft.drawLine(outs[1].X, outs[1].Y, ins[1].X, ins[1].Y,lineColor);
+  tft.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y,lineColor);
+  tft.drawLine(ins[2].X, ins[2].Y, outs[2].X, outs[2].Y,lineColor);
 }
 
 void DrawBackLeftWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(outs[0].X, ins[0].Y, ins[0].X, ins[0].Y);
-  u8g.drawLine(ins[0].X, ins[0].Y, ins[3].X, ins[3].Y);
-  u8g.drawLine(ins[3].X, ins[3].Y, outs[3].X, ins[3].Y);
+  tft.drawLine(outs[0].X, ins[0].Y, ins[0].X, ins[0].Y,lineColor);
+  tft.drawLine(ins[0].X, ins[0].Y, ins[3].X, ins[3].Y,lineColor);
+  tft.drawLine(ins[3].X, ins[3].Y, outs[3].X, ins[3].Y,lineColor);
 }
 
 void DrawBackRightWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(outs[1].X, ins[1].Y, ins[1].X, ins[1].Y);
-  u8g.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y);
-  u8g.drawLine(ins[2].X, ins[2].Y, outs[2].X, ins[2].Y);
+  tft.drawLine(outs[1].X, ins[1].Y, ins[1].X, ins[1].Y,lineColor);
+  tft.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y,lineColor);
+  tft.drawLine(ins[2].X, ins[2].Y, outs[2].X, ins[2].Y,lineColor);
 }
 
 void DrawFrontWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(outs[0].X, outs[0].Y, outs[1].X, outs[1].Y);
-  u8g.drawLine(outs[1].X, outs[1].Y, outs[2].X, outs[2].Y);
-  u8g.drawLine(outs[2].X, outs[2].Y, outs[3].X, outs[3].Y);
-  u8g.drawLine(outs[3].X, outs[3].Y, outs[0].X, outs[0].Y);
+  tft.drawLine(outs[0].X, outs[0].Y, outs[1].X, outs[1].Y,lineColor);
+  tft.drawLine(outs[1].X, outs[1].Y, outs[2].X, outs[2].Y,lineColor);
+  tft.drawLine(outs[2].X, outs[2].Y, outs[3].X, outs[3].Y,lineColor);
+  tft.drawLine(outs[3].X, outs[3].Y, outs[0].X, outs[0].Y,lineColor);
 }
 
 void DrawBackWall(Point* outs, Point* ins)
 {
-  u8g.drawLine(ins[0].X, ins[0].Y, ins[1].X, ins[1].Y);
-  u8g.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y);
-  u8g.drawLine(ins[2].X, ins[2].Y, ins[3].X, ins[3].Y);
-  u8g.drawLine(ins[3].X, ins[3].Y, ins[0].X, ins[0].Y);
+  tft.drawLine(ins[0].X, ins[0].Y, ins[1].X, ins[1].Y,lineColor);
+  tft.drawLine(ins[1].X, ins[1].Y, ins[2].X, ins[2].Y,lineColor);
+  tft.drawLine(ins[2].X, ins[2].Y, ins[3].X, ins[3].Y,lineColor);
+  tft.drawLine(ins[3].X, ins[3].Y, ins[0].X, ins[0].Y,lineColor);
 }
 
 //void DebugWalls(byte depth, byte col, byte row)
@@ -149,7 +146,8 @@ void DrawWalls(byte depth, byte col, byte row)
 
 void DrawMaze()
 {
-  u8g.drawFrame(0, 0, screenWidth, screenHeight);
+  tft.fillScreen(backgroundColor);
+  tft.drawRect(0, 0, screenWidth, screenHeight,lineColor);
 
   blocked = false; // Assume there's nothing in front of us
   for (byte depth = 0; depth < 3; depth++)
