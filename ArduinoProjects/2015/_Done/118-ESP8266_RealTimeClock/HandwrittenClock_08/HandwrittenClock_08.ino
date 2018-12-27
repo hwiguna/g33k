@@ -232,7 +232,8 @@ void DrawTime()
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, pmm / 10, black);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, pmm % 10, black);
 
-  if ((hh / 10) > 0) DrawDigit(0 * 8 - 1, y0, hh / 10, digitColor);
+  hourXoffset = (hh>=20) ? 0 : 1;
+  if ((hh / 10) > 0) DrawDigit(0 * 8 - hourXoffset, y0, hh / 10, digitColor);
   if (phh % 10 != hh % 10) DrawDigit(1 * 8 - 1, y0, hh % 10, digitColor);
   if (pmm / 10 != mm / 10) DrawDigit(2 * 8 + 1, y0, mm / 10, digitColor);
   if (pmm % 10 != mm % 10) DrawDigit(3 * 8 + 1, y0, mm % 10, digitColor);
